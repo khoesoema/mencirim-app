@@ -134,6 +134,9 @@ import { ListUserRole } from './admin/settings/userrole/List';
 import { ViewUserLog } from './admin/settings/userlog/Detail';
 import { ListUserLog } from './admin/settings/userlog/List';
 
+import { ViewErrorLog } from './admin/settings/errorlog/Detail';
+import { ListErrorLog } from './admin/settings/errorlog/List';
+
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
@@ -627,6 +630,16 @@ export function PageRoutes(props) {
 						index
 						path="/ViewUserLog/:_id"
 						element={<ViewUserLog/>}
+					/>
+					<Route
+						index
+						path="/ErrorLog"
+						element={<ListErrorLog/>}
+					/>
+					<Route
+						index
+						path="/ViewErrorLog/:_id"
+						element={<ViewErrorLog/>}
 					/>
 				</Routes>
 			</Router>

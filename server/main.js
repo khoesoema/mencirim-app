@@ -49,6 +49,7 @@ import '../imports/api/publish/Currencies';
 import '../imports/api/publish/Customers';
 import '../imports/api/publish/Locations';
 import '../imports/api/publish/Logs';
+import '../imports/api/publish/ErrorLogs';
 import '../imports/api/publish/PaymentTerms';
 import '../imports/api/publish/Pembelian';
 import '../imports/api/publish/PembelianDetail';

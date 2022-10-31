@@ -47,20 +47,10 @@ if (Meteor.isServer) {
 				this,
 				'errorlog.countList.' + searchText,
 				ErrorLogsCollections.find({
-					$or: [
-						{
-							username: {
-								$regex: searchText,
-								$options: 'i',
-							},
-						},
-						{
-							module: {
-								$regex: searchText,
-								$options: 'i',
-							},
-						},
-					],
+					module: {
+						$regex: searchText,
+						$options: 'i',
+					},
 				}),
 				{ noReady: true }
 			);
@@ -101,20 +91,10 @@ if (Meteor.isServer) {
 
 			let datasCursor = ErrorLogsCollections.find(
 				{
-					$or: [
-						{
-							username: {
-								$regex: searchText,
-								$options: 'i',
-							},
-						},
-						{
-							title: {
-								$regex: searchText,
-								$options: 'i',
-							},
-						},
-					],
+					module: {
+						$regex: searchText,
+						$options: 'i',
+					}
 				},
 				{
 					sort: sortObject,
@@ -181,13 +161,13 @@ if (Meteor.isServer) {
 			if (searchText.length > 2) {
 				let findOrObject = [
 					{
-						username: {
+						errorCode: {
 							$regex: searchText,
 							$options: 'i',
 						},
 					},
 					{
-						title: {
+						module: {
 							$regex: searchText,
 							$options: 'i',
 						},

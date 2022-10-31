@@ -51,9 +51,6 @@ if (Meteor.isServer) {
 							$regex: searchText,
 							$options: 'i',
 						},
-					},
-					{
-						sort: sortObject,
 					}
 				),
 				{ noReady: true }

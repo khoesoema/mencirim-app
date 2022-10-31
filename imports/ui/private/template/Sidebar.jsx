@@ -643,15 +643,14 @@ const Sidebar = (props) => {
 									User Log
 								</Nav.Item>
 								<Nav.Item
-									
-									eventKey="userErrorLog"
+									eventKey="errorLog"
 									className="navitem"
 									active={
-										props.currentmenu === 'userErrorLog'
+										props.currentmenu === 'errorLog'
 											? true
 											: false
 									}
-									onClick={(e) => navigate('/UserErrorLog')}
+									onClick={(e) => navigate('/ErrorLog')}
 								>
 									User Error Log
 								</Nav.Item>

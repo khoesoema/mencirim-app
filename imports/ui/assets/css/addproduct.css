@@ -1,0 +1,43 @@
+.prod-form {
+    font-size: 10px;
+    margin:5px !important;
+    margin-bottom: 5px !important;
+}
+
+.qty-kecil {
+    min-width: 50px !important;
+}
+
+.combobox {
+    width : 300px;
+}
+
+.row-qty {
+    margin-left:-5px;
+}
+
+.label {
+    font-size:10px;
+}
+
+h5 {
+    margin-top:8px;
+}
+
+.img-prod {
+    height: 185;
+    max-height : 185px;
+}
+
+.tbl-prod {
+	font-size: 11px;
+}
+
+.tbl-prod th {
+    white-space: nowrap;
+}
+
+.tbl-prod td {
+    overflow:hidden; 
+    white-space:nowrap
+}

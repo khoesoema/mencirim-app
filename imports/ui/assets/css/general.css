@@ -1,0 +1,137 @@
+.mainBackground {
+	background-color: rgba(10, 46, 161, 1) !important;
+}
+.sideBarContainer {
+	width: 15rem !important;
+}
+
+.mainContainerRoot {
+	display: flex !important;
+	flex-direction: row !important;
+	flex-wrap: nowrap !important;
+}
+.mainContent {
+	padding: 1rem !important;
+	flex: 1 !important;
+	flex-grow: 1 !important;
+	flex-shrink: 0 !important;
+	overflow: auto !important;
+	margin-top: 50px;
+	margin-left : 50px;
+	margin-right : 50px;
+}
+.breadcrumContainer {
+	display: flex !important;
+	flex-direction: row !important;
+	flex-wrap: nowrap !important;
+	justify-content: flex-end !important;
+	align-items: center !important;
+}
+
+.fakeLink {
+	cursor: pointer !important;
+}
+.fakeCursor {
+	cursor: pointer !important;
+}
+
+.selectedImage {
+	display: flex !important;
+	flex-direction: column !important;
+	flex-wrap: nowrap !important;
+	justify-content: center !important;
+	align-items: center !important;
+}
+
+.fullWidth {
+	width: 100% !important;
+}
+.react-datepicker-popper {
+	z-index: 9 !important;
+}
+
+.card{
+	height: 100% !important; 
+}
+
+.centered {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.success {
+	background-color: rgba(75, 192, 192, 1) !important;;
+	color: green !important;;
+}
+
+.text-right {
+	text-align: right !important; 
+	align-items: right !important;
+	text-align-last: right;
+}
+
+.row-modal {
+    margin-right : 50px;
+}
+
+.navlink {
+	color : #007bff !important;
+}
+
+.rowcard {
+	display: flex;
+}
+
+.action {
+	width: 150px !important;
+	text-align: center;
+}
+
+.nomor {
+	min-width: 50px !important;
+}
+
+.combobox {
+	width: 25%;
+}
+
+.inputimage {
+	width: 30% !important;  
+}
+
+.imgcontainer{
+	position: relative;
+  	width: 50%;
+}
+
+.imgcontainer img {
+	width: 100%;
+	height: auto;
+}
+
+.btnimg {
+	position: absolute;
+	top: 5%;
+	left: 165px;
+	cursor: pointer;
+}
+
+.iconmenu {
+	margin-left: 20px;
+	margin-bottom: 5px;
+	color: #0275d8;
+}
+
+.homemenu {
+	margin-left: 10px;
+	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.navitem:hover {
+	color: #3B71CA;
+}
+
+.tbl-supplier {
+	font-size: 12px;
+}

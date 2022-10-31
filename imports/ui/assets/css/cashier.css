@@ -1,0 +1,62 @@
+.kasir-container {
+	min-height: 100vh;
+	pointer-events: none !important;
+}
+
+/*
+*
+* ==========================================
+* CUSTOM UTIL CLASSES
+* ==========================================
+*
+*/
+.table-fixed tbody {
+	height: 400px;
+	overflow-y: auto;
+	width: 100%;
+}
+
+.table-fixed thead,
+.table-fixed tbody,
+.table-fixed tr,
+.table-fixed td,
+.table-fixed th {
+	display: block;
+}
+
+.table-fixed tbody td,
+.table-fixed tbody th,
+.table-fixed thead > tr > th {
+	float: left;
+	position: relative;
+
+	/*&::after {
+        content: '';
+        clear: both;
+        display: block;
+    }
+    */
+}
+
+.text-right {
+	text-align: right !important;
+}
+
+table.table-fit {
+	width: auto !important;
+	table-layout: auto !important;
+}
+table.table-fit thead th,
+table.table-fit tfoot th {
+	width: auto !important;
+}
+table.table-fit tbody td,
+table.table-fit tfoot td {
+	width: auto !important;
+}
+
+.selectedRow td,
+.selectedRow th {
+	color: white !important;
+	background-color: dodgerblue !important;
+}

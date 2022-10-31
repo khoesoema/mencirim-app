@@ -1,0 +1,39 @@
+.tbllog {
+	font-size: 14px;
+    table-layout:fixed;
+}
+
+.tbllog td {
+    overflow:hidden; 
+    white-space:nowrap
+}
+
+.nmr {
+    width: 50px !important;
+    max-width: 70px;
+    text-align: right;
+}
+
+.tanggallog {
+    width: 150px;
+}
+
+.username {
+    width: 120px;
+}
+
+.module {
+    width: 120px;
+}
+
+.desc {
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+}
+
+.act {
+    width: 70px;
+    max-width: 70px;
+    text-align: center !important;
+}

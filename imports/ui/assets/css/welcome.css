@@ -1,0 +1,75 @@
+body {
+	padding: 0 !important;
+	margin: 0 !important;
+}
+.welcomeMainContainer {
+	width: 100% !important;
+	height: 100vh !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	display: flex !important;
+	flex-direction: row !important;
+	flex-wrap: nowrap !important;
+	align-items: center !important;
+}
+
+.welcomeImageContainer {
+	background-image: url('../welcomeBG.jpg') !important;
+	background-position: center !important;
+	height: 100% !important;
+	flex-grow: 1 !important;
+	flex-shrink: 1 !important;
+}
+.welcomeLoginContainer {
+	height: 100% !important;
+	flex-grow: 1 !important;
+	flex-shrink: 1 !important;
+	display: flex !important;
+	flex-direction: column !important;
+	flex-wrap: nowrap !important;
+	justify-content: center !important;
+	align-items: center !important;
+}
+
+/* // Small devices (landscape phones, 576px and up) */
+@media (max-width: 576px) {
+	.welcomeLoginContainer {
+		background-image: url('../welcomeBG.jpg') !important;
+		padding: 0 !important;
+	}
+}
+/* // Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+	.welcomeLoginContainer {
+		background-image: url('../welcomeBG.jpg') !important;
+		padding: 0 !important;
+	}
+}
+
+/* // Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+	.welcomeLoginContainer {
+		background-image: url('welcomeBG.jpg') !important;
+	}
+}
+
+/* // Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+	.welcomeLoginContainer {
+		background-image: none !important;
+	}
+}
+
+/* // X-Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+	.welcomeLoginContainer {
+		background-image: none !important;
+	}
+}
+
+/* // XX-Large devices (larger desktops, 1400px and up) */
+@media (min-width: 1400px) {
+	.welcomeLoginContainer {
+		background-image: none !important;
+	}
+}

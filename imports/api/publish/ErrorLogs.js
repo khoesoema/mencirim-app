@@ -82,9 +82,6 @@ if (Meteor.isServer) {
 			let orderByColumn = data.orderByColumn;
 			let order = data.order;
 
-			let limit = 20;
-			let offset = (page - 1) * limit;
-
 			let sortObject = {};
 
 			sortObject[orderByColumn] = order;
@@ -98,8 +95,6 @@ if (Meteor.isServer) {
 				},
 				{
 					sort: sortObject,
-					skip: offset,
-					limit,
 				}
 			);
 

@@ -30,81 +30,22 @@ export function AddWarehouse(props) {
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogTitle, setDialogTitle] = useState('');
 	const [dialogContent, setDialogContent] = useState('');
+	
 	const [isStore, setIsStore] = useState(0);
 	const [name, setName] = useState('');
 	const [code, setCode] = useState('');
-	const [locationID, setLocationID] = useState('');
-	const [companyIDs, setCompanyIDs] = useState([]);
+	const [location, setLocation] = useState('');
 
-	const [searchLocationText, setSearchLocationText] = useState('');
-	const [searchCompanyText, setSearchCompanyText] = useState('');
-
-	const [locations, locationsLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('locations.search', {
-			searchText: searchLocationText,
-			selectedID: locationID,
-		});
-
-		let data = LocationsCollections.find({
-			$or: [
-				{
-					_id: locationID,
-				},
-				{
-					code: {
-						$regex: searchLocationText,
-						$options: 'i',
-					},
-				},
-				{
-					name: {
-						$regex: searchLocationText,
-						$options: 'i',
-					},
-				},
-			],
-		}).fetch();
-		return [data, !subs.ready()];
-	}, [searchLocationText, locationID]);
-	const [companies, companiesLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('companies.search', {
-			searchText: searchCompanyText,
-			selectedIDs: companyIDs,
-		});
-
-		let data = CompaniesCollections.find({
-			$or: [
-				{
-					_id: {
-						$in: companyIDs,
-					},
-				},
-				{
-					code: {
-						$regex: searchCompanyText,
-						$options: 'i',
-					},
-				},
-				{
-					name: {
-						$regex: searchCompanyText,
-						$options: 'i',
-					},
-				},
-			],
-		}).fetch();
-		return [data, !subs.ready()];
-	}, [searchCompanyText, companyIDs]);
 	const add = (e) => {
 		setAdding(true);
-		if (name && code && locationID) {
+		if (name && code && location) {
 			Meteor.call(
 				'warehouses.add',
 				{
 					isStore: Number(isStore),
 					name,
 					code,
-					locationID,
+					location,
 				},
 				(err, res) => {
 					if (err) {
@@ -119,7 +60,7 @@ export function AddWarehouse(props) {
 						if (resultCode === 200) {
 							setName('');
 							setCode('');
-							setLocationID('');
+							setLocation('');
 							setAdding(false);
 							setDialogOpen(true);
 							setDialogTitle(resultTitle);
@@ -268,26 +209,15 @@ export function AddWarehouse(props) {
 							<Form.ControlLabel>
 								Lokasi Gudang / Store
 							</Form.ControlLabel>
-							<SelectPicker
-								placeholder="Lokasi Gudang / Store"
+							<Form.Control
+								name="location"
 								required
+								placeholder="location"
+								value={location}
+								onChange={(e) => {
+									setLocation(e);
+								}}
 								disabled={adding}
-								data={locations.map((s) => ({
-									label: '[' + s.code + '] ' + s.name,
-									value: s._id,
-								}))}
-								style={{ width: '100%' }}
-								value={locationID}
-								onChange={(input) => {
-									setLocationID(input);
-								}}
-								onClean={() => {
-									setLocationID('');
-								}}
-								onSearch={(input) => {
-									setSearchLocationText(input);
-								}}
-								renderMenu={renderLocationsLoading}
 							/>
 						</Form.Group>
 						<Form.Group>

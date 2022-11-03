@@ -145,6 +145,61 @@ if (Meteor.isServer) {
 		}
 	});
 
+	Meteor.publish('products.list2', function products_countAll(data) {
+		try {
+			console.log('publish.products.list2');
+
+			let searchText = data.searchText;
+			let page = data.page;
+			let orderByColumn = data.orderByColumn;
+			let order = data.order;
+
+			let sortObject = {};
+
+			sortObject[orderByColumn] = order;
+
+			let datasCursor = ProductsCollections.find(
+				{
+					$or: [
+						{
+							kodeBarang: {
+								$regex: searchText,
+								$options: 'i',
+							},
+						},
+						{
+							namaBarang: {
+								$regex: searchText,
+								$options: 'i',
+							},
+						},
+					],
+				},
+				{
+					sort: sortObject,
+				}
+			);
+
+			return datasCursor;
+		} catch (tryErr) {
+			console.log(tryErr);
+			let currLine = getCurrentLine();
+			let errorCode = addErrorLog(
+				currLine.line,
+				currLine.file,
+				this,
+				'AGENT',
+				'publish.products.list2',
+				tryErr.message
+			);
+			throw new Meteor.Error(
+				'Terjadi Kesalahan',
+				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
+					errorCode
+			);
+		}
+	});
+
 	Meteor.publish('products.getByID', function products_countAll(data) {
 		try {
 			console.log('publish.products.getByID');

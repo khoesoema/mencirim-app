@@ -248,6 +248,19 @@ const Sidebar = (props) => {
 								<Nav.Item divider />
 								<Nav.Item panel style={panelStyles}> Others </Nav.Item>
 								<Nav.Item
+									eventKey="kassaMasterdata"
+									className="navitem"
+									active={
+										props.currentmenu ===
+										'kassaMasterdata'
+											? true
+											: false
+									}
+									onClick={(e) => navigate('/Kassa')}
+								>
+									Kassa
+								</Nav.Item>
+								<Nav.Item
 									
 									eventKey="currencyMasterdata"
 									className="navitem"

@@ -1,9 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
 
-import moment from 'moment-timezone';
-import 'moment/locale/id';
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, FormControl, InputGroup } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
@@ -13,26 +10,14 @@ import { Element, scroller } from 'react-scroll';
 import Modal from 'rsuite/Modal';
 import useWindowFocus from 'use-window-focus';
 
-import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-
-import { KassaCollections } from '../../../db/Kassa';
 import { CashierOnGoingTransactionsCollections } from '../../../db/Cashier';
 import '../../assets/css/cashier.css';
-
-import Clock from 'react-live-clock';
-
-moment.locale('id');
-moment.tz.setDefault('Asia/Jakarta');
 
 class CashierClass extends React.Component {
 	constructor(props) {
 		super(props);
 	}
 }
-
 export function Cashier(props) {
 	let scannedBarcode = '';
 	let navigate = useNavigate();
@@ -42,43 +27,7 @@ export function Cashier(props) {
 	const scrollRef = useRef();
 	const changeQtyRef = useRef();
 	const changeDescriptionRef = useRef();
-
-	
-	let { _id } = useParams();
-	let  kassaID = _id;
-
-	const [kassaCode, setKassaCode] = useState('');
-	const [kassaName, setKassaName] = useState('');
-
-	const [kassaData, kassaDataLoading] = useTracker(() => {
-		let isLoading = true;
-		let data = {};
-
-		if (_id) {
-			let subs = Meteor.subscribe('kassa.getByID', { _id });
-			isLoading = !subs.ready();
-
-			data = KassaCollections.findOne({ _id });
-		}
-		return [data, isLoading];
-	}, [_id]);
-
-
-	useEffect(() => {
-		if (kassaData && kassaDataLoading === false) {
-			setKassaCode(kassaData.code);
-			setKassaName(kassaData.name);
-		} else if (!kassaData && kassaDataLoading === false) {
-			setKassaCode('');
-			setKassaName('');
-		}
-	}, [kassaData, kassaDataLoading]);
-
-	//const [tanggal, setTanggal] = useState(new Date());
-
-	//useEffect(() => {
-	//	setInterval(() => setTanggal(new Date()), 30000);
- 	//}, []);
+	let { kassaID } = useParams();
 
 	const [changeQuantityDialogOpen, setChangeQuantityDialogOpen] =
 		useState(false);
@@ -96,7 +45,8 @@ export function Cashier(props) {
 	const [changeQtyAmount, setChangeQtyAmount] = useState(0);
 	const [changingQty, setChangingQty] = useState(false);
 
-	const [changeDescriptionDialogOpen, setChangeDescriptionDialogOpen] = useState(false);
+	const [changeDescriptionDialogOpen, setChangeDescriptionDialogOpen] =
+		useState(false);
 	const [changeDescriptionValue, setChangeDescriptionValue] = useState('');
 	const [changingDescription, setChangingDescription] = useState(false);
 
@@ -116,7 +66,6 @@ export function Cashier(props) {
 		}).fetch();
 		return [data, !subs.ready()];
 	}, [kassaID]);
-	
 	const [itemsCount, itemsCountLoading] = useTracker(() => {
 		let subs = Meteor.subscribe('cashierOnGoingTransactions.countList', {
 			kassaID,
@@ -549,7 +498,7 @@ export function Cashier(props) {
 		<>
 			<Container
 				fluid
-				className="kasir-container bg-light"
+				className="kasir-container text-primary bg-light"
 				style={{ 'pointer-events': 'none', pointerEvents: 'none' }}
 			>
 				<Modal
@@ -567,7 +516,6 @@ export function Cashier(props) {
 
 					<Modal.Body>{dialogContent}</Modal.Body>
 				</Modal>
-				
 				<Modal
 					backdrop={true}
 					keyboard={true}
@@ -1018,302 +966,266 @@ export function Cashier(props) {
 						</Button>
 					</Modal.Footer>
 				</Modal>
+				<div className="row">
+					<div className="col-lg-12 mx-auto rounded">
+						<div className="table-responsive table-stripped">
+							<table className="table table-fixed text-primary table-light">
+								<thead>
+									<tr>
+										<th scope="col" className="col-1">
+											#
+										</th>
+										<th scope="col" className="col-2">
+											Kode
+										</th>
+										<th scope="col" className="col-2">
+											Produk
+										</th>
+										<th
+											scope="col"
+											className="col-2 text-center"
+										>
+											Harga Barang
+										</th>
+										<th
+											scope="col"
+											className="col-1 text-center"
+										>
+											Qty
+										</th>
+										<th
+											scope="col"
+											className="col-1 text-center"
+										>
+											Satuan
+										</th>
+										<th
+											scope="col"
+											className="col-1 text-center"
+										>
+											Disc
+										</th>
+										<th
+											scope="col"
+											className="col-2 text-center"
+										>
+											Jumlah Harga
+										</th>
+									</tr>
+								</thead>
+								<tbody
+									ref={scrollRef}
+									id="productListContainer"
+								>
+									{items.map((item, index) => (
+										<tr
+											id={'item' + index}
+											tabIndex={index}
+											ref={
+												currentIndex === index
+													? currentRef
+													: undefined
+											}
+											className={
+												currentIndex === index
+													? 'selectedRow'
+													: ''
+											}
+											name={'myScrollToElement' + index}
+											onClick={(e) => {
+												setCurrentIndex(index);
+											}}
+										>
+											<td className="col-1">
+												<Element
+													name={
+														'myScrollToElement' +
+														index
+													}
+												></Element>
 
-				<Grid container spacing={2}>
-					<Grid item xs={9}>
-						<Card sx={{height:'100%', display: 'flex'}}>
-							<CardContent></CardContent>
-						</Card>
-					</Grid>
-					<Grid item xs={3}>
-						<Card>
-							<CardContent>
-								<Typography variant="h4" component="div">{kassaName}</Typography>
-								<Typography variant="body2" color="text.secondary">
-									<Clock format={'YYYY-MM-DD HH:mm:ss'} ticking={true} timezone={'Asia/Jakarta'} />
-        						</Typography>
-							</CardContent>
-						</Card>
-					</Grid>
-					<Grid item xs={9}>
-						<Card>
-							<CardContent>
-								<div className="row">
-									<div className="col-lg-12 mx-auto rounded">
-										<div className="table-responsive table-stripped">
-											<table className="table table-fixed table-light">
-												<thead>
-													<tr>
-														<th scope="col" className="col-1">
-															#
-														</th>
-														<th scope="col" className="col-2">
-															Kode
-														</th>
-														<th scope="col" className="col-2">
-															Produk
-														</th>
-														<th
-															scope="col"
-															className="col-2 text-center"
-														>
-															Harga Barang
-														</th>
-														<th
-															scope="col"
-															className="col-1 text-center"
-														>
-															Qty
-														</th>
-														<th
-															scope="col"
-															className="col-1 text-center"
-														>
-															Satuan
-														</th>
-														<th
-															scope="col"
-															className="col-1 text-center"
-														>
-															Disc
-														</th>
-														<th
-															scope="col"
-															className="col-2 text-center"
-														>
-															Jumlah Harga
-														</th>
-													</tr>
-												</thead>
-												<tbody
-													ref={scrollRef}
-													id="productListContainer"
-												>
-													{items.map((item, index) => (
-														<tr
-															id={'item' + index}
-															tabIndex={index}
-															ref={
-																currentIndex === index
-																	? currentRef
-																	: undefined
-															}
-															className={
-																currentIndex === index
-																	? 'selectedRow'
-																	: ''
-															}
-															name={'myScrollToElement' + index}
-															onClick={(e) => {
-																setCurrentIndex(index);
-															}}
-														>
-															<td className="col-1">
-																<Element
-																	name={
-																		'myScrollToElement' +
-																		index
-																	}
-																></Element>
-
-																{index + 1}
-															</td>
-															<td className="col-2">
-																{item.productCode}
-															</td>
-															<td className="col-2">
-																{item.productName}
-															</td>
-															<td className="col-2 text-center">
-																{item.productPrice
-																	.toString()
-																	.replace('.', ',')
-																	.replace(
-																		/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-																		'$1.'
-																	)}
-															</td>
-															<td className="col-1 text-center">
-																{item.productQuantity
-																	.toString()
-																	.replace('.', ',')
-																	.replace(
-																		/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-																		'$1.'
-																	)}
-															</td>
-															<td className="col-1 text-center">
-																{item.productUOMName}
-															</td>
-															<td className="col-1 text-center">
-																{item.productDiscount
-																	.toString()
-																	.replace('.', ',')
-																	.replace(
-																		/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-																		'$1.'
-																	)}
-															</td>
-															<td className="col-2 text-center">
-																{item.productSubTotal
-																	.toString()
-																	.replace('.', ',')
-																	.replace(
-																		/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-																		'$1.'
-																	)}
-															</td>
-														</tr>
-													))}
-												</tbody>
-											</table>
-										</div>
-									</div>
-								</div>
-								<div className="row">
-									<div className="col-lg-8 mx-auto rounded">
-										<p>
-											Keterangan:{' '}
-											{items[currentIndex] &&
-												items[currentIndex].productDescription}
-										</p>
-										<hr />
-									</div>
-									<div className="col-lg-4 mx-auto rounded">
-										<table className="table text-primary table-light">
-											<tbody>
-												<tr>
-													<td>Sub Total :</td>
-													<td className="pe-4 text-right">
-														{subTotal
-															.toString()
-															.replace('.', ',')
-															.replace(
-																/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-																'$1.'
-															)}
-													</td>
-												</tr>
-												<tr>
-													<td>Discount :</td>
-													<td className="pe-4 text-right">
-														{discountTotal
-															.toString()
-															.replace('.', ',')
-															.replace(
-																/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-																'$1.'
-															)}
-													</td>
-												</tr>
-												<tr>
-													<td>Grand Total :</td>
-													<td className="pe-4 text-right">
-														<h3>
-															<b>
-																{grandTotal
-																	.toString()
-																	.replace('.', ',')
-																	.replace(
-																		/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-																		'$1.'
-																	)}
-															</b>
-														</h3>
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</CardContent>
-						</Card>
-					</Grid>
-					<Grid item xs={3}>
-						<Card sx={{height:'100%', display: 'flex'}}>
-							<CardContent>
-								
-							</CardContent>
-						</Card>
-					</Grid>
-					<Grid item xs={12}>
-						<Card>
-							<CardContent>
-								<input type="text" hidden></input>
-								<div className="row">
-									<div className="col-lg-12 mx-auto">
-										<table className="table text-primary table-borderless table-light">
-											<tbody className="bg-light">
-												<tr>
-													<td colSpan={16}>
-														<InputGroup className="mb-3">
-															<FormControl
-																ref={scanRef}
-																disabled={adding}
-																value={productCode}
-																id="productCodeSearch"
-																// autoFocus
-																onKeyDown={(e) => {
-																	let currentKey = e.key;
-																}}
-																onChange={(e) => {
-																	setProductCode(
-																		e.currentTarget.value
-																	);
-																}}
-															/>
-															<Button
-																id="button-addon2"
-																variant="dark"
-																onClick={(e) => {}}
-															>
-																Cari Produk(F1)
-															</Button>
-														</InputGroup>
-													</td>
-												</tr>
-												<tr>
-													<td className="bg-dark text-white rounded text-center">
-														F2
-													</td>
-													<td className="text-dark">Ubah Qty</td>
-													<td className="bg-dark text-white rounded text-center">
-														F3
-													</td>
-													<td className="text-dark">Hapus</td>
-													<td className="bg-dark text-white rounded text-center">
-														F4
-													</td>
-													<td className="text-dark">Keterangan</td>
-													<td className="bg-dark text-white rounded text-center">
-														F5
-													</td>
-													<td className="text-dark">Diskon</td>
-													<td className="bg-dark text-white rounded text-center">
-														F6
-													</td>
-													<td className="text-dark">Member Card</td>
-													<td className="bg-dark text-white rounded text-center">
-														F7
-													</td>
-													<td className="text-dark">Print Struk</td>
-													<td className="bg-dark text-white rounded text-center">
-														F8
-													</td>
-													<td className="text-dark">Pembayaran</td>
-													<td className="bg-dark text-white rounded text-center">
-														Esc
-													</td>
-													<td className="text-dark">Log Out</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</CardContent>
-						</Card>
-					</Grid>
-				</Grid>
+												{index + 1}
+											</td>
+											<td className="col-2">
+												{item.productCode}
+											</td>
+											<td className="col-2">
+												{item.productName}
+											</td>
+											<td className="col-2 text-center">
+												{item.productPrice
+													.toString()
+													.replace('.', ',')
+													.replace(
+														/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
+														'$1.'
+													)}
+											</td>
+											<td className="col-1 text-center">
+												{item.productQuantity
+													.toString()
+													.replace('.', ',')
+													.replace(
+														/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
+														'$1.'
+													)}
+											</td>
+											<td className="col-1 text-center">
+												{item.productUOMName}
+											</td>
+											<td className="col-1 text-center">
+												{item.productDiscount
+													.toString()
+													.replace('.', ',')
+													.replace(
+														/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
+														'$1.'
+													)}
+											</td>
+											<td className="col-2 text-center">
+												{item.productSubTotal
+													.toString()
+													.replace('.', ',')
+													.replace(
+														/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
+														'$1.'
+													)}
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div className="row"></div>
+				<div className="row">
+					<div className="col-lg-8 mx-auto rounded">
+						<p>
+							Keterangan:{' '}
+							{items[currentIndex] &&
+								items[currentIndex].productDescription}
+						</p>
+						<hr />
+					</div>
+					<div className="col-lg-4 mx-auto rounded">
+						<table className="table text-primary table-light">
+							<tbody>
+								<tr>
+									<td>Sub Total :</td>
+									<td className="pe-4 text-right">
+										{subTotal
+											.toString()
+											.replace('.', ',')
+											.replace(
+												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
+												'$1.'
+											)}
+									</td>
+								</tr>
+								<tr>
+									<td>Discount :</td>
+									<td className="pe-4 text-right">
+										{discountTotal
+											.toString()
+											.replace('.', ',')
+											.replace(
+												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
+												'$1.'
+											)}
+									</td>
+								</tr>
+								<tr>
+									<td>Grand Total :</td>
+									<td className="pe-4 text-right">
+										<h3>
+											<b>
+												{grandTotal
+													.toString()
+													.replace('.', ',')
+													.replace(
+														/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
+														'$1.'
+													)}
+											</b>
+										</h3>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<input type="text" hidden></input>
+				<div className="row">
+					<div className="col-lg-12 mx-auto">
+						<table className="table text-primary table-borderless table-light">
+							<tbody className="bg-light">
+								<tr>
+									<td colSpan={16}>
+										<InputGroup className="mb-3">
+											<FormControl
+												ref={scanRef}
+												disabled={adding}
+												value={productCode}
+												id="productCodeSearch"
+												// autoFocus
+												onKeyDown={(e) => {
+													let currentKey = e.key;
+												}}
+												onChange={(e) => {
+													setProductCode(
+														e.currentTarget.value
+													);
+												}}
+											/>
+											<Button
+												id="button-addon2"
+												variant="dark"
+												onClick={(e) => {}}
+											>
+												Cari Produk(F1)
+											</Button>
+										</InputGroup>
+									</td>
+								</tr>
+								<tr>
+									<td className="bg-dark text-white rounded text-center">
+										F2
+									</td>
+									<td className="text-dark">Ubah Qty</td>
+									<td className="bg-dark text-white rounded text-center">
+										F3
+									</td>
+									<td className="text-dark">Hapus</td>
+									<td className="bg-dark text-white rounded text-center">
+										F4
+									</td>
+									<td className="text-dark">Keterangan</td>
+									<td className="bg-dark text-white rounded text-center">
+										F5
+									</td>
+									<td className="text-dark">Diskon</td>
+									<td className="bg-dark text-white rounded text-center">
+										F6
+									</td>
+									<td className="text-dark">Member Card</td>
+									<td className="bg-dark text-white rounded text-center">
+										F7
+									</td>
+									<td className="text-dark">Print Struk</td>
+									<td className="bg-dark text-white rounded text-center">
+										F8
+									</td>
+									<td className="text-dark">Pembayaran</td>
+									<td className="bg-dark text-white rounded text-center">
+										Esc
+									</td>
+									<td className="text-dark">Log Out</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</Container>
 		</>
 	);

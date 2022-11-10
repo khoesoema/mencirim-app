@@ -63,6 +63,10 @@ import { AddUOM } from './admin/masterdata/uom/Add';
 import { EditUOM } from './admin/masterdata/uom/Detail';
 import { UOMLists } from './admin/masterdata/uom/List';
 
+import { AddKassa } from './admin/masterdata/kassa/Add';
+import { EditKassa } from './admin/masterdata/kassa/Detail';
+import { KassaLists } from './admin/masterdata/kassa/List';
+
 import { AddSupplier } from './admin/masterdata/vendor/Add';
 import { EditSupplier } from './admin/masterdata/vendor/Detail';
 import { SupplierLists } from './admin/masterdata/vendor/List';
@@ -160,7 +164,7 @@ export function PageRoutes(props) {
 					/>
 					<Route
 						index
-						path="/Cashier/:warehouseID"
+						path="/Cashier/:_id"
 						// element={(props) => <DashboardPage {...props} />}
 						element={<Cashier />}
 					/>
@@ -407,6 +411,25 @@ export function PageRoutes(props) {
 						path="/EditCustomer/:_id"
 						// element={(props) => <DashboardPage {...props} />}
 						element={<EditCustomer />}
+					/>
+
+					<Route
+						index
+						path="/Kassa"
+						// element={(props) => <DashboardPage {...props} />}
+						element={<KassaLists />}
+					/>
+					<Route
+						index
+						path="/AddKassa"
+						// element={(props) => <DashboardPage {...props} />}
+						element={<AddKassa />}
+					/>
+					<Route
+						index
+						path="/EditKassa/:_id"
+						// element={(props) => <DashboardPage {...props} />}
+						element={<EditKassa />}
 					/>
 
 					<Route

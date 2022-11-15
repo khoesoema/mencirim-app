@@ -146,9 +146,9 @@ if (Meteor.isServer) {
 		try {
 			console.log('publish.userrole.getByID');
 
-			let roleid = data.roleID;
+			let _id = data._id;
 
-			let datasCursor = UserRoleCollections.find({ roleid });
+			let datasCursor = UserRoleCollections.find({ _id });
 
 			return datasCursor;
 		} catch (tryErr) {

@@ -81,7 +81,7 @@ export function EditUserRole() {
 						let resultCode = res.code;
 						let resultTitle = res.title;
 						let resultMessage = res.message;
-						if (resultcode === 200) {
+						if (resultCode === 200) {
 							setEditing(false);
 							setDialogOpen(true);
 							setDialogTitle(resultTitle);

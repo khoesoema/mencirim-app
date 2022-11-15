@@ -1,8 +1,6 @@
 .kasir-container {
 	min-height: 100vh;
-	pointer-events: none !important;
 }
-
 /*
 *
 * ==========================================

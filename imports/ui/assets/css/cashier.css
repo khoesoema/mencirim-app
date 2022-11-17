@@ -1,8 +1,6 @@
 .kasir-container {
 	min-height: 100vh;
-	pointer-events: none !important;
 }
-
 /*
 *
 * ==========================================
@@ -11,7 +9,7 @@
 *
 */
 .table-fixed tbody {
-	height: 400px;
+	height: 300px;
 	overflow-y: auto;
 	width: 100%;
 }

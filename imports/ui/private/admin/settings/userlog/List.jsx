@@ -25,7 +25,10 @@ import { faChevronCircleUp } from '@fortawesome/free-solid-svg-icons/faChevronCi
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 import SearchIcon from '@rsuite/icons/Search';
-import { FaExpandAlt } from "react-icons/fa";
+
+import Box from '@mui/material/Box';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import LaunchIcon from '@mui/icons-material/Launch';
 
 import { LogsCollections } from '../../../../../db/Logs';
 import { Topbar } from '../../../template/Topbar';
@@ -40,14 +43,14 @@ export function ListUserLog(props) {
 
 	const [searchText, setSearchText] = useState('');
 
-	const [limit, setLimit] = useState(10);
+	const [pageSize, setPageSize] = useState(10);
 
 	const [page, setPage] = useState(1);
 	const [maxPage, setMaxPage] = useState(1);
 	const [orderBy, setOrderBy] = useState('createdAt');
 	const [order, setOrder] = useState(-1);
 
-	const [UserLog, UserLogLoading] = useTracker(() => {
+	const [userLog, userLogLoading] = useTracker(() => {
 		let subs = Meteor.subscribe('userlog.list', {
 			page,
 			searchText,
@@ -83,137 +86,77 @@ export function ListUserLog(props) {
 		return [data, !subs.ready()];
 	}, [page, searchText, orderBy, order]);
 
-	const [UserLogCount, UserLogCountLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('userlog.countList', { searchText });
+	const columns = [
+		{ field: 'id', headerName: 'ID', width: 90},
+		{
+		  field: 'createdAt',
+		  headerName: 'Tanggal',
+		  width: 200,
+		  valueFormatter: params => 
+     		moment(params?.value).format("YYYY-MM-DD hh:mm:ss"),
+		},
+		{
+		  field: 'module',
+		  headerName: 'Module',
+		  width: 200,
+		},
+		{
+		  field: 'username',
+		  headerName: 'Username',
+		  width: 200,
+		},
+		{
+		  field: 'description',
+		  headerName: 'Description',
+		  sortable: false,
+		  width: 400,
+		},
+		{
+			field: '_id',
+			headerName: 'Action',
+			sortable: false,
+			width: 100,
+			align: 'center',
+			filterable: false,
+			renderCell: (params) => {
+				//console.log(params.value);
+				return (
+				  <>
+					<a className ="fakeLink"
+						onClick={( e ) => {
+							navigate('/ViewUserLog/' + params.value);
+						}}
+					>
+						<LaunchIcon /> 
+					</a>
+				  </>
+				);
+			  }
+		  },
+	];
 
-		let data = Counts.get('userlog.countList.' + searchText);
-		return [data, !subs.ready()];
-	}, [searchText]);
+	const [rows, setRows] = useState([]);
 
-	useEffect(() => {
-		setMaxPage(Math.ceil(UserLogCount / 20));
-	}, [UserLogCount]);
-
-	const [dialogOpen, setDialogOpen] = useState(false);
-	const [dialogTitle, setDialogTitle] = useState('');
-	const [dialogContent, setDialogContent] = useState('');
-	const [selectedID, setSelectedID] = useState('');
-	const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] =
-		useState(false);
-	const [deleteConfirmationDialogTitle, setDeleteConfirmationDialogTitle] =
-		useState('');
-	const [
-		deleteConfirmationDialogContent,
-		setDeleteConfirmationDialogContent,
-	] = useState('');
-
-	const [selectedDeleteID, setSelectedDeleteID] = useState('');
-	useEffect(() => {
-		if (selectedDeleteID) {
-			Meteor.call(
-				'userlog.delete',
-				{
-					_id: selectedDeleteID,
-				},
-				(err, res) => {
-					if (err) {
-						setSelectedID('');
-						setSelectedDeleteID('');
-						setDialogOpen(true);
-						setDialogTitle(err.error);
-						setDialogContent(err.reason);
-					} else if (res) {
-						let resultCode = res.code;
-						let resultTitle = res.title;
-						let resultMessage = res.message;
-						if (resultCode === 200) {
-							setSelectedID('');
-							setSelectedDeleteID('');
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
-						} else {
-							setSelectedID('');
-							setSelectedDeleteID('');
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
-						}
-					} else {
-						setSelectedID('');
-						setSelectedDeleteID('');
-						setDialogOpen(true);
-						setDialogTitle('Kesalahan Sistem');
-						setDialogContent(
-							'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						);
-					}
-				}
-			);
+	useEffect(()=>{
+		let baris = [];
+		if(userLog && userLogLoading === false) {
+			userLog.map((item, index) => {
+				baris[index]={
+					id: (index + 1),
+					...item
+				};
+			})
+			setRows(baris);
+		} else if(!userLog && userLogLoading === false) {
+			baris = [];
 		}
-	}, [selectedDeleteID]);
+	},[userLog, userLogLoading]);
+
 
 	return (
 		<>
 			<Topbar />
 			<div className="mainContainerRoot">
-				{selectedID && (
-					<Modal
-						backdrop={true}
-						keyboard={false}
-						open={deleteConfirmationDialogOpen}
-						onClose={(e) => {
-							setDeleteConfirmationDialogOpen(false);
-						}}
-					>
-						<Modal.Header>
-							<Modal.Title>
-								{deleteConfirmationDialogTitle}
-							</Modal.Title>
-						</Modal.Header>
-
-						<Modal.Body>
-							{deleteConfirmationDialogContent}
-						</Modal.Body>
-						<Modal.Footer>
-							<Button
-								onClick={(e) => {
-									setSelectedDeleteID(selectedID);
-								}}
-								appearance="primary"
-							>
-								Hapus
-							</Button>
-							<Button
-								onClick={(e) => {
-									setSelectedDeleteID('');
-									setSelectedID('');
-									setDeleteConfirmationDialogOpen(false);
-									setDeleteConfirmationDialogTitle('');
-									setDeleteConfirmationDialogContent('');
-								}}
-								appearance="subtle"
-							>
-								Batal
-							</Button>
-						</Modal.Footer>
-					</Modal>
-				)}
-				<Modal
-					backdrop={true}
-					keyboard={false}
-					open={dialogOpen}
-					onClose={(e) => {
-						setDialogOpen(false);
-					}}
-				>
-					<Modal.Header>
-						<Modal.Title>{dialogTitle}</Modal.Title>
-					</Modal.Header>
-
-					<Modal.Body>{dialogContent}</Modal.Body>
-				</Modal>{' '}
-
 				<div className="mainContent">
 					<div className="breadcrumContainer">
 						<Breadcrumb
@@ -252,209 +195,20 @@ export function ListUserLog(props) {
 						</Col>
 					</Row>
 					<hr />
-					<Table responsive striped bordered hover size="sm" className="tbllog">
-						<thead>
-							<tr>
-								<th className ="nmr">#</th>
-								<th className ="tanggallog">
-									<div
-										onClick={(e) => {
-											if (orderBy === 'createdAt') {
-												if (order === -1) {
-													setOrder(1);
-												} else if (order === 1) {
-													setOrder(-1);
-												}
-											} else {
-												setOrderBy('createdAt');
-												setOrder(1);
-											}
-										}}
-										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
-									>
-										Tanggal
-										{orderBy === 'createdAt' && (
-											<>
-												{order === 1 ? (
-													<FontAwesomeIcon
-														icon={faChevronCircleUp}
-													/>
-												) : (
-													order === -1 && (
-														<FontAwesomeIcon
-															icon={
-																faChevronCircleDown
-															}
-														/>
-													)
-												)}
-											</>
-										)}
-									</div>
-								</th>
-								<th className="username">
-									<div
-										onClick={(e) => {
-											if (orderBy === 'username') {
-												if (order === -1) {
-													setOrder(1);
-												} else if (order === 1) {
-													setOrder(-1);
-												}
-											} else {
-												setOrderBy('username');
-												setOrder(1);
-											}
-										}}
-										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
-									>
-										Username
-										{orderBy === 'username' && (
-											<>
-												{order === 1 ? (
-													<FontAwesomeIcon
-														icon={faChevronCircleUp}
-													/>
-												) : (
-													order === -1 && (
-														<FontAwesomeIcon
-															icon={
-																faChevronCircleDown
-															}
-														/>
-													)
-												)}
-											</>
-										)}
-									</div>
-								</th>
-								<th className="module">
-									<div
-										onClick={(e) => {
-											if (orderBy === 'module') {
-												if (order === -1) {
-													setOrder(1);
-												} else if (order === 1) {
-													setOrder(-1);
-												}
-											} else {
-												setOrderBy('module');
-												setOrder(1);
-											}
-										}}
-										className="fakeCursor  d-flex flex-row justify-content-between align-items-center flex-nowrap "
-									>
-										Module
-										{orderBy === 'name' && (
-											<>
-												{order === 1 ? (
-													<FontAwesomeIcon
-														icon={faChevronCircleUp}
-													/>
-												) : (
-													order === -1 && (
-														<FontAwesomeIcon
-															icon={
-																faChevronCircleDown
-															}
-														/>
-													)
-												)}
-											</>
-										)}
-									</div>
-								</th>
-								<th >Description</th>
-								<th className="act"> Action</th>
-							</tr>
-						</thead>
-						<tbody>
-							{UserLogLoading ? (
-								<tr>
-									<td colSpan={6}>
-										<center>
-											<Loader
-												size="sm"
-												content="Loading Data..."
-											/>
-										</center>
-									</td>
-								</tr>
-							) : (
-								<>
-									{UserLog.length > 0 ? (
-										<>
-											{UserLog.map((item, index) => (
-												<tr key={index}>
-													<td className="text-right">
-														{(page - 1) * limit +
-															(index + 1)}
-													</td>
-													<td className='nowrap'>
-														{moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}
-													</td>
-													<td>{item.username}</td>
-													<td>{item.title}</td>
-													<td>{item.description}</td>
-													<td style={{ textAlign: "center" }}>
-														<a className ="fakeLink"
-															onClick={( e ) => {
-																navigate('/ViewUserLog/' + item._id);
-															}}
-														>
-															<FaExpandAlt /> 
-														</a>
-													</td>
-												</tr>
-											))}
-										</>
-									) : (
-										<tr>
-											<td colSpan={10}>
-												<center>Tidak ada data</center>
-											</td>
-										</tr>
-									)}
-								</>
-							)}
-						</tbody>
-					</Table>
-					<hr />
-					<Pagination className="float-end">
-						<Pagination.First
-							onClick={(e) => {
-								setPage(1);
-							}}
-						/>
-						<Pagination.Prev
-							onClick={(e) => {
-								let nextPage = page - 1;
-								if (nextPage <= 0) {
-									setPage(1);
-								} else {
-									setPage(nextPage);
-								}
-							}}
-						/>
-						<Pagination.Item disabled>
-							{page}/{maxPage}
-						</Pagination.Item>
-						<Pagination.Next
-							onClick={(e) => {
-								let nextPage = page + 1;
-								if (nextPage > maxPage) {
-									setPage(maxPage);
-								} else {
-									setPage(nextPage);
-								}
-							}}
-						/>
-						<Pagination.Last
-							onClick={(e) => {
-								setPage(maxPage);
-							}}
-						/>
-					</Pagination>
+					<Box sx={{ height: 500, width: '100%'}}>
+    				  	<DataGrid
+							components={{ Toolbar: GridToolbar }}
+							
+							loading={userLogLoading}
+							columns={columns}
+    				  	  	rows={rows}
+							
+							pageSize={pageSize}
+							onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+							rowsPerPageOptions={[10,20,50]}
+							pagination
+    				  	/>
+    				</Box>
 				</div>
 			</div>
 		</>

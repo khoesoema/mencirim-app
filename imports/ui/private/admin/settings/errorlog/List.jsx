@@ -19,6 +19,7 @@ import SearchIcon from '@rsuite/icons/Search';
 
 import Box from '@mui/material/Box';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import LaunchIcon from '@mui/icons-material/Launch';
 
 import { ErrorLogsCollections } from '../../../../../db/Logs';
 import { Topbar } from '../../../template/Topbar';
@@ -30,8 +31,6 @@ export function ListErrorLog() {
 	let navigate = useNavigate();
 
 	const [searchText, setSearchText] = useState('');
-
-	const [limit, setLimit] = useState(10);
 
 	const [page, setPage] = useState(1);
 	const [maxPage, setMaxPage] = useState(1);
@@ -66,18 +65,6 @@ export function ListErrorLog() {
 		return [data, !subs.ready()];
 	}, [page, searchText, orderBy, order]);
 
-	const [errorLogCount, errorLogCountLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('errorlog.countList', { searchText });
-
-		let data = Counts.get('errorlog.countList.' + searchText);
-		return [data, !subs.ready()];
-	}, [searchText]);
-
-	useEffect(() => {
-		setMaxPage(Math.ceil(errorLogCount / 20));
-	}, [errorLogCount]);
-
-
 	const columns = [
 		{ field: 'id', headerName: 'ID', width: 90},
 		{
@@ -85,7 +72,7 @@ export function ListErrorLog() {
 		  headerName: 'Tanggal',
 		  width: 200,
 		  valueFormatter: params => 
-     		moment(params?.value).format("YYYY/MM/D hh:mm:ss"),
+     		moment(params?.value).format("YYYY-MM-DD hh:mm:ss"),
 		},
 		{
 		  field: 'errorCode',
@@ -103,6 +90,28 @@ export function ListErrorLog() {
 		  sortable: false,
 		  width: 400,
 		},
+		{
+			field: '_id',
+			headerName: 'Action',
+			sortable: false,
+			width: 100,
+			align: 'center',
+			filterable: false,
+			renderCell: (params) => {
+				//console.log(params.value);
+				return (
+				  <>
+					<a className ="fakeLink"
+						onClick={( e ) => {
+							navigate('/ViewErrorLog/' + params.value);
+						}}
+					>
+						<LaunchIcon /> 
+					</a>
+				  </>
+				);
+			  }
+		  },
 	];
 
 	const [rows, setRows] = useState([]);
@@ -174,6 +183,7 @@ export function ListErrorLog() {
 							
 							pageSize={pageSize}
 							onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+							rowsPerPageOptions={[10,20,50]}
 							pagination
     				  	/>
     				</Box>

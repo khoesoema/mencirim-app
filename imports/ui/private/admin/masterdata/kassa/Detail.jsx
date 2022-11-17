@@ -1,6 +1,5 @@
 import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Col, Form as BSForm, Row } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,23 +12,23 @@ import Modal from 'rsuite/Modal';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
-import { UserRoleCollections } from '../../../../../db/UserRole';
+import { KassaCollections } from '../../../../../db/Kassa';
 
 import { Topbar } from '../../../template/Topbar';
 
-export function EditUserRole() {
+export function EditKassa() {
 	let navigate = useNavigate();
 	let { _id } = useParams();
 
-	const [userroleData, userroleDataLoading] = useTracker(() => {
+	const [kassaData, kassaDataLoading] = useTracker(() => {
 		let isLoading = true;
 		let data = {};
 
 		if (_id) {
-			let subs = Meteor.subscribe('userrole.getByID', { _id });
+			let subs = Meteor.subscribe('kassa.getByID', { _id });
 			isLoading = !subs.ready();
 
-			data = UserRoleCollections.findOne({ _id });
+			data = KassaCollections.findOne({ _id });
 		}
 		return [data, isLoading];
 	}, [_id]);
@@ -40,36 +39,44 @@ export function EditUserRole() {
 	const [dialogContent, setDialogContent] = useState('');
 
 	const [previousName, setPreviousName] = useState('');
-	const [roleid, setRoleID ] = useState('');
-    const [roledesc, setRoleDesc] = useState('');
+	const [name, setName] = useState('');
+	const [code, setCode] = useState('');
+	const [desc, setDesc] = useState('');
 
 	const [selectedID, setSelectedID] = useState('');
-	const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = useState(false);
-	const [deleteConfirmationDialogTitle, setDeleteConfirmationDialogTitle] = useState('');
-	const [deleteConfirmationDialogContent, setDeleteConfirmationDialogContent] = useState('');
+	const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] =
+		useState(false);
+	const [deleteConfirmationDialogTitle, setDeleteConfirmationDialogTitle] =
+		useState('');
+	const [
+		deleteConfirmationDialogContent,
+		setDeleteConfirmationDialogContent,
+	] = useState('');
 
 	useEffect(() => {
-		if (userroleData && userroleDataLoading === false) {
-			setPreviousName(userroleData.roledesc);
-			setRoleID(userroleData.roleid);
-            setRoleDesc(userroleData.roledesc);
-		} else if (!userroleData && userroleDataLoading === false) {
-			setPreviousName('');		
-			setRoleID('');
-            setRoleDesc('');
-			navigate('/UserRole');
+		if (kassaData && kassaDataLoading === false) {
+			setPreviousName(kassaData.name);
+			setName(kassaData.name);
+			setCode(kassaData.code);
+			setDesc(kassaData.desc);
+		} else if (!kassaData && kassaDataLoading === false) {
+			setPreviousName('');
+			setName('');
+			setCode('');
+			setDesc('');
+			navigate('/Kassa');
 		}
-	}, [userroleData, userroleDataLoading]);
+	}, [kassaData, kassaDataLoading]);
 
 	const edit = async (e) => {
 		setEditing(true);
-		if (roledesc && roleid) {
+		if (name && code) {
 			await Meteor.call(
-				'userrole.edit',
+				'kassa.edit',
 				{
 					_id,
-					roleid,
-					roledesc,
+					code,
+					name,
 				},
 				(err, res) => {
 					if (err) {
@@ -106,7 +113,7 @@ export function EditUserRole() {
 			setEditing(false);
 			setDialogOpen(true);
 			setDialogTitle('Kesalahan Validasi');
-			setDialogContent('Role ID dan Role Description Wajib Diisi');
+			setDialogContent('Nama, Kode Wajib Diisi');
 		}
 	};
 
@@ -114,7 +121,7 @@ export function EditUserRole() {
 	useEffect(() => {
 		if (selectedDeleteID) {
 			Meteor.call(
-				'userrole.delete',
+				'kassa.delete',
 				{
 					_id: selectedDeleteID,
 				},
@@ -126,7 +133,7 @@ export function EditUserRole() {
 						setDialogTitle(err.error);
 						setDialogContent(err.reason);
 					} else if (res) {
-						let resultCode= res.code;
+						let resultCode = res.code;
 						let resultTitle = res.title;
 						let resultMessage = res.message;
 						if (resultCode === 200) {
@@ -227,17 +234,17 @@ export function EditUserRole() {
 								Dashboard
 							</Breadcrumb.Item>
 							<Breadcrumb.Item
-								onClick={(e) => navigate('/userrole')}
+								onClick={(e) => navigate('/Kassa')}
 							>
-								Data User Role
+								Data Kassa
 							</Breadcrumb.Item>
 							<Breadcrumb.Item active>
-								Ubah Data User Role - {previousName}
+								Ubah Data Kassa - {previousName}
 							</Breadcrumb.Item>
 						</Breadcrumb>
 					</div>
 					<h6>
-						<b>Ubah Data User Role - {previousName}</b>
+						<b>Ubah Data Kassa - {previousName}</b>
 					</h6>
 					<hr />
 					<Form
@@ -245,49 +252,62 @@ export function EditUserRole() {
 						onSubmit={() => {
 							edit();
 						}}
-						disabled={editing || userroleDataLoading}
+						disabled={editing || kassaDataLoading}
 					>
-						<Form.Group controlId="roleid">
-							<Form.ControlLabel>Role ID</Form.ControlLabel>
+						<Form.Group controlId="code">
+							<Form.ControlLabel>Kode Kassa</Form.ControlLabel>
 							<Form.Control
-								name="roleid"
+								name="code"
 								required
-								placeholder="Role ID"
-								value={roleid}
+								placeholder="Kode Kassa"
+								value={code}
 								onChange={(e) => {
-									setRoleID(e);
+									setCode(e);
 								}}
-								disabled={editing || userroleDataLoading}
+								disabled={editing || kassaDataLoading}
 							/>
 						</Form.Group>
-                        <Form.Group controlId="roledesc">
-							<Form.ControlLabel>Role Description</Form.ControlLabel>
+						<Form.Group controlId="name">
+							<Form.ControlLabel>Nama Kassa</Form.ControlLabel>
 							<Form.Control
-								name="roledesc"
+								name="name"
 								required
-								placeholder="Role Description"
-								value={roledesc}
+								placeholder="Nama Kassa"
+								value={name}
 								onChange={(e) => {
-									setRoleDesc(e);
+									setName(e);
 								}}
-								disabled={editing || userroleDataLoading}
+								disabled={editing || kassaDataLoading}
 							/>
 						</Form.Group>
+						<Form.Group controlId="desc">
+							<Form.ControlLabel>Keterangan</Form.ControlLabel>
+							<Form.Control
+								name="desc"
+								placeholder="Keterangan"
+								value={desc}
+								onChange={(e) => {
+									setDesc(e);
+								}}
+								disabled={editing || kassaDataLoading}
+							/>
+						</Form.Group>
+						
 						<Form.Group>
 							<ButtonToolbar>
 								<Button
 									type="submit"
 									appearance="primary"
-									loading={editing || userroleDataLoading}
+									loading={editing || kassaDataLoading}
 								>
 									Simpan
 								</Button>
 								<Button
 									appearance="default"
 									onClick={(e) => {
-										navigate('/UserRole');
+										navigate('/Kassa');
 									}}
-									disabled={editing || userroleDataLoading}
+									disabled={editing || kassaDataLoading}
 								>
 									Batal
 								</Button>
@@ -299,18 +319,18 @@ export function EditUserRole() {
 										setSelectedID(_id);
 										setDeleteConfirmationDialogOpen(true);
 										setDeleteConfirmationDialogTitle(
-											'Hapus data User Role'
+											'Hapus data Kassa'
 										);
 										setDeleteConfirmationDialogContent(
-											'Anda akan menghapus data User Role ' +
+											'Anda akan menghapus data Kassa ' +
 												'[' +
-												roleid +
+												code +
 												']' +
-												roledesc +
-												'. Semua data yang berhubungan dengan User Role ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
+												name +
+												'. Semua data yang berhubungan dengan Kassa ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
 										);
 									}}
-									disabled={editing || userroleDataLoading}
+									disabled={editing || kassaDataLoading}
 								>
 									Hapus
 								</Button>

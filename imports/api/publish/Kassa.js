@@ -2,59 +2,59 @@ import getCurrentLine from 'get-current-line';
 import moment from 'moment-timezone';
 import 'moment/locale/id';
 
-import { UserRoleCollections } from '../../db/UserRole';
+import { KassaCollections } from '../../db/Kassa';
 import { addErrorLog } from '../methods/Logs';
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
 if (Meteor.isServer) {
-	Meteor.publish('userrole.countAll', function userrole_countAll(data) {
+	Meteor.publish('kassa.countAll', function kassa_countAll(data) {
 		try {
-			console.log('publish.userrole.countAll');
+			console.log('publish.kassa.countAll');
 
 			Counts.publish(
 				this,
-				'userrole.countAll',
-				UserRoleCollections.find({}),
+				'kassa.countAll',
+				KassaCollections.find({}),
 				{ noReady: true }
 			);
 		} catch (tryErr) {
 			console.log(tryErr);
 			let currLine = getCurrentLine();
-			let errorroleid = addErrorLog(
+			let errorCode = addErrorLog(
 				currLine.line,
 				currLine.file,
 				this,
 				'AGENT',
-				'publish.userrole.countAll',
+				'publish.kassa.countAll',
 				tryErr.message
 			);
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorroleid
+					errorCode
 			);
 		}
 	});
 
-	Meteor.publish('userrole.countList', function userrole_countAll(data) {
+	Meteor.publish('kassa.countList', function kassa_countAll(data) {
 		try {
-			console.log('publish.userrole.countList');
+			console.log('publish.kassa.countList');
 
 			let searchText = data.searchText;
 			Counts.publish(
 				this,
-				'userrole.countList.' + searchText,
-				UserRoleCollections.find({
+				'kassa.countList.' + searchText,
+				KassaCollections.find({
 					$or: [
 						{
-							roleid: {
+							code: {
 								$regex: searchText,
 								$options: 'i',
 							},
 						},
 						{
-							roledesc: {
+							name: {
 								$regex: searchText,
 								$options: 'i',
 							},
@@ -66,25 +66,25 @@ if (Meteor.isServer) {
 		} catch (tryErr) {
 			console.log(tryErr);
 			let currLine = getCurrentLine();
-			let errorroleid = addErrorLog(
+			let errorCode = addErrorLog(
 				currLine.line,
 				currLine.file,
 				this,
 				'AGENT',
-				'publish.userrole.countList',
+				'publish.kassa.countList',
 				tryErr.message
 			);
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorroleid
+					errorCode
 			);
 		}
 	});
 
-	Meteor.publish('userrole.list', function userrole_countAll(data) {
+	Meteor.publish('kassa.list', function kassa_countAll(data) {
 		try {
-			console.log('publish.userrole.list');
+			console.log('publish.kassa.list');
 
 			let searchText = data.searchText;
 			let page = data.page;
@@ -98,17 +98,17 @@ if (Meteor.isServer) {
 
 			sortObject[orderByColumn] = order;
 
-			let datasCursor = UserRoleCollections.find(
+			let datasCursor = KassaCollections.find(
 				{
 					$or: [
 						{
-							roleid: {
+							code: {
 								$regex: searchText,
 								$options: 'i',
 							},
 						},
 						{
-							roledesc: {
+							name: {
 								$regex: searchText,
 								$options: 'i',
 							},
@@ -126,53 +126,81 @@ if (Meteor.isServer) {
 		} catch (tryErr) {
 			console.log(tryErr);
 			let currLine = getCurrentLine();
-			let errorroleid = addErrorLog(
+			let errorCode = addErrorLog(
 				currLine.line,
 				currLine.file,
 				this,
 				'AGENT',
-				'publish.userrole.list',
+				'publish.kassa.list',
 				tryErr.message
 			);
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorroleid
+					errorCode
 			);
 		}
 	});
 
-	Meteor.publish('userrole.getByID', function userrole_countAll(data) {
+	Meteor.publish('kassa.getByID', function kassa_countAll(data) {
 		try {
-			console.log('publish.userrole.getByID');
+			console.log('publish.kassa.getByID');
 
 			let _id = data._id;
 
-			let datasCursor = UserRoleCollections.find({ _id });
+			let datasCursor = KassaCollections.find({ _id });
 
 			return datasCursor;
 		} catch (tryErr) {
 			console.log(tryErr);
 			let currLine = getCurrentLine();
-			let errorroleid = addErrorLog(
+			let errorCode = addErrorLog(
 				currLine.line,
 				currLine.file,
 				this,
 				'AGENT',
-				'publish.userrole.getByID',
+				'publish.kassa.getByID',
 				tryErr.message
 			);
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorroleid
+					errorCode
 			);
 		}
 	});
 
-	Meteor.publish('userrole.search', function userrole_countAll(data) {
+	Meteor.publish('kassa.getByCode', function kassa_countAll(data) {
 		try {
-			console.log('publish.userrole.search');
+			console.log('publish.kassa.getByCode');
+
+			let code = data.code;
+
+			let datasCursor = KassaCollections.find({ code });
+
+			return datasCursor;
+		} catch (tryErr) {
+			console.log(tryErr);
+			let currLine = getCurrentLine();
+			let errorCode = addErrorLog(
+				currLine.line,
+				currLine.file,
+				this,
+				'AGENT',
+				'publish.kassa.getByCode',
+				tryErr.message
+			);
+			throw new Meteor.Error(
+				'Terjadi Kesalahan',
+				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
+					errorCode
+			);
+		}
+	});
+
+	Meteor.publish('kassa.search', function kassa_countAll(data) {
+		try {
+			console.log('publish.kassa.search');
 
 			let selectedID = data.selectedID;
 			let searchText = data.searchText;
@@ -180,13 +208,13 @@ if (Meteor.isServer) {
 			if (searchText.length > 2) {
 				let findOrObject = [
 					{
-						roleid: {
+						code: {
 							$regex: searchText,
 							$options: 'i',
 						},
 					},
 					{
-						roledesc: {
+						name: {
 							$regex: searchText,
 							$options: 'i',
 						},
@@ -195,19 +223,19 @@ if (Meteor.isServer) {
 
 				if (selectedID) {
 					findOrObject.push({
-						roleid: selectedID,
+						_id: selectedID,
 					});
 				}
 
-				let datasCursor = UserRoleCollections.find({
+				let datasCursor = KassaCollections.find({
 					$or: findOrObject,
 				});
 
 				return datasCursor;
 			} else {
 				if (selectedID) {
-					let datasCursor = UserRoleCollections.find({
-						roleid: selectedID,
+					let datasCursor = KassaCollections.find({
+						_id: selectedID,
 					});
 
 					return datasCursor;
@@ -216,18 +244,18 @@ if (Meteor.isServer) {
 		} catch (tryErr) {
 			console.log(tryErr);
 			let currLine = getCurrentLine();
-			let errorroleid = addErrorLog(
+			let errorCode = addErrorLog(
 				currLine.line,
 				currLine.file,
 				this,
 				'AGENT',
-				'publish.userrole.search',
+				'publish.kassa.search',
 				tryErr.message
 			);
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorroleid
+					errorCode
 			);
 		}
 	});

@@ -1,18 +1,23 @@
-import ArrowRightIcon from '@rsuite/icons/ArrowRight';
-import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
 import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
+
 import moment from 'moment-timezone';
 import 'moment/locale/id';
+
 import React, { useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+
 import Breadcrumb from 'rsuite/Breadcrumb';
 import Button from 'rsuite/Button';
 import Form from 'rsuite/Form';
 import Modal from 'rsuite/Modal';
 import SelectPicker from 'rsuite/SelectPicker';
-import { WarehousesCollections } from '../../../db/Warehouses';
+
+import ArrowRightIcon from '@rsuite/icons/ArrowRight';
+import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
+
+import { KassaCollections } from '../../../db/Kassa';
 import { Topbar } from '../template/Topbar';
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
@@ -25,42 +30,40 @@ export function CashierOnBoarding(props) {
 	const [dialogTitle, setDialogTitle] = useState('');
 	const [dialogContent, setDialogContent] = useState('');
 	const [selecting, setSelecting] = useState(false);
-	const [warehouseID, setWarehouseID] = useState('');
+	const [kassaID, setKassaID] = useState('');
 
-	const [searchWarehousesText, setSearchWarehousesText] = useState('');
+	const [searchKassaText, setSearchKassaText] = useState('');
 
-	const [warehouses, warehousesLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('warehouses.search', {
-			isStore: 1,
-			searchText: searchWarehousesText,
-			selectedID: warehouseID,
+	const [kassa, kassaLoading] = useTracker(() => {
+		let subs = Meteor.subscribe('kassa.search', {
+			searchText: searchKassaText,
+			selectedID: kassaID,
 		});
 
-		let data = WarehousesCollections.find({
-			isStore: 1,
+		let data = KassaCollections.find({
 			$or: [
 				{
-					_id: warehouseID,
+					_id: kassaID,
 				},
 				{
 					code: {
-						$regex: searchWarehousesText,
+						$regex: searchKassaText,
 						$options: 'i',
 					},
 				},
 				{
 					name: {
-						$regex: searchWarehousesText,
+						$regex: searchKassaText,
 						$options: 'i',
 					},
 				},
 			],
 		}).fetch();
 		return [data, !subs.ready()];
-	}, [searchWarehousesText, warehouseID]);
+	}, [searchKassaText, kassaID]);
 
-	const renderWarehousesLoading = (menu) => {
-		if (warehousesLoading) {
+	const renderKassaLoading = (menu) => {
+		if (kassaLoading) {
 			return (
 				<p style={{ padding: 4, color: '#999', textAlign: 'center' }}>
 					<SpinnerIcon spin /> Loading...
@@ -107,27 +110,27 @@ export function CashierOnBoarding(props) {
 					<hr />
 					<Row>
 						<Col sm={12}>
-							<Form.Group controlId="warehouseID">
-								<Form.ControlLabel>Store</Form.ControlLabel>
+							<Form.Group controlId="kassaID">
+								<Form.ControlLabel>Kassa</Form.ControlLabel>
 								<SelectPicker
-									placeholder="Store"
+									placeholder="Kassa"
 									disabled={selecting}
-									value={warehouseID}
-									data={warehouses.map((s) => ({
+									value={kassaID}
+									data={kassa.map((s) => ({
 										label: '[' + s.code + '] ' + s.name,
 										value: s._id,
 									}))}
 									style={{ width: '100%' }}
 									onSelect={(value, item, e) => {
-										setWarehouseID(value);
+										setKassaID(value);
 									}}
 									onClean={() => {
-										setWarehouseID('');
+										setKassaID('');
 									}}
 									onSearch={(input) => {
-										setSearchWarehousesText(input);
+										setSearchKassaText(input);
 									}}
-									renderMenu={renderWarehousesLoading}
+									renderMenu={renderKassaLoading}
 								/>
 							</Form.Group>
 							<br />
@@ -136,14 +139,14 @@ export function CashierOnBoarding(props) {
 								appearance="primary"
 								loading={selecting}
 								onClick={() => {
-									if (warehouseID) {
-										navigate('/Cashier/' + warehouseID);
+									if (kassaID) {
+										navigate('/Cashier/' + kassaID);
 									} else {
 										setSelecting(false);
 										setDialogOpen(true);
 										setDialogTitle('Kesalahan Validasi');
 										setDialogContent(
-											'Silahkan Pilih Store'
+											'Silahkan Pilih Kassa'
 										);
 									}
 								}}

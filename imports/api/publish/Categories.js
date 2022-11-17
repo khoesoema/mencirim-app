@@ -170,6 +170,34 @@ if (Meteor.isServer) {
 		}
 	});
 
+	Meteor.publish('categories.getByCode', function categories_countAll(data) {
+		try {
+			console.log('publish.categories.getByCode');
+
+			let code = data.code;
+
+			let datasCursor = CategoriesCollections.find({ code });
+
+			return datasCursor;
+		} catch (tryErr) {
+			console.log(tryErr);
+			let currLine = getCurrentLine();
+			let errorCode = addErrorLog(
+				currLine.line,
+				currLine.file,
+				this,
+				'AGENT',
+				'publish.categories.getByCode',
+				tryErr.message
+			);
+			throw new Meteor.Error(
+				'Terjadi Kesalahan',
+				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
+					errorCode
+			);
+		}
+	});
+
 	Meteor.publish('categories.search', function categories_countAll(data) {
 		try {
 			console.log('publish.categories.search');

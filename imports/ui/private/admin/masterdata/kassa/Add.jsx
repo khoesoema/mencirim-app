@@ -1,51 +1,40 @@
 import { Meteor } from 'meteor/meteor';
-import { useTracker } from 'meteor/react-meteor-data';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { Col, Form as BSForm, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 import Breadcrumb from 'rsuite/Breadcrumb';
 import Button from 'rsuite/Button';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Form from 'rsuite/Form';
-import IconButton from 'rsuite/IconButton';
-import Input from 'rsuite/Input';
 import Modal from 'rsuite/Modal';
-import SelectPicker from 'rsuite/SelectPicker';
-import Checkbox from 'rsuite/Checkbox';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
-import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
-import MenuIcon from '@rsuite/icons/Menu';
 
-import { CompaniesCollections } from '../../../../../db/Companies';
-import { LocationsCollections } from '../../../../../db/Locations';
 import { Topbar } from '../../../template/Topbar';
 
-export function AddWarehouse(props) {
+export function AddKassa() {
 	let navigate = useNavigate();
-
 	const [adding, setAdding] = useState(false);
 
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogTitle, setDialogTitle] = useState('');
 	const [dialogContent, setDialogContent] = useState('');
 	
-	const [isStore, setIsStore] = useState(0);
 	const [name, setName] = useState('');
 	const [code, setCode] = useState('');
-	const [location, setLocation] = useState('');
+	const [desc, setDesc] = useState('');
 
-	const add = (e) => {
+	const add = async (e) => {
 		setAdding(true);
-		if (name && code && location) {
-			Meteor.call(
-				'warehouses.add',
+		if (name && code) {
+			await Meteor.call(
+				'kassa.add',
 				{
-					isStore: Number(isStore),
-					name,
 					code,
-					location,
+					name,
+					desc,
 				},
 				(err, res) => {
 					if (err) {
@@ -60,7 +49,7 @@ export function AddWarehouse(props) {
 						if (resultCode === 200) {
 							setName('');
 							setCode('');
-							setLocation('');
+							setDesc('');
 							setAdding(false);
 							setDialogOpen(true);
 							setDialogTitle(resultTitle);
@@ -85,30 +74,8 @@ export function AddWarehouse(props) {
 			setAdding(false);
 			setDialogOpen(true);
 			setDialogTitle('Kesalahan Validasi');
-			setDialogContent('Nama, Kode, Lokasi Wajib Diisi');
+			setDialogContent('Nama, Kode Wajib Diisi');
 		}
-	};
-
-	const renderLocationsLoading = (menu) => {
-		if (locationsLoading) {
-			return (
-				<p style={{ padding: 4, color: '#999', textAlign: 'center' }}>
-					<SpinnerIcon spin /> Loading...
-				</p>
-			);
-		}
-		return menu;
-	};
-
-	const renderCompaniesLoading = (menu) => {
-		if (companiesLoading) {
-			return (
-				<p style={{ padding: 4, color: '#999', textAlign: 'center' }}>
-					<SpinnerIcon spin /> Loading...
-				</p>
-			);
-		}
-		return menu;
 	};
 
 	return (
@@ -139,17 +106,17 @@ export function AddWarehouse(props) {
 								Dashboard
 							</Breadcrumb.Item>
 							<Breadcrumb.Item
-								onClick={(e) => navigate('/Warehouses')}
+								onClick={(e) => navigate('/Kassa')}
 							>
-								Data Gudang / Store
+								Data Kassa
 							</Breadcrumb.Item>
 							<Breadcrumb.Item active>
-								Tambah Data Gudang / Store
+								Tambah Data Kassa
 							</Breadcrumb.Item>
 						</Breadcrumb>
 					</div>
 					<h6>
-						<b>Tambah Data Gudang / Store</b>
+						<b>Tambah Data Kassa</b>
 					</h6>
 					<hr />
 					<Form
@@ -159,45 +126,12 @@ export function AddWarehouse(props) {
 						}}
 						disabled={adding}
 					>
-						<Form.Group>
-							<Checkbox
-								checked={isStore === 1 ? true : false}
-								onChange={(e) => {
-									if (isStore === 1) {
-										setIsStore(0);
-									} else {
-										setIsStore(1);
-									}
-								}}
-								disabled={adding}
-							>
-								Toko / Store
-							</Checkbox>
-							{/* <Checkbox> Perkiraan Bank</Checkbox> */}
-						</Form.Group>
-						<Form.Group controlId="name">
-							<Form.ControlLabel>
-								Nama Gudang / Store
-							</Form.ControlLabel>
-							<Form.Control
-								name="name"
-								required
-								placeholder="Nama Gudang / Store"
-								value={name}
-								onChange={(e) => {
-									setName(e);
-								}}
-								disabled={adding}
-							/>
-						</Form.Group>
 						<Form.Group controlId="code">
-							<Form.ControlLabel>
-								Kode Gudang / Store
-							</Form.ControlLabel>
+							<Form.ControlLabel>Kode Kassa</Form.ControlLabel>
 							<Form.Control
 								name="code"
 								required
-								placeholder="Kode Gudang / Store"
+								placeholder="Kode Kassa"
 								value={code}
 								onChange={(e) => {
 									setCode(e);
@@ -205,17 +139,27 @@ export function AddWarehouse(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="locationID">
-							<Form.ControlLabel>
-								Lokasi Gudang / Store
-							</Form.ControlLabel>
+						<Form.Group controlId="name">
+							<Form.ControlLabel>Nama Kassa</Form.ControlLabel>
 							<Form.Control
-								name="location"
+								name="name"
 								required
-								placeholder="location"
-								value={location}
+								placeholder="Nama Kassa"
+								value={name}
 								onChange={(e) => {
-									setLocation(e);
+									setName(e);
+								}}
+								disabled={adding}
+							/>
+						</Form.Group>
+						<Form.Group controlId="desc">
+							<Form.ControlLabel>Keterangan</Form.ControlLabel>
+							<Form.Control
+								name="desc"
+								placeholder="Keterangan"
+								value={desc}
+								onChange={(e) => {
+									setDesc(e);
 								}}
 								disabled={adding}
 							/>
@@ -232,7 +176,7 @@ export function AddWarehouse(props) {
 								<Button
 									appearance="default"
 									onClick={(e) => {
-										navigate('/Warehouses');
+										navigate('/Kassa');
 									}}
 									disabled={adding}
 								>

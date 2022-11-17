@@ -104,10 +104,6 @@ export function Cashier() {
 		}
 		return [data, isLoading];
 	}, [userID]);
-	
-	useEffect(()=>{
-		console.log(userID);
-	},[])
 
 	const [itemNum, setItemNum] = useState(0);
 	const [kodeBarang, setKodeBarang] = useState('');
@@ -199,33 +195,18 @@ export function Cashier() {
 		}
     },[productData, productDataLoading])
 
-	const [categories, categoriesLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('categories.search', {
-			searchText: searchCategoriesText,
-			selectedID: categoryID,
-		});
+	const [categoryData, categoryDataLoading] = useTracker(() => {
+		let isLoading = true;
+		let data = {};
+		let code = categoryID;
+		if (code) {
+			let subs = Meteor.subscribe('categories.getByCode', { code });
+			isLoading = !subs.ready();
 
-		let data = CategoriesCollections.find({
-			$or: [
-				{
-					code: categoryID,
-				},
-				{
-					code: {
-						$regex: searchCategoriesText,
-						$options: 'i',
-					},
-				},
-				{
-					name: {
-						$regex: searchCategoriesText,
-						$options: 'i',
-					},
-				},
-			],
-		}).fetch();
-		return [data, !subs.ready()];
-	}, [searchCategoriesText, categoryID]);
+			data = CategoriesCollections.findOne({ code });
+		}
+		return [data, isLoading];
+	}, [categoryID]);
 
     const [products, productsLoading] = useTracker(() => {
 
@@ -441,12 +422,10 @@ export function Cashier() {
 	useEffect(() => {
 		if (windowFocused) {
 			if (
-				scanRef.current &&
-				!scanRef.current.onfocus &&
-				changeQuantityDialogOpen === false &&
-				changeDescriptionDialogOpen === false
+				scanRef.input &&
+				!scanRef.input.onfocus 
 			) {
-				// scanRef.current.focus();
+				scanRef.input.focus();
 			}
 		}
 	}, [windowFocused]);
@@ -568,11 +547,12 @@ export function Cashier() {
 				// setCurrentIndex(currIndex);
 			} else if (currentKey === 'F1') {
 				event.preventDefault();
-				if (productCode) {
-					add();
-				} else {
-					scanRef.current.focus();
-				}
+				scanRef.input.focus();
+				//if (productCode) {
+				//	add();
+				//} else {
+				//	scanRef.current.focus();
+				//}
 				// let currIndex = currentIndex + 1;
 				// setCurrentIndex(currIndex);
 			} else if (currentKey === 'F12') {
@@ -1502,8 +1482,9 @@ export function Cashier() {
 									>
 									<Row>
 										<Col xs={8}>
-											<Form.Group controlId="kodebrg" style={{ marginBottom: 0}}> 
+											<Form.Group controlId="kodebrg" style={{ marginBottom: 2}}> 
 												<SelectPicker
+													ref={scanRef}
 													placeholder="Search Barang"
 													disabled={ isDisabled() }
 													data={products.map((s) => ({
@@ -1524,36 +1505,32 @@ export function Cashier() {
 													renderMenu={renderProductsLoading}
 												/>
         									</Form.Group>
-											<Form.Group controlId="barcode" style={{ marginBottom: 0}}>
-												<Form.Control
-													readOnly
-													name="barcode"
-													placeholder="Barcode"
-													value={barcode}
-													style={{color: "#1675e0" }}
-													disabled={isDisabled()}
-												/>
+											<Form.Group controlId="barcode" style={{ marginBottom: 2}}>
+												<Form.ControlLabel className="text-left" style={{color: "#1675e0"}}>
+													{barcode}
+												</Form.ControlLabel>
 											</Form.Group>
-											<Form.Group controlId="categoryID" style={{ marginBottom: 0}}>
-												<SelectPicker
-													name="categoryID"
-													placeholder="Kategori"
-													readOnly
-													disabled={isDisabled()}
-													data={categories.map((s) => ({
-														label: '[' + s.code + '] ' + s.name,
-														value: s.code,
-													}))}
-													style={{ width: 300 }}
-													value={categoryID}
-													onChange={(input) => {
-														setCategoryID(input);
-													}}
-												/>
+											<Form.Group controlId="categoryID" style={{ marginBottom: 2}}>
+												<Form.ControlLabel className="text-left" style={{color: "#1675e0"}}>
+													{(categoryDataLoading === false) && categoryData.name}
+												</Form.ControlLabel>
 											</Form.Group>
 											</Col>
 											<Col xs={4}>
-												
+												{currentImage && (
+													<>
+														<div 
+															className="d-flex flex-row flex-nowrap justify-content-end align-content-end fullWidth"
+															style={{height:120}}
+															>
+															<img
+																src={currentImage}
+																className="img-fluid img-thumbnail rounded mx-auto d-block"
+																alt="Responsive image"
+															></img>
+														</div>
+													</>
+												)}
 											</Col>
 									</Row>
 								</Form>		

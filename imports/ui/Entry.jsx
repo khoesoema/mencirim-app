@@ -1,12 +1,14 @@
 import React from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 
 import moment from 'moment-timezone';
 import 'moment/locale/id';
 
-import { PageRoutes } from './private/Routers';
+import { HomePage } from './private/Home';
 import { LoginPage } from './public/Login';
+import { Cashier } from './private/cashier/Index';
 
 import 'rsuite/dist/rsuite.min.css';
 import './assets/css/adminlte.css';
@@ -34,7 +36,20 @@ export function EntryPoint(props) {
 			{userLoading ? (
 				<Loader size="lg" center content="Loading Data" />
 			) : userData ? (
-				<PageRoutes />
+				<Router>
+					<Routes>
+						<Route
+							index
+							path="*"
+							element={<HomePage />}
+						/>
+						<Route
+							index
+							path="/Cashier/:_id"
+							element={<Cashier />}
+						/>
+					</Routes>
+				</Router>
 			) : (
 				<LoginPage />
 			)}

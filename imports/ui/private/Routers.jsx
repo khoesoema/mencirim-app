@@ -1,7 +1,7 @@
 import moment from 'moment-timezone';
 import 'moment/locale/id';
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import { AddAccount } from './admin/masterdata/account/Add';
 import { EditAccount } from './admin/masterdata/account/Detail';
@@ -147,7 +147,6 @@ moment.tz.setDefault('Asia/Jakarta');
 export function PageRoutes(props) {
 	return (
 		<>
-			<Router>
 				<Routes>
 					<Route
 						index
@@ -162,12 +161,11 @@ export function PageRoutes(props) {
 						// element={(props) => <DashboardPage {...props} />}
 						element={<CashierOnBoarding />}
 					/>
-					<Route
+					{/*<Route
 						index
 						path="/Cashier/:_id"
-						// element={(props) => <DashboardPage {...props} />}
 						element={<Cashier />}
-					/>
+					/>*/}
 
 					<Route
 						index
@@ -665,7 +663,6 @@ export function PageRoutes(props) {
 						element={<ViewErrorLog/>}
 					/>
 				</Routes>
-			</Router>
 		</>
 	);
 }

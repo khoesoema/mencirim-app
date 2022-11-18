@@ -28,6 +28,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
 
@@ -46,7 +49,15 @@ import Clock from 'react-live-clock';
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
-export function Cashier() {
+class CashierClass extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+}
+
+export function Cashier(props) {
+	const myRefs = useRef();
+
 	let scannedBarcode = '';
 	let navigate = useNavigate();
 	const windowFocused = useWindowFocus();
@@ -419,16 +430,17 @@ export function Cashier() {
 		}
 	}, [currentIndex]);
 
-	useEffect(() => {
-		if (windowFocused) {
-			if (
-				scanRef.input &&
-				!scanRef.input.onfocus 
-			) {
-				scanRef.input.focus();
-			}
-		}
-	}, [windowFocused]);
+	//useEffect(() => {
+	//	if (windowFocused) {
+	//		if (
+	//			scanRef.current &&
+	//			!scanRef.current.onfocus 
+	//		) {
+	//			//scanRef.current.focus();
+	//		}
+	//	}
+	//}, [windowFocused]);
+
 	// useEffect(() => {
 	// 	if (
 	// 		changeQuantityDialogOpen === false &&
@@ -439,6 +451,7 @@ export function Cashier() {
 	// 		}, 500);
 	// 	}
 	// }, [changeDescriptionDialogOpen, changeQuantityDialogOpen]);
+	+
 	useEffect(() => {
 		/**
 		 * Alert if clicked on outside of element
@@ -547,7 +560,9 @@ export function Cashier() {
 				// setCurrentIndex(currIndex);
 			} else if (currentKey === 'F1') {
 				event.preventDefault();
-				scanRef.input.focus();
+				scanRef.current.focus();
+				
+				//scanRef.current.focus();
 				//if (productCode) {
 				//	add();
 				//} else {
@@ -583,7 +598,7 @@ export function Cashier() {
 		document.addEventListener('keydown', handleKeyboardButon);
 		window.addEventListener('keypress', handleBarcode);
 		return () => {
-			// Unbind the event listener on clean up
+			// Unbind the event listener on clean upproductCode
 			document.removeEventListener('keydown', handleKeyboardButon);
 			window.removeEventListener('keypress', handleBarcode);
 		};
@@ -1475,65 +1490,41 @@ export function Cashier() {
 					<Grid item xs={9}>
 						<Card sx={{height:'100%', display: 'flex'}}>
 							<CardContent>
-								<Form 
-									layout="horizontal"
-									//onSubmit={() => { addDetail();}}
-									disabled={ isDisabled() }
-									>
-									<Row>
-										<Col xs={8}>
-											<Form.Group controlId="kodebrg" style={{ marginBottom: 2}}> 
-												<SelectPicker
-													ref={scanRef}
-													placeholder="Search Barang"
-													disabled={ isDisabled() }
-													data={products.map((s) => ({
-														label: '[' + s.kodeBarang + '] ' + s.namaBarang,
-														value: s.kodeBarang,
-													}))}
-													style={{ minWidth: 300, maxWidth: 350 }}
-													value={kodeBarang}
-													onSelect={( e) => {
-														setKodeBarang(e);
-													}}
-													onClean={() => {
-														resetvalue();
-													}}
-													onSearch={(e) => {
-														setSearchKodeBarangText(e);
-													}}
-													renderMenu={renderProductsLoading}
-												/>
-        									</Form.Group>
-											<Form.Group controlId="barcode" style={{ marginBottom: 2}}>
-												<Form.ControlLabel className="text-left" style={{color: "#1675e0"}}>
-													{barcode}
-												</Form.ControlLabel>
-											</Form.Group>
-											<Form.Group controlId="categoryID" style={{ marginBottom: 2}}>
-												<Form.ControlLabel className="text-left" style={{color: "#1675e0"}}>
-													{(categoryDataLoading === false) && categoryData.name}
-												</Form.ControlLabel>
-											</Form.Group>
-											</Col>
-											<Col xs={4}>
-												{currentImage && (
-													<>
-														<div 
-															className="d-flex flex-row flex-nowrap justify-content-end align-content-end fullWidth"
-															style={{height:120}}
-															>
-															<img
-																src={currentImage}
-																className="img-fluid img-thumbnail rounded mx-auto d-block"
-																alt="Responsive image"
-															></img>
-														</div>
-													</>
-												)}
-											</Col>
-									</Row>
-								</Form>		
+								<Row>
+									<Col>
+										<Autocomplete
+    									  id="searchProducts"
+    									  options={top100Films}
+    									  sx={{ width: 300 }}
+    									  renderInput={(params) => 
+										  	<TextField 
+												{...params} 
+												label="Search Products" 
+												onKeyDown={(e) => {
+													let currentKey = e.key;
+												}}
+												inputRef={(input) => (scanRef.current = input)}
+											/>}
+    									/>
+									</Col>
+									<Col></Col>
+									<Col xs={3}>
+										{currentImage && (
+											<>
+												<div 
+													className="d-flex flex-row flex-nowrap justify-content-end align-content-end fullWidth"
+													style={{height:120}}
+													>
+													<img
+														src={currentImage}
+														className="img-fluid img-thumbnail rounded mx-auto d-block"
+														alt="Responsive image"
+													></img>
+												</div>
+											</>
+										)}
+									</Col>
+								</Row>
 							</CardContent>
 						</Card>
 					</Grid>
@@ -1688,3 +1679,130 @@ export function Cashier() {
 		</>
 	);
 }
+
+const top100Films = [
+	{ label: 'The Shawshank Redemption', year: 1994 },
+	{ label: 'The Godfather', year: 1972 },
+	{ label: 'The Godfather: Part II', year: 1974 },
+	{ label: 'The Dark Knight', year: 2008 },
+	{ label: '12 Angry Men', year: 1957 },
+	{ label: "Schindler's List", year: 1993 },
+	{ label: 'Pulp Fiction', year: 1994 },
+	{
+	  label: 'The Lord of the Rings: The Return of the King',
+	  year: 2003,
+	},
+	{ label: 'The Good, the Bad and the Ugly', year: 1966 },
+	{ label: 'Fight Club', year: 1999 },
+	{
+	  label: 'The Lord of the Rings: The Fellowship of the Ring',
+	  year: 2001,
+	},
+	{
+	  label: 'Star Wars: Episode V - The Empire Strikes Back',
+	  year: 1980,
+	},
+	{ label: 'Forrest Gump', year: 1994 },
+	{ label: 'Inception', year: 2010 },
+	{
+	  label: 'The Lord of the Rings: The Two Towers',
+	  year: 2002,
+	},
+	{ label: "One Flew Over the Cuckoo's Nest", year: 1975 },
+	{ label: 'Goodfellas', year: 1990 },
+	{ label: 'The Matrix', year: 1999 },
+	{ label: 'Seven Samurai', year: 1954 },
+	{
+	  label: 'Star Wars: Episode IV - A New Hope',
+	  year: 1977,
+	},
+	{ label: 'City of God', year: 2002 },
+	{ label: 'Se7en', year: 1995 },
+	{ label: 'The Silence of the Lambs', year: 1991 },
+	{ label: "It's a Wonderful Life", year: 1946 },
+	{ label: 'Life Is Beautiful', year: 1997 },
+	{ label: 'The Usual Suspects', year: 1995 },
+	{ label: 'Léon: The Professional', year: 1994 },
+	{ label: 'Spirited Away', year: 2001 },
+	{ label: 'Saving Private Ryan', year: 1998 },
+	{ label: 'Once Upon a Time in the West', year: 1968 },
+	{ label: 'American History X', year: 1998 },
+	{ label: 'Interstellar', year: 2014 },
+	{ label: 'Casablanca', year: 1942 },
+	{ label: 'City Lights', year: 1931 },
+	{ label: 'Psycho', year: 1960 },
+	{ label: 'The Green Mile', year: 1999 },
+	{ label: 'The Intouchables', year: 2011 },
+	{ label: 'Modern Times', year: 1936 },
+	{ label: 'Raiders of the Lost Ark', year: 1981 },
+	{ label: 'Rear Window', year: 1954 },
+	{ label: 'The Pianist', year: 2002 },
+	{ label: 'The Departed', year: 2006 },
+	{ label: 'Terminator 2: Judgment Day', year: 1991 },
+	{ label: 'Back to the Future', year: 1985 },
+	{ label: 'Whiplash', year: 2014 },
+	{ label: 'Gladiator', year: 2000 },
+	{ label: 'Memento', year: 2000 },
+	{ label: 'The Prestige', year: 2006 },
+	{ label: 'The Lion King', year: 1994 },
+	{ label: 'Apocalypse Now', year: 1979 },
+	{ label: 'Alien', year: 1979 },
+	{ label: 'Sunset Boulevard', year: 1950 },
+	{
+	  label: 'Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb',
+	  year: 1964,
+	},
+	{ label: 'The Great Dictator', year: 1940 },
+	{ label: 'Cinema Paradiso', year: 1988 },
+	{ label: 'The Lives of Others', year: 2006 },
+	{ label: 'Grave of the Fireflies', year: 1988 },
+	{ label: 'Paths of Glory', year: 1957 },
+	{ label: 'Django Unchained', year: 2012 },
+	{ label: 'The Shining', year: 1980 },
+	{ label: 'WALL·E', year: 2008 },
+	{ label: 'American Beauty', year: 1999 },
+	{ label: 'The Dark Knight Rises', year: 2012 },
+	{ label: 'Princess Mononoke', year: 1997 },
+	{ label: 'Aliens', year: 1986 },
+	{ label: 'Oldboy', year: 2003 },
+	{ label: 'Once Upon a Time in America', year: 1984 },
+	{ label: 'Witness for the Prosecution', year: 1957 },
+	{ label: 'Das Boot', year: 1981 },
+	{ label: 'Citizen Kane', year: 1941 },
+	{ label: 'North by Northwest', year: 1959 },
+	{ label: 'Vertigo', year: 1958 },
+	{
+	  label: 'Star Wars: Episode VI - Return of the Jedi',
+	  year: 1983,
+	},
+	{ label: 'Reservoir Dogs', year: 1992 },
+	{ label: 'Braveheart', year: 1995 },
+	{ label: 'M', year: 1931 },
+	{ label: 'Requiem for a Dream', year: 2000 },
+	{ label: 'Amélie', year: 2001 },
+	{ label: 'A Clockwork Orange', year: 1971 },
+	{ label: 'Like Stars on Earth', year: 2007 },
+	{ label: 'Taxi Driver', year: 1976 },
+	{ label: 'Lawrence of Arabia', year: 1962 },
+	{ label: 'Double Indemnity', year: 1944 },
+	{
+	  label: 'Eternal Sunshine of the Spotless Mind',
+	  year: 2004,
+	},
+	{ label: 'Amadeus', year: 1984 },
+	{ label: 'To Kill a Mockingbird', year: 1962 },
+	{ label: 'Toy Story 3', year: 2010 },
+	{ label: 'Logan', year: 2017 },
+	{ label: 'Full Metal Jacket', year: 1987 },
+	{ label: 'Dangal', year: 2016 },
+	{ label: 'The Sting', year: 1973 },
+	{ label: '2001: A Space Odyssey', year: 1968 },
+	{ label: "Singin' in the Rain", year: 1952 },
+	{ label: 'Toy Story', year: 1995 },
+	{ label: 'Bicycle Thieves', year: 1948 },
+	{ label: 'The Kid', year: 1921 },
+	{ label: 'Inglourious Basterds', year: 2009 },
+	{ label: 'Snatch', year: 2000 },
+	{ label: '3 Idiots', year: 2009 },
+	{ label: 'Monty Python and the Holy Grail', year: 1975 },
+  ];

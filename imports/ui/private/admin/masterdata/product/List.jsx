@@ -460,7 +460,7 @@ export function ProductLists(props) {
 						</Col>
 					</Row>
 					<hr />
-					<Box sx={{ height: 700, width: '100%'}}>
+					<Box sx={{ height: 500, width: '100%'}}>
     				  	<DataGrid
 							sx={{
 							  boxShadow: 2,

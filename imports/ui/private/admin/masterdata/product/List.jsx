@@ -7,17 +7,23 @@ import 'moment/locale/id';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Pagination, Table } from 'react-bootstrap';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 import Breadcrumb from 'rsuite/Breadcrumb';
 import Button from 'rsuite/Button';
+import Dropdown from 'rsuite/Dropdown';
 import IconButton from 'rsuite/IconButton';
 import Input from 'rsuite/Input';
 import InputGroup from 'rsuite/InputGroup';
+import Loader from 'rsuite/Loader';
 import Modal from 'rsuite/Modal';
 import Divider from 'rsuite/Divider';
 
+import { faChevronCircleDown } from '@fortawesome/free-solid-svg-icons/faChevronCircleDown';
+import { faChevronCircleUp } from '@fortawesome/free-solid-svg-icons/faChevronCircleUp';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 import PlusIcon from '@rsuite/icons/Plus';
 import SearchIcon from '@rsuite/icons/Search';
@@ -46,14 +52,10 @@ import { Topbar } from '../../../template/Topbar';
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
-
-
 export function ProductLists(props) {
 	let navigate = useNavigate();
 
 	const [searchText, setSearchText] = useState('');
-
-	const [pageSize, setPageSize] = useState(20);
 
 	const [limit, setLimit] = useState(20);
 
@@ -62,16 +64,10 @@ export function ProductLists(props) {
 	const [orderBy, setOrderBy] = useState('kodeBarang');
 	const [order, setOrder] = useState(1);
 
-	function SortedDescendingIcon() {
-		return <ExpandMoreIcon className="icon" />;
-	}
-	  
-	function SortedAscendingIcon() {
-		return <ExpandLessIcon className="icon" />;
-	}
+	const [vendorID, setVendorID] = useState('');
 	
 	const [products, productsLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('products.list2', {
+		let subs = Meteor.subscribe('products.list', {
 			page,
 			searchText,
 			orderByColumn: orderBy,
@@ -103,7 +99,6 @@ export function ProductLists(props) {
 				sort: sortObject,
 			}
 		).fetch();
-
 		return [data, !subs.ready()];
 	}, [page, searchText, orderBy, order]);
 
@@ -117,6 +112,19 @@ export function ProductLists(props) {
 	useEffect(() => {
 		setMaxPage(Math.ceil(productsCount / 20));
 	}, [productsCount]);
+
+	const [supplierData, supplierDataLoading] = useTracker(() => {
+		let isLoading = true;
+		let data = {};
+
+		if (vendorID) {
+			let subs = Meteor.subscribe('vendors.getByID', { _id: vendorID });
+			isLoading = !subs.ready();
+
+			data = VendorsCollections.findOne({ _id: vendorID});
+		}
+		return [data, isLoading];
+	}, [vendorID]);
 
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogTitle, setDialogTitle] = useState('');
@@ -171,180 +179,6 @@ export function ProductLists(props) {
 			);
 		}
 	}, [selectedDeleteID]);
-
-	function CustomPagination() {
-		const apiRef = useGridApiContext();
-		const page = useGridSelector(apiRef, gridPageSelector);
-		const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-	  
-		return (
-		  <Pagination
-			color="primary"
-			count={pageCount}
-			page={page + 1}
-			onChange={(event, value) => apiRef.current.setPage(value - 1)}
-			showFirstButton 
-			showLastButton
-		  />
-		);
-	};
-
-	const columns = [
-		{ field: 'id', headerName: 'ID', width: 90},
-		{
-		  field: 'kodeBarang',
-		  headerName: 'Kode Barang',
-		  
-		  minWidth: 100,
-		},
-		{
-			field: "imageBase64",
-			headerName: "Image",
-			width: 100,
-			renderCell: (params) => {
-			  //console.log(params);
-			  return (
-				<>
-				  { params.value 
-				  	? <Avatar src={params.value} variant="rounded"/>
-					: <Avatar sx={{ bgcolor: blue[400] }} variant="rounded"><ImageIcon /></Avatar>
-				  }
-				</>
-			  );
-			}
-		},
-		{
-		  field: 'namaBarang',
-		  headerName: 'Nama Barang',
-		  
-          minWidth: 400,
-		},
-		{
-		  field: 'barcode',
-		  headerName: 'Barcode',
-		  
-		  minWidth: 150,
-		},
-		{
-		  field: 'categoryID',
-		  headerName: 'Kategori',
-		  width: 100,
-		},
-		{
-			field: 'supplier',
-			headerName: 'Supplier',
-			width: 100,
-		},
-		{
-			field: 'hargamodal',
-			headerName: 'Harga Modal',
-			
-			minWidth: 100,
-			align: 'right',
-			valueFormatter: params => 
-     			formatNum(params?.value),
-		},
-		{
-			field: 'hargajual',
-			headerName: 'Harga Jual',
-			
-			minWidth: 100,
-			align: 'right',
-			valueFormatter: params => 
-     			formatNum(params?.value),
-		},
-		{
-			field: 'profitjual',
-			headerName: 'Profit',
-			
-			minWidth: 100,
-			align: 'right',
-			valueFormatter: params => 
-     			(params?.value + ' %'),
-		},
-		{
-			field: 'qty',
-			headerName: 'Qty',
-			
-			minWidth: 100,
-			align: 'right',
-		},
-		{
-			field: 'satuanKecil',
-			headerName: 'Satuan',
-			
-			minWidth: 100,
-		},
-		{
-			field: 'modifiedBy',
-			headerName: 'Diubah Oleh',
-			
-			minWidth: 100,
-		},
-		{
-			field: 'modifiedAt',
-			headerName: 'Diubah Tanggal',
-			
-			minWidth: 200,
-			valueFormatter: params => 
-			   moment(params?.value).format("YYYY-MM-DD hh:mm:ss"),
-		  },
-		{
-			field: '_id',
-			headerName: 'Action',
-			sortable: false,
-			width: 100,
-			align: 'center',
-			filterable: false,
-			renderCell: (params) => {
-				//console.log(params.value);
-				return (
-				  <>
-					<a className ="fakeLink"
-						onClick={( e ) => {
-							navigate('/EditProduct/' + params.value);
-						}}
-					>
-						<FaPencilAlt /> 
-					</a>
-					<Divider vertical />
-					<a className ="fakeLink"
-							onClick={(e) => {
-								setSelectedID(params.value);
-								setDeleteConfirmationDialogOpen(true);
-								setDeleteConfirmationDialogTitle('Hapus data Product');
-								setDeleteConfirmationDialogContent(
-									'Anda akan menghapus data Product ' +
-									'[' + params.getValue(params.id, "kodeBarang") + ']' 
-									+  params.getValue(params.id, "namaBarang") +
-									'. Semua data yang berhubungan dengan Product ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
-								);
-							}}
-						>
-						<FaTrashAlt />
-					</a>
-				  </>
-				);
-			  }
-		  },
-	];
-
-	const [rows, setRows] = useState([]);
-
-	useEffect(()=>{
-		let baris = [];
-		if(products && productsLoading === false) {
-			products.map((item, index) => {
-				baris[index]={
-					id: (index + 1),
-					...item
-				};
-			})
-			setRows(baris);
-		} else if(!products && productsLoading === false) {
-			baris = [];
-		}
-	},[products, productsLoading]);
 
 	const formatNum = (input) => {
 		if (input) {
@@ -460,38 +294,536 @@ export function ProductLists(props) {
 						</Col>
 					</Row>
 					<hr />
-					<Box sx={{ height: 700, width: '100%'}}>
-    				  	<DataGrid
-							sx={{
-							  boxShadow: 2,
-							  border: 2,
-							  borderColor: 'primary.light',
-							  '& .MuiDataGrid-cell:hover': {
-								color: 'primary.main',
-							  },
-							}}
-							loading={productsLoading}
-							columns={columns}
-    				  	  	rows={rows}
-							
-							initialState={{
-								pagination: {
-								  pageSize: 20,
-								},
-							}}
+					<Table responsive striped bordered hover className="tbl-prod">
+						<thead>
+							<tr>
+								<th className="nomor">#</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'kodeBarang') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('kodeBarang');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Kode Barang
+										{orderBy === 'kodeBarang' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'namaBarang') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('namaBarang');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor  d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Nama Barang
+										{orderBy === 'namaBarang' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'barcode') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('barcode');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Barcode
+										{orderBy === 'barcode' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'categoryID') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('categoryID');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Kategori
+										{orderBy === 'categoryID' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'supplier') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('supplier');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Supplier
+										{orderBy === 'supplier' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'hargamodal') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('hargamodal');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Harga Modal
+										{orderBy === 'hargamodal' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'hargajual') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('hargajual');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Harga Jual
+										{orderBy === 'hargajual' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'profitjual') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('profitjual');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Profit Jual
+										{orderBy === 'profitjual' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'qty') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('qty');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Qty
+										{orderBy === 'qty' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>							
+								<th>
+									<div className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap " >
+										Satuan
+									</div>
+								</th>
 
-							pageSize={pageSize}
-							pagination
-							rowsPerPageOptions={[20]}
-        					components={{
-								Toolbar: GridToolbar,
-								LoadingOverlay: LinearProgress,
-        						Pagination: CustomPagination,
-								ColumnSortedDescendingIcon: SortedDescendingIcon,
-          						ColumnSortedAscendingIcon: SortedAscendingIcon,
-        					}}
-    				  	/>
-    				</Box>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'modifiedBy') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('modifiedBy');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Diubah Oleh
+										{orderBy === 'modifiedBy' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+								<th>
+									<div
+										onClick={(e) => {
+											if (orderBy === 'modifiedAt') {
+												if (order === -1) {
+													setOrder(1);
+												} else if (order === 1) {
+													setOrder(-1);
+												}
+											} else {
+												setOrderBy('modifiedAt');
+												setOrder(1);
+											}
+										}}
+										className="fakeCursor d-flex flex-row justify-content-between align-items-center flex-nowrap "
+									>
+										Diubah Tanggal
+										{orderBy === 'modifiedAt' && (
+											<>
+												{order === 1 ? (
+													<FontAwesomeIcon
+														icon={faChevronCircleUp}
+													/>
+												) : (
+													order === -1 && (
+														<FontAwesomeIcon
+															icon={
+																faChevronCircleDown
+															}
+														/>
+													)
+												)}
+											</>
+										)}
+									</div>
+								</th>
+
+								<th className="action" style={{ width:50}}>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							{productsLoading ? (
+								<tr>
+									<td colSpan={14}>
+										<center>
+											<Loader
+												size="sm"
+												content="Memuat Data..."
+											/>
+										</center>
+									</td>
+								</tr>
+							) : (
+								<>
+									{products.length > 0 ? (
+										<>
+											{products.map((item, index) => (
+												<tr key={index}>
+													<td>
+														{(page - 1) * limit +
+															(index + 1)}
+													</td>
+													<td>{item.kodeBarang}</td>
+													<td>{item.namaBarang}</td>
+													<td>{item.barcode}</td>
+													<td>{item.categoryID}</td>
+													<td>{item.supplier}</td>
+													<td className="text-right">{formatNum(item.hargamodal)}</td>
+													<td className="text-right">{formatNum(item.hargajual)}</td>
+													<td className="text-right">{item.profitjual + ' %'}</td>
+													<td className="text-right">{item.qty}</td>
+													<td>{item.satuanKecil}</td>
+													<td>{item.modifiedBy}</td>
+													<td>{moment(item.modifiedAt).format( 'YYYY-MM-DD HH:mm:ss')}</td>
+													<td style={{ textAlign: "center" }}>
+														<a className ="fakeLink"
+															onClick={( e ) => {
+																navigate('/EditProduct/' + item._id);
+															}}
+														>
+															<FaPencilAlt /> 
+														</a>
+														<Divider vertical />
+														<a className ="fakeLink"
+																onClick={(
+																	e
+																) => {
+																	setSelectedID(
+																		item._id
+																	);
+																	setDeleteConfirmationDialogOpen(
+																		true
+																	);
+																	setDeleteConfirmationDialogTitle(
+																		'Hapus data Product'
+																	);
+																	setDeleteConfirmationDialogContent(
+																		'Anda akan menghapus data Product ' +
+																			'[' +
+																			item.kodeBarang +
+																			']' +
+																			item.namaBarang +
+																			'. Semua data yang berhubungan dengan Product ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
+																	);
+																}}
+															>
+															<FaTrashAlt />
+														</a>
+													</td>
+												</tr>
+											))}
+										</>
+									) : (
+										<tr>
+											<td colSpan={14}>
+												<center>Tidak ada data</center>
+											</td>
+										</tr>
+									)}
+								</>
+							)}
+						</tbody>
+					</Table>
+					<hr />
+
+					<Pagination className="float-end">
+						<Pagination.First
+							onClick={(e) => {
+								setPage(1);
+							}}
+						/>
+						<Pagination.Prev
+							onClick={(e) => {
+								let nextPage = page - 1;
+								if (nextPage <= 0) {
+									setPage(1);
+								} else {
+									setPage(nextPage);
+								}
+							}}
+						/>
+						<Pagination.Item disabled>
+							{page}/{maxPage}
+						</Pagination.Item>
+						<Pagination.Next
+							onClick={(e) => {
+								let nextPage = page + 1;
+								if (nextPage > maxPage) {
+									setPage(maxPage);
+								} else {
+									setPage(nextPage);
+								}
+							}}
+						/>
+						<Pagination.Last
+							onClick={(e) => {
+								setPage(maxPage);
+							}}
+						/>
+					</Pagination>
 				</div>
 			</div>
 		</>

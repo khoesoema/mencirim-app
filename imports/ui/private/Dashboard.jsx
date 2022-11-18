@@ -1,537 +1,428 @@
-import { Meteor } from 'meteor/meteor';
-import { useTracker } from 'meteor/react-meteor-data';
+import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import moment from 'moment-timezone';
-import 'moment/locale/id';
+import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import MuiDrawer from '@mui/material/Drawer';
+import Box from '@mui/material/Box';
+import MuiAppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import List from '@mui/material/List';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import Link from '@mui/material/Link';
+import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import LogoutIcon from '@mui/icons-material/Logout';
 
-import React, { useEffect, useState } from 'react';
-import { Col, Row } from 'react-bootstrap';
-import { Table, Card } from 'react-bootstrap';
-import Stack from 'react-bootstrap/Stack';
-import Badge from 'react-bootstrap/Badge';
+import { secondaryListItems } from './template/listItems';
 
-import Modal from 'rsuite/Modal';
-import Loader from 'rsuite/Loader';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PeopleIcon from '@mui/icons-material/People';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import LayersIcon from '@mui/icons-material/Layers';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
-import { Topbar } from './template/Topbar';
+import Chart from './template/Chart';
+import TopSales from './template/TopSales';
+import Currencies from './template/Currencies';
+import SoldOut from './template/SoldOut';
+import TodaySales from './template/TodaySales';
+import TodayCustomers from './template/TodayCustomers';
+import Chart2 from './template/Chart2';
 
-import { ProductsCollections } from '../../db/Products';
-import { ProductsHistoriesCollections } from '../../db/Products';
-import { CurrenciesCollections } from '../../db/Currencies';
+function Copyright(props) {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+      {'Copyright © '}
+      <Link color="inherit" href="https://mantapagungsejati.com/">
+        mantapagungsejati.com
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
 
-import BarChart from "./components/BarChart";
-import DoughnutChart from './components/DoughnutChart';
+const drawerWidth = 240;
 
-export function DashboardPage(props) {
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
 
-	const [page, setPage] = useState(1);
-	const [maxPage, setMaxPage] = useState(1);
-	const [orderBy, setOrderBy] = useState('code');
-	const [order, setOrder] = useState(1);
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    '& .MuiDrawer-paper': {
+      position: 'relative',
+      whiteSpace: 'nowrap',
+      width: drawerWidth,
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      boxSizing: 'border-box',
+      ...(!open && {
+        overflowX: 'hidden',
+        transition: theme.transitions.create('width', {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+        width: theme.spacing(7),
+        [theme.breakpoints.up('sm')]: {
+          width: theme.spacing(9),
+        },
+      }),
+    },
+  }),
+);
 
-	const [currencies, currenciesLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('currencies.listAll', {
-			orderByColumn: orderBy,
-			order,
-		});
+const mdTheme = createTheme();
 
-		let sortObject = {};
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#1976d2',
+    },
+  },
+});
 
-		sortObject[orderBy] = order;
 
-		let data = CurrenciesCollections.find( {}, { sort: sortObject,} ).fetch();
+function DashboardContent() {
+  let navigate = useNavigate();
 
-		return [data, !subs.ready()];
-	}, [ orderBy, order]);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleChange = (event) => {
+    setAuth(event.target.checked);
+  };
 
-	const [currenciesCount, currenciesCountLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('currencies.countAll', {});
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-		let data = Counts.get('currencies.countAll');
-		return [data, !subs.ready()];
-	}, []);
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [dialogTitle, setDialogTitle] = React.useState('');
+  const [dialogContent, setDialogContent] = React.useState('');
+  const [changePasswordDialogOpen, setChangePasswordDialogOpen] = React.useState(false);
+  const [currentPassword, setCurrentPassword] = React.useState('');
+  const [newPassword, setNewPassword] = React.useState('');
+  const [repeatNewPassword, setRepeatNewPassword] = React.useState('');
+  const [changing, setChanging] = React.useState(false);
 
-	useEffect(() => {
-		setMaxPage(Math.ceil(currenciesCount / 10));
-	}, [currenciesCount]);
-	
-	const [productshistories, productshistoriesLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('productshistories.countBrg', {});
-
-		let data = ProductsHistoriesCollections.find(
-			{},
-			{
-				sort: {jumlah: -1}
-			},
-			{
-				limit: 10
-			}
-		).fetch();
-		
-		return [data, !subs.ready()];
-	}, []);
-
-	const [products, productsLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('products.countZero', {});
-
-		let data = ProductsCollections.find({}).fetch();
-		
-		return [data, !subs.ready()];
-	}, []);
-
-	const [loading, setLoading] = useState(false);
-	const [dialogOpen, setDialogOpen] = useState(false);
-	const [dialogTitle, setDialogTitle] = useState('');
-	const [dialogContent, setDialogContent] = useState('');
-
-	const [tahun, setTahun] = useState(new Date());
-	const [chartData, setChartData] = useState({});
-	
-	const [haveData, setHaveData] = useState(false);
-
-	const toMonthName = (monthNumber) => {
-		const date = new Date();
-		date.setMonth(monthNumber - 1);
-	  
-		return date.toLocaleString('en-US', {
-		  month: 'short',
-		});
-	}
-
-	const formatNum = (input) => {
-		if (input) {
-			return parseFloat(input)
-					.toFixed(2)
-					.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
-		} else {
-			return 0;
-		}	
-	};
-	
-	const [productshistories2, productshistories2Loading] = useTracker(() => {
-		let subs = Meteor.subscribe('productshistories.sumHargaYear',{tahun});
-        let data = [];
-
-        if(tahun){
-            data =  ProductsHistoriesCollections.find({}).fetch();
+  const logoutNow = (e) => {
+    Meteor.logout();
+  };
+  const changePassword = (e) => {
+    setChanging(true);
+    if (newPassword && confirmNewPassword) {
+      setChanging(true);
+      Meteor.call(
+        'system.selfResetPassword',
+        {
+          userID: _id,
+          newPassword,
+          confirmNewPassword,
+        },
+        (err, res) => {
+          if (err) {
+            setStartChangePassword(false);
+            setChanging(false);
+            setDialogOpen(true);
+            setDialogTitle(err.error);
+            setDialogContent(err.reason);
+          } else if (res) {
+            let resultCode = res.code;
+            let resultTitle = res.title;
+            let resultMessage = res.message;
+            if (resultCode === 200) {
+              setStartChangePassword(false);
+              setChanging(false);
+              setSiteChangePasswordModal(false);
+              setNewPassword('');
+              setConfirmNewPassword('');
+              setChanging(false);
+              setDialogOpen(true);
+              setDialogTitle('Success');
+              setDialogContent('Password Changed.');
+            } else {
+              setStartChangePassword(false);
+              setChanging(false);
+              setDialogOpen(true);
+              setDialogTitle(resultTitle);
+              setDialogContent(resultMessage);
+            }
+          } else {
+            setStartChangePassword(false);
+            setChanging(false);
+            setDialogOpen(true);
+            setDialogTitle('Unexpected Error');
+            setDialogContent(
+              'Unexpected Error Occured, please contact your customer service'
+            );
+          }
         }
-		
-		let dataTahun = [];
+      );
+    } else {
+      setStartChangePassword(false);
+      setDialogOpen(true);
+      setDialogTitle('Validation Failed');
+      setDialogContent('Please fill all field');
+    }
+  };
 
-        for(let i=0; i < 12; i++) {
+  const [open, setOpen] = React.useState(false);
+  const toggleDrawer = () => {
+    setOpen(!open);
+  };
 
-			let pembelian = 0;
-			let returPembelian = 0;
-			let penjualan = 0 ;
-			let returPenjualan = 0;
-			let profit = 0;
+  return (
+    <ThemeProvider theme={mdTheme}>
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBar position="absolute" open={open} sx={{ backgroundColor: '#121212', color: 'white' }}>
+          <Toolbar
+            sx={{
+              pr: '24px', // keep right padding when drawer closed
+            }}
+          >
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={toggleDrawer}
+              sx={{
+                marginRight: '36px',
+                ...(open && { display: 'none' }),
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              component="h1"
+              variant="h6"
+              color="#00e5ff"
+              noWrap
+              sx={{ flexGrow: 1 }}
+            >
+              Mantap Agung Sejati
+            </Typography>
+            <div>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem onClick={() => { setChangePasswordDialogOpen(true);}}>Change Password</MenuItem>
+              </Menu>
+            </div>
+            <Button color="inherit" endIcon={<LogoutIcon />} onClick={(e) => { logoutNow(e); }}>Sign Out</Button>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <Toolbar
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              px: [1],
+            }}
+          >
+            <IconButton onClick={toggleDrawer}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </Toolbar>
+          <Divider />
+          <List component="nav">
+            <ListItemButton onClick={() => navigate('/')}>
+              <ListItemIcon>
+                <DashboardIcon />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItemButton>
+            <ListItemButton onClick={() => navigate('/CashierOnBoarding')}>
+              <ListItemIcon>
+                <ShoppingCartIcon />
+              </ListItemIcon>
+              <ListItemText primary="Cashier" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemIcon>
+                <PeopleIcon />
+              </ListItemIcon>
+              <ListItemText primary="Customers" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemIcon>
+                <BarChartIcon />
+              </ListItemIcon>
+              <ListItemText primary="Reports" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemIcon>
+                <LayersIcon />
+              </ListItemIcon>
+              <ListItemText primary="Integrations" />
+            </ListItemButton>
+            <Divider sx={{ my: 1 }} />
+            {secondaryListItems}
+          </List>
+        </Drawer>
+        <Box
+          component="main"
+          sx={{
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'light'
+                ? theme.palette.grey[100]
+                : theme.palette.grey[900],
+            flexGrow: 1,
+            height: '100vh',
+            overflow: 'auto',
+          }}
+        >
+          <Toolbar />
+          <Container fixed sx={{ mt: 2, mb: 2 }}>
+            <Grid container spacing={2}>
+              {/* Chart */}
+              <Grid item xs={12} md={7} lg={8}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                  }}
+                >
+                  <Chart />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={5} lg={4}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                  }}
+                >
+                  <TopSales />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={6} lg={6} container spacing={2}>
+                <Grid item xs={12} md={6} lg={6}>
+                  <Paper sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%'
+                  }}>
+                    <TodaySales />
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} md={6} lg={6}>
+                  <Paper sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%'
+                  }}>
+                    <TodayCustomers />
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12}>
+                  <Paper sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%'
+                  }}>
+                    <SoldOut />
+                  </Paper>
+                </Grid>
+              </Grid>
+              <Grid item xs={12} md={3} lg={3}>
+                <Paper sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%'
+                }}>
+                  <Chart2 />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={3} lg={3}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                  }}
+                >
+                  <Currencies />
+                </Paper>
+              </Grid>
 
-			data.map((item) => {
-				if(item.month === i + 1) {
-					if (item.jenis === 'Pembelian'){
-						pembelian = item.total;
-					}
-					if (item.jenis === 'Retur Pembelian'){
-						returPembelian = item.total;
-					}
-					if (item.jenis === 'Penjualan'){
-						penjualan = item.total;
-						profit = item.profit;
-					}
-					if (item.jenis === 'Retur Penjualan'){
-						returPenjualan = item.total;
-						profit -= item.profit;
-					}
-				}
-			})
+            </Grid>
+            <Copyright sx={{ pt: 4 }} />
+          </Container>
+        </Box>
+      </Box>
+    </ThemeProvider>
+  );
+}
 
-			dataTahun[i] = {
-				id:  i + 1,
-				bulan: toMonthName(i + 1),
-				beli: pembelian - returPembelian,
-				jual: penjualan - returPenjualan,
-			}
-		}
-		console.log(dataTahun);
-		return [dataTahun, !subs.ready()];
-	}, []);
-
-	{/*const UserData = [
-		{
-		  id: 1,
-		  month: "Jan",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 2,
-		  month: "Feb",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 3,
-		  month: "Mar",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 4,
-		  month: "Apr",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 5,
-		  month: "Mei",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 6,
-		  month: "Jun",
-		  Beli: 0,
-		  Jual: 0,
-		},
-				{
-		  id: 7,
-		  month: "Jul",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 8,
-		  month: "Aug",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 9,
-		  month: "Sep",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 10,
-		  month: "Oct",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 11,
-		  month: "Nov",
-		  Beli: 0,
-		  Jual: 0,
-		},
-		{
-		  id: 12,
-		  month: "Dec",
-		  Beli: 0,
-		  Jual: 0,
-		},
-	  ];
-	
-	const [chartData0, setChartData0] = useState({
-		labels: UserData.map((item) => item.Bulan),
-		datasets: [
-		  	{
-				label: "TotalPembelian",
-				data: UserData.map((item) => item.Beli),
-				backgroundColor: 'rgba(255, 99, 132, 0.2)',
-				borderColor: 'rgb(255, 99, 132)',
-				borderWidth: 1,
-		  	},
-		  	{
-				label: "TotalPenjualan",
-				data: UserData.map((item) => item.Jual),
-				backgroundColor: 'rgba(75, 192, 192, 0.2)',
-				borderColor: 'rgb(75, 192, 192)',
-				borderWidth: 1,
-		  	},
-		],
-	}); */}
-
-	useEffect(()=>{
-		const fetchData = async () => {
-			try {
-				setChartData({
-					labels: productshistories2.map((item) => item.bulan),
-					datasets: [
-					  {
-						label: "Total Pembelian",
-						data: productshistories2.map((item) => item.beli),
-						backgroundColor: 'rgba(255, 99, 132, 0.2)',
-						borderColor: 'rgb(255, 99, 132)',
-						borderWidth: 1,
-					  },
-					  {
-						label: "Total Penjualan",
-						data: productshistories2.map((item) => item.jual),
-						backgroundColor: 'rgba(75, 192, 192, 0.2)',
-						borderColor: 'rgb(75, 192, 192)',
-						borderWidth: 1,
-					  },
-					],
-				});
-				setHaveData(true);
-			} catch(error) {
-				setHaveData(false);
-				console.log(error);
-			}
-		}
-		fetchData();
-	},[productshistories2, productshistories2Loading]);
-
-	const userData2 = {
-		labels: [
-		  'Member',
-		  'Non-Member'
-		],
-		datasets: [{
-		  label: 'Member Dataset',
-		  data: [50, 500],
-		  backgroundColor: [
-			'rgb(54, 162, 235)',
-			'rgb(75, 192, 192)'
-		  ],
-		  hoverOffset: 4
-		}]
-	};
-	
-	return (
-		<>
-			<Topbar />
-			<div className="mainContainerRoot" >
-				<Modal
-					backdrop={true}
-					keyboard={false}
-					open={dialogOpen}
-					onClose={(e) => {
-						setDialogOpen(false);
-					}}
-				>
-					<Modal.Header>
-						<Modal.Title>{dialogTitle}</Modal.Title>
-					</Modal.Header>
-
-					<Modal.Body>{dialogContent}</Modal.Body>
-				</Modal>
-
-				<div className="mainContent">
-					<Row>
-						<Col sm={7} >
-							<Card>
-					  			<Card.Body>
-								  	<Card.Title as="h5">Total Penjualan dan Pembelian Periode Tahun {new Date().getUTCFullYear()}</Card.Title>
-									<div> {haveData && <BarChart chartData={chartData} /> }</div>
-					  			</Card.Body>
-							</Card>
-						</Col>
-						<Col sm={3} >
-							<Card>
-					  			<Card.Header style={{fontSize: 14}}>Top Penjualan Barang Bulan {moment(new Date()).format('MMMM')}</Card.Header>
-					  			<Card.Body>
-							  		<Table responsive bordered={false} hover size="sm" style={{fontSize: 12}}>
-								  		<tbody>
-										 	{productshistoriesLoading 
-												? ( <tr>
-														<td colSpan={2}>
-															<center>
-																<Loader
-																	size="sm"
-																	content="Memuat Data..."
-																/>
-															</center>
-														</td>
-													</tr> )
-												: ( <>
-													{productshistories.length > 0 
-														? (
-															<>
-																{productshistories.map((item, index) => (
-																	<tr key={index}>
-																		<td>{item.nama}</td>
-																		<td style={{ textAlign: "right" }}> {item.jumlah}</td>
-																	</tr>
-																))}
-															</>
-														) 
-														: (
-															<tr>
-																<td colSpan={2}>
-																	<center>Tidak ada data</center>
-																</td>
-															</tr>
-														)}
-													</>
-												)
-											}
-								  		</tbody>
-									</Table>
-					  			</Card.Body>
-							</Card>
-						</Col> 
-						<Col sm={2} >
-							<Card>
-					  			<Card.Header style={{fontSize: 14}}>{ 'Kurs Hari ini (' + moment(new Date()).format('DD/MM/YY') + ')'}</Card.Header>
-					  			<Card.Body>
-							  		<Table bordered responsive hover size="sm" style={{fontSize: 12}}>
-								  		<thead>
-								  		  <tr>
-								  		    <th>Kode</th>
-								  		    <th style={{ textAlign: "right" }}>Nominal</th>
-								  		  </tr>
-								  		</thead>
-										<tbody>
-								  			{currenciesLoading ? (
-												<tr>
-													<td colSpan={10}>
-														<center>
-															<Loader
-																size="sm"
-																content="Memuat Data..."
-															/>
-														</center>
-													</td>
-												</tr>
-											) : (
-											<>
-											{currencies.length > 0 ? (
-												<>
-													{currencies.map((item, index) => (
-														<tr key={index}>
-															<td>{item.code}</td>
-															<td style={{ textAlign: "right" }}> {formatNum(item.kurs)}</td>
-														</tr>
-													))}
-												</>
-											) : (
-											<tr>
-												<td colSpan={10}>
-													<center>Tidak ada data</center>
-												</td>
-											</tr>
-											)}
-											</>
-											)}
-										</tbody>
-									</Table>
-					  			</Card.Body>
-							</Card>
-						</Col>
-					</Row>
-					<br />
-					<Row>
-						<Col sm={3} >
-							<Card className="d-flex">
-					  			<Card.Body className ="align-items-center d-flex justify-content-center">
-							  		<div>
-										<h6><center>Today Sales</center></h6>
-										<Stack direction="horizontal" gap={3} className="centered">
-											<h1 className="strong">12,631</h1> <h3>K</h3>
-											<h5>IDR</h5>
-										</Stack>
-										<div className="centered text-success">
-											<Badge bg="success" > ▲ 10.00 % </Badge>
-										</div>
-										<div className="centered">
-											<h6>vs Yesterday</h6>
-										</div>
-										
-									</div>
-					  			</Card.Body>
-							</Card>
-						</Col>
-						<Col sm={3}>
-							<Card className="d-flex">
-					  			<Card.Body className ="align-items-center d-flex justify-content-center">
-							  		<div>
-										<h6><center>Today Customers</center></h6>
-										<Stack direction="horizontal" gap={3} className="centered">
-											<h1 className="strong">226</h1> 
-										</Stack>
-										<div className="centered text-danger">
-											<Badge bg="danger" > ▼ 5.50 % </Badge>
-										</div>
-										<div className="centered">
-											<h6>vs Yesterday</h6>
-										</div>
-										
-									</div>
-					  			</Card.Body>
-							</Card>
-						</Col>
-						<Col sm={3} >
-							<Card>
-					  			<Card.Header style={{fontSize: 14}}>Barang yang sudah sold out</Card.Header>
-					  			<Card.Body>
-							  		<Table responsive bordered={false} hover size="sm" style={{fontSize: 10}}>
-								  		<tbody>
-										  	{ productsLoading 
-												? ( <tr>
-														<td colSpan={2}>
-															<center>
-																<Loader
-																	size="sm"
-																	content="Memuat Data..."
-																/>
-															</center>
-														</td>
-													</tr> 
-												): ( 
-													<>
-														{ products.length > 0 
-															? (
-																<>
-																	{products.map((item, index) => (
-																		<tr key={index}>
-																			<td>{item.namaBarang}</td>
-																			<td style={{ textAlign: "right" }}> {moment(item.tglLastTrx).format('YYYY-MM-DD')}</td>
-																		</tr>
-																	))}
-																</>
-															) : (
-																<tr>
-																	<td colSpan={2}>
-																		<center>Tidak ada data</center>
-																	</td>
-																</tr>
-														)}
-													</>
-												)
-											}
-								  		  {/*<tr>
-								  		    <td>Chicato </td>
-											<td className="text-right">31-01-2021</td>
-								  		  </tr>
-								  		  <tr>
-											<td>Mie Sedap</td>
-											<td className="text-right">28-05-2022</td>
-								  		  </tr>
-								  		  <tr>
-											<td>Item3</td>
-											<td className="text-right">02-Jun-2022</td>
-								  		  </tr>
-											<tr>
-											<td>Item4</td>
-											<td className="text-right">03-Jun-2022</td>
-										</tr>*/}
-								  		</tbody>
-									</Table>
-					  			</Card.Body>
-							</Card>
-						</Col> 
-						<Col sm={3} >
-							<Card>
-					  			<Card.Body>
-									<div className="text-center">Total Customer Bulan ini</div>
-									<div ><DoughnutChart chartData={userData2}></DoughnutChart></div>
-					  			</Card.Body>
-							</Card>
-						</Col>
-					</Row>
-				</div>
-			</div>
-		</>
-	);
+export function DashboardPage() {
+  return <DashboardContent />;
 }

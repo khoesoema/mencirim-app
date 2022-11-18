@@ -13,12 +13,12 @@ import useWindowFocus from 'use-window-focus';
 import { CashierOnGoingTransactionsCollections } from '../../../db/Cashier';
 import '../../assets/css/cashier.css';
 
-class CashierClass extends React.Component {
+class CashierClass2 extends React.Component {
 	constructor(props) {
 		super(props);
 	}
 }
-export function Cashier(props) {
+export function Cashier2(props) {
 	let scannedBarcode = '';
 	let navigate = useNavigate();
 	const windowFocused = useWindowFocus();

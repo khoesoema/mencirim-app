@@ -547,7 +547,7 @@ export function Cashier() {
 				// setCurrentIndex(currIndex);
 			} else if (currentKey === 'F1') {
 				event.preventDefault();
-				scanRef.input.focus();
+				scanRef.current.focus();
 				//if (productCode) {
 				//	add();
 				//} else {
@@ -1482,29 +1482,21 @@ export function Cashier() {
 									>
 									<Row>
 										<Col xs={8}>
-											<Form.Group controlId="kodebrg" style={{ marginBottom: 2}}> 
-												<SelectPicker
-													ref={scanRef}
-													placeholder="Search Barang"
-													disabled={ isDisabled() }
-													data={products.map((s) => ({
-														label: '[' + s.kodeBarang + '] ' + s.namaBarang,
-														value: s.kodeBarang,
-													}))}
-													style={{ minWidth: 300, maxWidth: 350 }}
-													value={kodeBarang}
-													onSelect={( e) => {
-														setKodeBarang(e);
-													}}
-													onClean={() => {
-														resetvalue();
-													}}
-													onSearch={(e) => {
-														setSearchKodeBarangText(e);
-													}}
-													renderMenu={renderProductsLoading}
-												/>
-        									</Form.Group>
+											<FormControl
+												ref={scanRef}
+												disabled={adding}
+												value={productCode}
+												id="productCodeSearch"
+												// autoFocus
+												onKeyDown={(e) => {
+													let currentKey = e.key;
+												}}
+												onChange={(e) => {
+													setProductCode(
+														e.currentTarget.value
+													);
+												}}
+											/>
 											<Form.Group controlId="barcode" style={{ marginBottom: 2}}>
 												<Form.ControlLabel className="text-left" style={{color: "#1675e0"}}>
 													{barcode}

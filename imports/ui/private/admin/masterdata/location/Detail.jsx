@@ -18,8 +18,6 @@ import { CitiesCollections } from '../../../../../db/Cities';
 import { CountriesCollections } from '../../../../../db/Countries';
 import { LocationsCollections } from '../../../../../db/Locations';
 import { StatesCollections } from '../../../../../db/States';
-import { Sidebar } from '../../../template/Sidebar';
-import { Topbar } from '../../../template/Topbar';
 
 export function EditLocation(props) {
 	let navigate = useNavigate();
@@ -329,7 +327,6 @@ export function EditLocation(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal
@@ -388,13 +385,6 @@ export function EditLocation(props) {
 
 					<Modal.Body>{dialogContent}</Modal.Body>
 				</Modal>
-				<Sidebar
-					currentmenu="locationMasterdata"
-					openDrawer={openDrawer}
-					closeDrawer={(e) => {
-						setOpenDrawer(false);
-					}}
-				/>
 				<div className="mainContent">
 					<IconButton
 						icon={<MenuIcon />}

@@ -15,7 +15,6 @@ import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 import MenuIcon from '@rsuite/icons/Menu';
 
 import { BusinessTypesCollections } from '../../../../../db/BusinessTypes';
-import { Topbar } from '../../../template/Topbar';
 
 export function EditBusinessType(props) {
 	let navigate = useNavigate();
@@ -165,7 +164,6 @@ export function EditBusinessType(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

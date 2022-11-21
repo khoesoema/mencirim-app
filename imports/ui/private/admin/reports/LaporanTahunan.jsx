@@ -21,8 +21,6 @@ import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
 import { ProductsHistoriesCollections } from '../../../../db/Products';
 
-import { Topbar } from '../../template/Topbar';
-
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
@@ -102,7 +100,6 @@ export function LaporanTahunan() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<div className="mainContent">
 					<div className="breadcrumContainer">

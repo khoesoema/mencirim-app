@@ -12,8 +12,6 @@ import Form from 'rsuite/Form';
 import Modal from 'rsuite/Modal';
 import { CurrenciesCollections } from '../../../../../db/Currencies';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function EditCurrency(props) {
 	let navigate = useNavigate();
 	let { _id } = useParams();
@@ -167,7 +165,6 @@ export function EditCurrency(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 			{selectedID && (
 					<Modal

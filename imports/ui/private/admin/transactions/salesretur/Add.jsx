@@ -29,7 +29,6 @@ import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { PenjualanReturDetailCollections } from '../../../../../db/PenjualanReturDetail';
 import { CurrenciesCollections } from '../../../../../db/Currencies';
 import { CustomersCollections } from '../../../../../db/Customers';
-import { Topbar } from '../../../template/Topbar';
 
 import DetailPurchase from './components/DetailPurchase';
 import EditDetailPurchase from './components/EditDetailPurchase';
@@ -340,7 +339,6 @@ export function AddSalesReturInvoice() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

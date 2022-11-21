@@ -10,7 +10,6 @@ import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Form from 'rsuite/Form';
 import Modal from 'rsuite/Modal';
 import { UOMCollections } from '../../../../../db/UOM';
-import { Topbar } from '../../../template/Topbar';
 
 export function EditUOM(props) {
 	let navigate = useNavigate();
@@ -161,7 +160,6 @@ export function EditUOM(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

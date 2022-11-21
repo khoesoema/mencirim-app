@@ -15,8 +15,6 @@ import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
 import { UserRoleCollections } from '../../../../../db/UserRole';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function EditUserRole() {
 	let navigate = useNavigate();
 	let { _id } = useParams();
@@ -158,7 +156,6 @@ export function EditUserRole() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

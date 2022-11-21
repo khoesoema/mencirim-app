@@ -12,8 +12,6 @@ import Modal from 'rsuite/Modal';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function AddKassa() {
 	let navigate = useNavigate();
 	const [adding, setAdding] = useState(false);
@@ -80,7 +78,6 @@ export function AddKassa() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<Modal
 					backdrop={true}

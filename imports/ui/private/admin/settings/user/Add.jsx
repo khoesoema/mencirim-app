@@ -19,8 +19,6 @@ import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
 
 import { UserRoleCollections } from '../../../../../db/UserRole';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function AddUser() {
 	let navigate = useNavigate();
 
@@ -139,7 +137,6 @@ export function AddUser() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<Modal
 					backdrop={true}

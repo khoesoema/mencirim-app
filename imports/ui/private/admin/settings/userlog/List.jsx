@@ -31,7 +31,6 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import LaunchIcon from '@mui/icons-material/Launch';
 
 import { LogsCollections } from '../../../../../db/Logs';
-import { Topbar } from '../../../template/Topbar';
 
 import '../../../../../ui/assets/css/userlog.css';
 
@@ -155,7 +154,6 @@ export function ListUserLog(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<div className="mainContent">
 					<div className="breadcrumContainer">

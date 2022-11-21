@@ -20,8 +20,6 @@ import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
 import { UserRoleCollections } from '../../../../../db/UserRole';
 import { DataUsersCollections } from '../../../../../db/Userscol';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function EditUser() {
 	let navigate = useNavigate();
 	let { _id } = useParams();
@@ -217,7 +215,6 @@ export function EditUser() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

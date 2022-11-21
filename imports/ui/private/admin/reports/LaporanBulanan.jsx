@@ -18,13 +18,11 @@ import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
 import { ProductsHistoriesCollections } from '../../../../db/Products';
 
-import { Topbar } from '../../template/Topbar';
-
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
 export function LaporanBulanan() {
-	let navigate = useNavigate();
+    let navigate = useNavigate();
 
     const [bulan, setBulan] = useState(new Date());
 
@@ -34,20 +32,20 @@ export function LaporanBulanan() {
     const [totalReturPenjualan, setTotalReturPenjualan] = useState(0);
     const [profit, setProfit] = useState(0);
 
-	const [productshistories, productshistoriesLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('productshistories.sumHarga',{bulan});
+    const [productshistories, productshistoriesLoading] = useTracker(() => {
+        let subs = Meteor.subscribe('productshistories.sumHarga', { bulan });
         let data = [];
 
-        if(bulan){
-             data =  ProductsHistoriesCollections.find({}).fetch();
+        if (bulan) {
+            data = ProductsHistoriesCollections.find({}).fetch();
         }
-		
+
         console.log(data);
-		return [data, !subs.ready()];
-	}, [bulan]);
-	
-    useEffect(()=>{
-        if  (productshistories && productshistoriesLoading === false) {
+        return [data, !subs.ready()];
+    }, [bulan]);
+
+    useEffect(() => {
+        if (productshistories && productshistoriesLoading === false) {
             setTotalPembelian(0);
             setTotalReturPembelian(0);
             setTotalPenjualan(0);
@@ -72,65 +70,64 @@ export function LaporanBulanan() {
                     setProfit(pft);
                 }
             })
-        } else if(!productshistories && productshistoriesLoading === false){
+        } else if (!productshistories && productshistoriesLoading === false) {
             setTotalPembelian(0);
             setTotalReturPembelian(0);
             setTotalPenjualan(0);
             setTotalReturPenjualan(0);
             setProfit(0);
         };
-    },[bulan, productshistories, productshistoriesLoading])
+    }, [bulan, productshistories, productshistoriesLoading])
 
-	const formatNum = (input) => {
-		if (input) {
-			return parseFloat(input)
-					.toFixed(2)
-					.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
-		} else {
-			return 0;
-		}	
-	};
+    const formatNum = (input) => {
+        if (input) {
+            return parseFloat(input)
+                .toFixed(2)
+                .replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+        } else {
+            return 0;
+        }
+    };
 
-	const formatNum0 = (input) => {
-		if (input) {
-			return parseFloat(input)
-					.toFixed(0)
-					.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
-		} else {
-			return 0;
-		}	
-	};
+    const formatNum0 = (input) => {
+        if (input) {
+            return parseFloat(input)
+                .toFixed(0)
+                .replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+        } else {
+            return 0;
+        }
+    };
 
-	return (
-		<>
-			<Topbar />
-			<div className="mainContent">
-				<div className="breadcrumContainer">
-					<Breadcrumb
-						separator={<ArrowRightIcon />}
-						className="m-0"
-					>
-						<Breadcrumb.Item onClick={(e) => navigate('/')}>
-							Dashboard
-						</Breadcrumb.Item>
-						<Breadcrumb.Item active>
-							Laporan Bulanan
-						</Breadcrumb.Item>
-					</Breadcrumb>
-				</div>
-				<h6>
-					<b>Laporan Bulanan</b>
-				</h6>
-				<hr />
+    return (
+        <>
+            <div className="mainContent">
+                <div className="breadcrumContainer">
+                    <Breadcrumb
+                        separator={<ArrowRightIcon />}
+                        className="m-0"
+                    >
+                        <Breadcrumb.Item onClick={(e) => navigate('/')}>
+                            Dashboard
+                        </Breadcrumb.Item>
+                        <Breadcrumb.Item active>
+                            Laporan Bulanan
+                        </Breadcrumb.Item>
+                    </Breadcrumb>
+                </div>
+                <h6>
+                    <b>Laporan Bulanan</b>
+                </h6>
+                <hr />
                 <Stack spacing={20}>
                     Bulan :
-                    <DatePicker 
-                        oneTap 
-                        format="yyyy-MM" 
+                    <DatePicker
+                        oneTap
+                        format="yyyy-MM"
                         ranges={[]}
                         value={bulan}
-                        onChange={(e)=> { setBulan(e) } }
-                        onClean={()=>{
+                        onChange={(e) => { setBulan(e) }}
+                        onClean={() => {
                             setTotalPembelian(0);
                             setTotalReturPembelian(0);
                             setTotalPenjualan(0);
@@ -139,9 +136,9 @@ export function LaporanBulanan() {
                         }}
                     />
                 </Stack>
-				<hr />
-				<Card style={{ width: "50%" }}>
-                    <Card.Header className="text-center"><strong>{'Laporan Bulan - ' + moment(bulan).format( 'MMMM YYYY')}</strong></Card.Header>
+                <hr />
+                <Card style={{ width: "50%" }}>
+                    <Card.Header className="text-center"><strong>{'Laporan Bulan - ' + moment(bulan).format('MMMM YYYY')}</strong></Card.Header>
                     <Card.Body>
                         <Row>
                             <Col>
@@ -151,7 +148,7 @@ export function LaporanBulanan() {
                                 <div>Total Penjualan</div>
                                 <div>Total Retur Penjualan</div>
                                 <br />
-                                <div>{ 'Total Profit Penjualan (' + formatNum(profit/(totalPenjualan-totalReturPenjualan) * 100 ) + ' %)' }</div>
+                                <div>{'Total Profit Penjualan (' + formatNum(profit / (totalPenjualan - totalReturPenjualan) * 100) + ' %)'}</div>
                             </Col>
                             <Col className="text-right">
                                 <div>{formatNum(totalPembelian)}</div>
@@ -165,7 +162,7 @@ export function LaporanBulanan() {
                         </Row>
                     </Card.Body>
                 </Card>
-			</div>
-		</>
-	);
+            </div>
+        </>
+    );
 }

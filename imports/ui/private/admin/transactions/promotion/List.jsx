@@ -30,7 +30,6 @@ import SearchIcon from '@rsuite/icons/Search';
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 
 import { PromotionsCollections } from '../../../../../db/Promotions';
-import { Topbar } from '../../../template/Topbar';
 
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
@@ -187,7 +186,6 @@ export function PromotionLists() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

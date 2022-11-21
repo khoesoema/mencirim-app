@@ -23,8 +23,6 @@ import { ProfitCollections } from '../../../../db/Profit';
 import { VendorsCollections } from '../../../../db/Vendors';
 import { CustomersCollections } from '../../../../db/Customers';
 
-import { Topbar } from '../../template/Topbar';
-
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
@@ -162,7 +160,6 @@ export function LaporanPenjualanDetail() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

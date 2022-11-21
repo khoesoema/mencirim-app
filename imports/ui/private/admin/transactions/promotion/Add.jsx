@@ -30,8 +30,6 @@ import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 
 import { PromotionsDetailCollections } from '../../../../../db/PromotionsDetail';
 
-import { Topbar } from '../../../template/Topbar';
-
 import DetailPurchase from './components/DetailPurchase';
 import EditDetailPurchase from './components/EditDetailPurchase';
 
@@ -250,7 +248,6 @@ export function AddPromotion(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

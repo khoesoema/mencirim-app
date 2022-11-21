@@ -14,8 +14,6 @@ import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
 import { CitiesCollections } from '../../../../../db/Cities';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function EditKota(props) {
 	const imageRef = useRef();
 	let navigate = useNavigate();
@@ -158,7 +156,6 @@ export function EditKota(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

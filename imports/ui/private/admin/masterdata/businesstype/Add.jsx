@@ -5,13 +5,9 @@ import Breadcrumb from 'rsuite/Breadcrumb';
 import Button from 'rsuite/Button';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Form from 'rsuite/Form';
-import IconButton from 'rsuite/IconButton';
 import Modal from 'rsuite/Modal';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
-import MenuIcon from '@rsuite/icons/Menu';
-
-import { Topbar } from '../../../template/Topbar';
 
 export function AddBusinessType(props) {
 	let navigate = useNavigate();
@@ -76,7 +72,6 @@ export function AddBusinessType(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<Modal
 					backdrop={true}

@@ -29,7 +29,6 @@ import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { ReturPembelianDetailCollections } from '../../../../../db/ReturPembelianDetail';
 import { CurrenciesCollections } from '../../../../../db/Currencies';
 import { VendorsCollections } from '../../../../../db/Vendors';
-import { Topbar } from '../../../template/Topbar';
 
 import DetailPurchase from './components/DetailPurchase';
 import EditDetailPurchase from './components/EditDetailPurchase';
@@ -341,7 +340,6 @@ export function AddPurchaseRetur() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

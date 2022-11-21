@@ -24,8 +24,6 @@ import { ProductsCollections } from '../../../../db/Products';
 import { ProductsHistoriesCollections } from '../../../../db/Products';
 import { VendorsCollections } from '../../../../db/Vendors';
 
-import { Topbar } from '../../template/Topbar';
-
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
@@ -194,7 +192,6 @@ export function LaporanPembelian() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<div className="mainContent">
 					<div className="breadcrumContainer">

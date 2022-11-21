@@ -12,8 +12,6 @@ import Modal from 'rsuite/Modal';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function AddCurrency() {
 	let navigate = useNavigate();
 	const [openDrawer, setOpenDrawer] = React.useState(false);

@@ -22,7 +22,6 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import LaunchIcon from '@mui/icons-material/Launch';
 
 import { ErrorLogsCollections } from '../../../../../db/Logs';
-import { Topbar } from '../../../template/Topbar';
 
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
@@ -133,7 +132,6 @@ export function ListErrorLog() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<div className="mainContent">
 					<div className="breadcrumContainer">

@@ -22,7 +22,6 @@ import { CitiesCollections } from '../../../../../db/Cities';
 import { CountriesCollections } from '../../../../../db/Countries';
 import { StatesCollections } from '../../../../../db/States';
 import { VendorsCollections } from '../../../../../db/Vendors';
-import { Topbar } from '../../../template/Topbar';
 
 export function EditSupplier() {
 	let navigate = useNavigate();

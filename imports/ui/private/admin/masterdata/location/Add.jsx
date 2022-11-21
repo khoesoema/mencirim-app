@@ -21,8 +21,6 @@ import { CitiesCollections } from '../../../../../db/Cities';
 import { CountriesCollections } from '../../../../../db/Countries';
 import { StatesCollections } from '../../../../../db/States';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function AddLocation(props) {
 	let navigate = useNavigate();
 
@@ -238,7 +236,6 @@ export function AddLocation(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<Modal
 					backdrop={true}

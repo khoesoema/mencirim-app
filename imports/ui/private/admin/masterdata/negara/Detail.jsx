@@ -15,8 +15,6 @@ import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 import { CountriesCollections } from '../../../../../db/Countries';
 import { toBase64 } from '../../../../etc/tools';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function EditNegara(props) {
 	const imageRef = useRef();
 	let navigate = useNavigate();
@@ -169,7 +167,6 @@ export function EditNegara(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

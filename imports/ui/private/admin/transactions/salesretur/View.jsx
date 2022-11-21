@@ -21,8 +21,6 @@ import { PenjualanReturCollections } from '../../../../../db/PenjualanRetur';
 import { PenjualanReturDetailCollections } from '../../../../../db/PenjualanReturDetail';
 import { CustomersCollections } from '../../../../../db/Customers';
 
-import { Topbar } from '../../../template/Topbar';
-
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
@@ -252,7 +250,6 @@ export function ViewSalesReturInvoice() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<Modal
 					backdrop={true}

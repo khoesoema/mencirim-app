@@ -32,7 +32,6 @@ import WarningRoundIcon from '@rsuite/icons/WarningRound';
 import CheckRoundIcon from '@rsuite/icons/CheckRound';
 
 import { ReturPembelianCollections } from '../../../../../db/ReturPembelian';
-import { Topbar } from '../../../template/Topbar';
 
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
@@ -155,7 +154,6 @@ export function PurchaseReturLists() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

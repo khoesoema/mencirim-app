@@ -11,8 +11,6 @@ import Modal from 'rsuite/Modal';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function AddNegara() {
 	let navigate = useNavigate();
 
@@ -77,7 +75,6 @@ export function AddNegara() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<Modal
 					backdrop={true}

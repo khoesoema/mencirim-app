@@ -27,7 +27,6 @@ import SearchIcon from '@rsuite/icons/Search';
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 
 import { DataUsersCollections } from '../../../../../db/Userscol';
-import { Topbar } from '../../../template/Topbar';
 
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
@@ -153,7 +152,6 @@ export function UserLists() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

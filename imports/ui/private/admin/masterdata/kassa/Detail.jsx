@@ -14,8 +14,6 @@ import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
 import { KassaCollections } from '../../../../../db/Kassa';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function EditKassa() {
 	let navigate = useNavigate();
 	let { _id } = useParams();
@@ -165,7 +163,6 @@ export function EditKassa() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

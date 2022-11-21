@@ -22,8 +22,6 @@ import { PembelianDetailCollections } from '../../../../../db/PembelianDetail';
 import { VendorsCollections } from '../../../../../db/Vendors';
 import { BusinessTypesCollections } from '../../../../../db/BusinessTypes';
 
-import { Topbar } from '../../../template/Topbar';
-
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
@@ -278,7 +276,6 @@ export function ViewPurchaseOrder() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<Modal
 					backdrop={true}

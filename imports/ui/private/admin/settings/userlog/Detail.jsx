@@ -12,7 +12,6 @@ import DatePicker from 'rsuite/DatePicker';
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
 import { LogsCollections } from '../../../../../db/Logs';
-import { Topbar } from '../../../template/Topbar';
 
 export function ViewUserLog() {
 	let navigate = useNavigate();
@@ -73,7 +72,6 @@ export function ViewUserLog() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<div className="mainContent">
 					<div className="breadcrumContainer">

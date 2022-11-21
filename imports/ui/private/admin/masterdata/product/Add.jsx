@@ -29,7 +29,6 @@ import { CategoriesCollections } from '../../../../../db/Categories';
 import { VendorsCollections } from '../../../../../db/Vendors';
 import { UOMCollections } from '../../../../../db/UOM';
 import { toBase64 } from '../../../../etc/tools';
-import { Topbar } from '../../../template/Topbar';
 
 import '../../../../../ui/assets/css/addproduct.css';
 
@@ -406,7 +405,6 @@ export function AddProduct(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<Modal
 					backdrop={true}

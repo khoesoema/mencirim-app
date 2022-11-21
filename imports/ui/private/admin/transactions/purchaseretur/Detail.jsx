@@ -32,7 +32,6 @@ import { PembelianCollections } from '../../../../../db/Pembelian';
 import { PembelianDetailCollections } from '../../../../../db/PembelianDetail';
 import { CurrenciesCollections } from '../../../../../db/Currencies';
 import { VendorsCollections } from '../../../../../db/Vendors';
-import { Topbar } from '../../../template/Topbar';
 
 import DetailPurchase from './components/DetailPurchase';
 import EditDetailPurchase from './components/EditDetailPurchase';
@@ -416,7 +415,6 @@ export function EditPurchaseRetur() {
 	
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

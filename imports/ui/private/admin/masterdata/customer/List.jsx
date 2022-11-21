@@ -30,7 +30,6 @@ import SearchIcon from '@rsuite/icons/Search';
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 
 import { CustomersCollections } from '../../../../../db/Customers';
-import { Topbar } from '../../../template/Topbar';
 
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
@@ -155,7 +154,6 @@ export function CustomerLists(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

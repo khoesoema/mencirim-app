@@ -12,9 +12,7 @@ import Modal from 'rsuite/Modal';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
-import { StatesCollections } from '../../../../../db/States';
-
-import { Topbar } from '../../../template/Topbar';
+import { StatesCollections } from '../../../../../db/States'
 
 export function EditProvinsi() {
 
@@ -162,7 +160,6 @@ export function EditProvinsi() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

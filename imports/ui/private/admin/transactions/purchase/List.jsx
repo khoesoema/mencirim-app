@@ -33,7 +33,6 @@ import CheckRoundIcon from '@rsuite/icons/CheckRound';
 
 import { PembelianCollections } from '../../../../../db/Pembelian';
 import { VendorsCollections } from '../../../../../db/Vendors';
-import { Topbar } from '../../../template/Topbar';
 
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
@@ -177,7 +176,6 @@ export function PurchaseInvoicesLists() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

@@ -15,8 +15,6 @@ import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 import { CategoriesCollections } from '../../../../../db/Categories';
 import { toBase64 } from '../../../../etc/tools';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function EditCategory(props) {
 	const imageRef = useRef();
 	let navigate = useNavigate();
@@ -169,7 +167,6 @@ export function EditCategory(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

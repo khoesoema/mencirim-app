@@ -30,8 +30,6 @@ import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 
 import { CurrenciesCollections } from '../../../../../db/Currencies';
 
-import { Topbar } from '../../../template/Topbar';
-
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
@@ -159,7 +157,6 @@ export function CurrencyLists(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

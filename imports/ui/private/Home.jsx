@@ -22,8 +22,6 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 
-import { secondaryListItems } from './template/listItems';
-
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -49,17 +47,26 @@ import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import PublicIcon from '@mui/icons-material/Public';
 import DomainIcon from '@mui/icons-material/Domain';
+import StoreIcon from '@mui/icons-material/Store';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxes } from '@fortawesome/free-solid-svg-icons/faBoxes';
+import { faPercent } from '@fortawesome/free-solid-svg-icons/faPercent';
 
 import { FaUserTie } from 'react-icons/fa'
 import { GrMoney } from 'react-icons/gr';
 import { GiWorld } from 'react-icons/gi';
 import { GiPaperBagOpen } from 'react-icons/gi';
+import { CiDiscount1 } from 'react-icons/ci';
 
 import { Icon } from '@rsuite/icons';
 import GearIcon from '@rsuite/icons/Gear';
+
+import Form from 'rsuite/Form';
+import Modal from 'rsuite/Modal';
 
 import { PageRoutes } from './Routers';
 
@@ -220,15 +227,16 @@ function DashboardContent() {
     }
   };
 
-  const [open, setOpen] = React.useState(false);
+  const [openDrawer, setOpenDrawer] = React.useState(false);
   const toggleDrawer = () => {
-    setOpen(!open);
+    setOpenDrawer(!openDrawer);
   };
 
   const [openMenu, setOpenMenu] = React.useState(false);
   const [openReports, setOpenReports] = React.useState(false);
   const [openSettings, setOpenSettings] = React.useState(false);
   const [openAcc, setOpenAcc] = React.useState(false);
+  const [openTrx, setOpenTrx] = React.useState(false);
 
   const handleClick = () => {
     setOpenMenu(!openMenu);
@@ -237,352 +245,504 @@ function DashboardContent() {
 
 
   return (
-    <ThemeProvider theme={mdTheme}>
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <AppBar position="absolute" open={open} sx={{ backgroundColor: '#121212', color: 'white' }}>
-          <Toolbar
-            sx={{
-              pr: '24px', // keep right padding when drawer closed
+    <>
+      <Modal
+        backdrop={true}
+        keyboard={false}
+        open={dialogOpen}
+        onClose={(e) => {
+          setDialogOpen(false);
+        }}
+      >
+        <Modal.Header>
+          <Modal.Title>{dialogTitle}</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>{dialogContent}</Modal.Body>
+      </Modal>
+      <Modal
+        size="lg"
+        backdrop={true}
+        keyboard={false}
+        open={changePasswordDialogOpen}
+        onClose={(e) => {
+          setChangePasswordDialogOpen(false);
+        }}
+      >
+        <Modal.Header>
+          <Modal.Title>Reset Password</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <Form
+            fluid
+            onSubmit={() => {
+              changePassword();
             }}
+            disabled={changing}
           >
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={toggleDrawer}
+            <Form.Group controlId="currentPassword">
+              <Form.ControlLabel>Password Lama</Form.ControlLabel>
+              <Form.Control
+                type="password"
+                name="currentPassword"
+                required
+                placeholder="Password Lama"
+                value={currentPassword}
+                onChange={(e) => {
+                  setCurrentPassword(e);
+                }}
+                disabled={changing}
+              />
+            </Form.Group>
+            <Form.Group controlId="newPassword">
+              <Form.ControlLabel>Password Baru</Form.ControlLabel>
+              <Form.Control
+                type="password"
+                name="newPassword"
+                required
+                placeholder="Password Baru"
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e);
+                }}
+                disabled={changing}
+              />
+            </Form.Group>
+            <Form.Group controlId="repeatNewPassword">
+              <Form.ControlLabel>
+                Konfirmasi Password Baru
+              </Form.ControlLabel>
+              <Form.Control
+                type="password"
+                name="repeatNewPassword"
+                required
+                placeholder="Konfirmasi Password Baru"
+                value={repeatNewPassword}
+                onChange={(e) => {
+                  setRepeatNewPassword(e);
+                }}
+                disabled={changing}
+              />
+            </Form.Group>
+            <Button
+              type="submit"
+              appearance="primary"
+              loading={changing}
+            >
+              Ubah Password
+            </Button>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={(e) => {
+              setChangePasswordDialogOpen(false);
+            }}
+            appearance="subtle"
+          >
+            Tutup
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <ThemeProvider theme={mdTheme}>
+        <Box sx={{ display: 'flex' }}>
+          <CssBaseline />
+          <AppBar position="absolute" open={openDrawer} sx={{ backgroundColor: '#121212', color: 'white' }}>
+            <Toolbar
               sx={{
-                marginRight: '36px',
-                ...(open && { display: 'none' }),
+                pr: '24px', // keep right padding when drawer closed
               }}
             >
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="#00e5ff"
-              noWrap
-              sx={{ flexGrow: 1 }}
-            >
-              Mantap Agung Sejati
-            </Typography>
-            <div>
               <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleMenu}
+                edge="start"
                 color="inherit"
+                aria-label="open drawer"
+                onClick={toggleDrawer}
+                sx={{
+                  marginRight: '36px',
+                  ...(openDrawer && { display: 'none' }),
+                }}
               >
-                <AccountCircle />
+                <MenuIcon />
               </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={() => { setChangePasswordDialogOpen(true); }}>Change Password</MenuItem>
-              </Menu>
-            </div>
-            <Button color="inherit" endIcon={<LogoutIcon />} onClick={(e) => { logoutNow(e); }}>Sign Out</Button>
-          </Toolbar>
-        </AppBar>
-        <Drawer variant="permanent" open={open}>
-          <Toolbar
+              <Box sx={{ flexGrow: 1 }}>
+                <Button sx={{ color: "#00e5ff" }} onClick={() => navigate('/')} >
+                  Mantap Agung Sejati
+                </Button>
+              </Box>
+              <div>
+                <IconButton
+                  size="large"
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleMenu}
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={handleClose}>Profile</MenuItem>
+                  <MenuItem onClick={() => { setChangePasswordDialogOpen(true); }}>Change Password</MenuItem>
+                </Menu>
+              </div>
+              <Button color="inherit" endIcon={<LogoutIcon />} onClick={(e) => { logoutNow(e); }}>Sign Out</Button>
+            </Toolbar>
+          </AppBar>
+          <Drawer variant="permanent" open={openDrawer}>
+            <Toolbar
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                px: [1],
+                backgroundColor: '#121212',
+                color: 'white'
+              }}
+            >
+              <IconButton onClick={toggleDrawer} color="inherit">
+                <ChevronLeftIcon />
+              </IconButton>
+            </Toolbar>
+            <Divider />
+            <List
+              component="nav">
+
+              <ListItemButton onClick={() => navigate('/')}>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItemButton>
+
+              <ListItemButton onClick={() => navigate('/CashierOnBoarding')}>
+                <ListItemIcon>
+                  <PointOfSaleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Cashier" />
+              </ListItemButton>
+
+              <ListItemButton onClick={() => navigate('/Products')}>
+                <ListItemIcon>
+                  <FontAwesomeIcon icon={faBoxes} />
+                </ListItemIcon>
+                <ListItemText primary="Products" />
+              </ListItemButton>
+
+              <ListItemButton onClick={() => navigate('/Customers')}>
+                <ListItemIcon>
+                  <HailIcon />
+                </ListItemIcon>
+                <ListItemText primary="Customers" />
+              </ListItemButton>
+
+              <ListItemButton onClick={() => navigate('/Supplier')}>
+                <ListItemIcon>
+                  <Icon as={FaUserTie} />
+                </ListItemIcon>
+                <ListItemText primary="Supplier" />
+              </ListItemButton>
+
+              <ListItemButton onClick={handleClick}>
+                <ListItemIcon>
+                  <LayersIcon />
+                </ListItemIcon>
+                <ListItemText primary="Data" />
+                {openMenu ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={openMenu} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Categories')}>
+                    <ListItemIcon>
+                      <Category />
+                    </ListItemIcon>
+                    <ListItemText primary="Kategori" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} divider onClick={() => navigate('/UOM')}>
+                    <ListItemIcon>
+                      <Icon as={GiPaperBagOpen} />
+                    </ListItemIcon>
+                    <ListItemText primary="Satuan" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} divider onClick={() => navigate('/BusinessTypes')}>
+                    <ListItemIcon>
+                      <DomainIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Tipe Bisnis" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Negara')}>
+                    <ListItemIcon>
+                      <Icon as={GiWorld} />
+                    </ListItemIcon>
+                    <ListItemText primary="Negara" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Provinsi')}>
+                    <ListItemIcon>
+                      <PublicIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Provinsi" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} divider onClick={() => navigate('/Kota')}>
+                    <ListItemIcon>
+                      <LocationCityIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Kota" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Kassa')}>
+                    <ListItemIcon>
+                      <PointOfSaleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Kassa" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Currencies')}>
+                    <ListItemIcon>
+                      <MonetizationOnIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Mata Uang" />
+                  </ListItemButton>
+
+                </List>
+              </Collapse>
+
+              <ListItemButton onClick={() => { setOpenTrx(!openTrx); }}>
+                <ListItemIcon>
+                  <StoreIcon />
+                </ListItemIcon>
+                <ListItemText primary="Transactions" />
+                {openTrx ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={openTrx} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/PurchaseOrder')}>
+                    <ListItemIcon>
+                      <AddShoppingCartIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Order Pembelian" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/PurchaseInvoices')}>
+                    <ListItemIcon>
+                      <ShoppingCartCheckoutIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Pembelian Barang" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} divider onClick={() => navigate('/PurchaseRetur')}>
+                    <ListItemIcon>
+                      <RemoveShoppingCartIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Retur Pembelian" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/SalesInvoices')}>
+                    <ListItemIcon>
+                      <ShoppingCartIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Penjualan" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} divider onClick={() => navigate('/SalesReturInvoices')}>
+                    <ListItemIcon>
+                      <RemoveShoppingCartIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Retur Penjualan" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Promotions')}>
+                    <ListItemIcon>
+                      <FontAwesomeIcon icon={faPercent} />
+                    </ListItemIcon>
+                    <ListItemText primary="Promo Barang" />
+                  </ListItemButton>
+
+                </List>
+              </Collapse>
+
+              <ListItemButton onClick={() => { setOpenReports(!openReports); }}>
+                <ListItemIcon>
+                  <BarChartIcon />
+                </ListItemIcon>
+                <ListItemText primary="Reports" />
+                {openReports ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={openReports} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/LaporanStok')}>
+                    <ListItemIcon>
+                      <AssignmentIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Laporan Stok" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/LaporanPembelian')}>
+                    <ListItemIcon>
+                      <AssignmentIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Laporan Pembelian" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/LaporanPenjualan')}>
+                    <ListItemIcon>
+                      <AssignmentIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Laporan Penjualan" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/LaporanPenjualanDetail')}>
+                    <ListItemIcon>
+                      <AssignmentIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Laporan Penjualan Detail" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/LaporanBulanan')}>
+                    <ListItemIcon>
+                      <AssignmentIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Laporan Bulanan" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/LaporanTahunan')}>
+                    <ListItemIcon>
+                      <AssignmentIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Laporan Tahunan" />
+                  </ListItemButton>
+
+                </List>
+              </Collapse>
+
+              <Divider sx={{ my: 1 }} />
+              <ListItemButton onClick={() => { setOpenAcc(!openAcc); }}>
+                <ListItemIcon>
+                  <LibraryBooksIcon />
+                </ListItemIcon>
+                <ListItemText primary="Accounting" />
+                {openAcc ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={openAcc} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <HailIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Customers & Penjualan" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <Icon as={FaUserTie} />
+                    </ListItemIcon>
+                    <ListItemText primary="Supplier & Pembelian" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <FontAwesomeIcon icon={faBoxes} />
+                    </ListItemIcon>
+                    <ListItemText primary="Persediaan" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <Icon as={GrMoney} />
+                    </ListItemIcon>
+                    <ListItemText primary="Kas Bank" />
+                  </ListItemButton>
+                </List>
+              </Collapse>
+
+              <Divider sx={{ my: 1 }} />
+
+              <ListItemButton onClick={() => { setOpenSettings(!openSettings); }}>
+                <ListItemIcon>
+                  <Icon as={GearIcon} spin />
+                </ListItemIcon>
+                <ListItemText primary="Settings" />
+                {openSettings ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+              <Collapse in={openSettings} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={(e) => navigate('/Users')}>
+                    <ListItemIcon>
+                      <PeopleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Users" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={(e) => navigate('/UserRole')}>
+                    <ListItemIcon>
+                      <ManageAccountsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="User Role" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={(e) => navigate('/UserLog')}>
+                    <ListItemIcon>
+                      <CheckCircleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="User Log" />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 4 }} onClick={(e) => navigate('/ErrorLog')}>
+                    <ListItemIcon>
+                      <ReportProblemIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="User Error Log" />
+                  </ListItemButton>
+
+                </List>
+              </Collapse>
+
+            </List>
+          </Drawer>
+          <Box
+            component="main"
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              px: [1],
-              backgroundColor: '#121212', 
-              color: 'white'
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light'
+                  ? theme.palette.grey[100]
+                  : theme.palette.grey[900],
+              flexGrow: 1,
+              height: '100vh',
+              overflow: 'auto',
             }}
           >
-            <IconButton onClick={toggleDrawer} color="inherit">
-              <ChevronLeftIcon />
-            </IconButton>
-          </Toolbar>
-          <Divider />
-          <List
-            component="nav">
-
-            <ListItemButton onClick={() => navigate('/')}>
-              <ListItemIcon>
-                <DashboardIcon />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItemButton>
-
-            <ListItemButton onClick={() => navigate('/CashierOnBoarding')}>
-              <ListItemIcon>
-                <ShoppingCartIcon />
-              </ListItemIcon>
-              <ListItemText primary="Cashier" />
-            </ListItemButton>
-
-            <ListItemButton onClick={() => navigate('/Products')}>
-              <ListItemIcon>
-                <FontAwesomeIcon icon={faBoxes} />
-              </ListItemIcon>
-              <ListItemText primary="Products" />
-            </ListItemButton>
-
-            <ListItemButton onClick={() => navigate('/Customers')}>
-              <ListItemIcon>
-                <HailIcon />
-              </ListItemIcon>
-              <ListItemText primary="Customers" />
-            </ListItemButton>
-
-            <ListItemButton onClick={() => navigate('/Supplier')}>
-              <ListItemIcon>
-                <Icon as={FaUserTie} />
-              </ListItemIcon>
-              <ListItemText primary="Supplier" />
-            </ListItemButton>
-
-            <ListItemButton onClick={handleClick}>
-              <ListItemIcon>
-                <LayersIcon />
-              </ListItemIcon>
-              <ListItemText primary="Data" />
-              {openMenu ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={openMenu} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <Category />
-                  </ListItemIcon>
-                  <ListItemText primary="Kategori" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }} divider>
-                  <ListItemIcon>
-                    <Icon as={GiPaperBagOpen} />
-                  </ListItemIcon>
-                  <ListItemText primary="Satuan" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }} divider>
-                  <ListItemIcon>
-                    <DomainIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Tipe Bisnis" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <Icon as={GiWorld} />
-                  </ListItemIcon>
-                  <ListItemText primary="Negara" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <PublicIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Provinsi" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }} divider>
-                  <ListItemIcon>
-                    <LocationCityIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Kota" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <PointOfSaleIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Kassa" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <MonetizationOnIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Mata Uang" />
-                </ListItemButton>
-
-              </List>
-            </Collapse>
-
-            <ListItemButton onClick={() => { setOpenReports(!openReports); }}>
-              <ListItemIcon>
-                <BarChartIcon />
-              </ListItemIcon>
-              <ListItemText primary="Reports" />
-              {openReports ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={openReports} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <AssignmentIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Laporan Stok" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <AssignmentIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Laporan Pembelian" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <AssignmentIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Laporan Penjualan" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <AssignmentIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Laporan Penjualan Detail" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <AssignmentIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Laporan Bulanan" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <AssignmentIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Laporan Tahunan" />
-                </ListItemButton>
-
-              </List>
-            </Collapse>
-
-            <Divider sx={{ my: 1 }} />
-            <ListItemButton onClick={() => { setOpenAcc(!openAcc); }}>
-              <ListItemIcon>
-                <LibraryBooksIcon />
-              </ListItemIcon>
-              <ListItemText primary="Accounting" />
-              {openAcc ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={openAcc} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <HailIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Customers & Penjualan" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <Icon as={FaUserTie} />
-                  </ListItemIcon>
-                  <ListItemText primary="Supplier & Pembelian" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <FontAwesomeIcon icon={faBoxes} />
-                  </ListItemIcon>
-                  <ListItemText primary="Persediaan" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <Icon as={GrMoney} />
-                  </ListItemIcon>
-                  <ListItemText primary="Kas Bank" />
-                </ListItemButton>
-              </List>
-            </Collapse>
-
-            <Divider sx={{ my: 1 }} />
-
-            <ListItemButton onClick={() => { setOpenSettings(!openSettings); }}>
-              <ListItemIcon>
-                <Icon as={GearIcon} spin />
-              </ListItemIcon>
-              <ListItemText primary="Settings" />
-              {openSettings ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={openSettings} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <PeopleIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Users" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <ManageAccountsIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="User Role" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <CheckCircleIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="User Log" />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <ReportProblemIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="User Error Log" />
-                </ListItemButton>
-
-              </List>
-            </Collapse>
-
-          </List>
-        </Drawer>
-        <Box
-          component="main"
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
-          }}
-        >
-          <Toolbar />
-          <Container fixed sx={{ mt: 2, mb: 2 }}>
-            <PageRoutes />
-          </Container>
+            <Toolbar />
+            <Container fixed sx={{ mt: 2, mb: 2 }}>
+              <PageRoutes />
+            </Container>
+          </Box>
         </Box>
-      </Box>
-    </ThemeProvider>
+      </ThemeProvider>
+    </>
   );
 }
 

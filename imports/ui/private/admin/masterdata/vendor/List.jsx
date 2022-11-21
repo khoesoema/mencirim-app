@@ -30,7 +30,6 @@ import SearchIcon from '@rsuite/icons/Search';
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 
 import { VendorsCollections } from '../../../../../db/Vendors';
-import { Topbar } from '../../../template/Topbar';
 
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');

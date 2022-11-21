@@ -9,8 +9,6 @@ import Form from 'rsuite/Form';
 import IconButton from 'rsuite/IconButton';
 import Modal from 'rsuite/Modal';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function AddUOM(props) {
 	let navigate = useNavigate();
 	const [openDrawer, setOpenDrawer] = React.useState(false);
@@ -74,7 +72,6 @@ export function AddUOM(props) {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				<Modal
 					backdrop={true}

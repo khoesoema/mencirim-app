@@ -25,8 +25,6 @@ import { CitiesCollections } from '../../../../../db/Cities';
 import { CountriesCollections } from '../../../../../db/Countries';
 import { StatesCollections } from '../../../../../db/States';
 
-import { Topbar } from '../../../template/Topbar';
-
 export function EditCustomer() {
 	let navigate = useNavigate();
 	let { _id } = useParams();
@@ -365,7 +363,6 @@ export function EditCustomer() {
 	
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

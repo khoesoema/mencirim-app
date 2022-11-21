@@ -33,7 +33,6 @@ import { PenjualanReturCollections } from '../../../../../db/PenjualanRetur';
 import { PenjualanReturDetailCollections } from '../../../../../db/PenjualanReturDetail';
 import { CurrenciesCollections } from '../../../../../db/Currencies';
 import { CustomersCollections } from '../../../../../db/Customers';
-import { Topbar } from '../../../template/Topbar';
 
 import DetailPurchase from './components/DetailPurchase';
 import EditDetailPurchase from './components/EditDetailPurchase';
@@ -437,7 +436,6 @@ export function EditSalesReturInvoice() {
 	
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

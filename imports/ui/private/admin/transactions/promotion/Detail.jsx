@@ -31,8 +31,6 @@ import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { PromotionsCollections } from '../../../../../db/Promotions';
 import { PromotionsDetailCollections } from '../../../../../db/PromotionsDetail';
 
-import { Topbar } from '../../../template/Topbar';
-
 import DetailPurchase from './components/DetailPurchase';
 import EditDetailPurchase from './components/EditDetailPurchase';
 
@@ -298,7 +296,6 @@ export function EditPromotion() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

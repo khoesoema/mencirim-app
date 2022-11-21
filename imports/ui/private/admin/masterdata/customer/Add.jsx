@@ -7,9 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from 'rsuite/Breadcrumb';
 import Button from 'rsuite/Button';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
-import Checkbox from 'rsuite/Checkbox';
 import Form from 'rsuite/Form';
-import IconButton from 'rsuite/IconButton';
 import Input from 'rsuite/Input';
 import Modal from 'rsuite/Modal';
 import SelectPicker from 'rsuite/SelectPicker';
@@ -17,15 +15,26 @@ import DatePicker from 'rsuite/DatePicker';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
-import MenuIcon from '@rsuite/icons/Menu';
 
-import { BusinessTypesCollections } from '../../../../../db/BusinessTypes';
 import { CitiesCollections } from '../../../../../db/Cities';
 import { CountriesCollections } from '../../../../../db/Countries';
 import { StatesCollections } from '../../../../../db/States';
 
+import MuiAlert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Snackbar from '@mui/material/Snackbar';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+	return <MuiAlert elevation={6} ref={ref} {...props} />;
+});
+
 export function AddCustomer(props) {
 	let navigate = useNavigate();
+
+	const [openSnackbar, setOpenSnackbar] = useState(false);
+	const [severity, setSeverity] = useState('info');
+	const [msg, setMsg] = useState('');
+	const [msgTitle, setMsgTitle] = useState('');
 
 	const [adding, setAdding] = useState(false);
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -37,7 +46,7 @@ export function AddCustomer(props) {
 	const [birthDate, setBirthDate] = useState(new Date);
 	const [birthPlace, setBirthPlace] = useState('')
 	const [gender, setGender] = useState('');
-	
+
 	const [phoneNumber, setPhoneNumber] = useState('');
 	const [mobileNumber, setMobileNumber] = useState('');
 
@@ -180,10 +189,10 @@ export function AddCustomer(props) {
 
 	const add = (e) => {
 		setAdding(true);
-		if ( name && code ) {
+		if (name && code) {
 			Meteor.call(
 				'customers.add',
-				{	
+				{
 					code,
 					name,
 					birthDate,
@@ -206,9 +215,10 @@ export function AddCustomer(props) {
 				(err, res) => {
 					if (err) {
 						setAdding(false);
-						setDialogOpen(true);
-						setDialogTitle(err.error);
-						setDialogContent(err.reason);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle(err.error);
+						setMsg(err.reason);
 					} else if (res) {
 						let resultCode = res.code;
 						let resultTitle = res.title;
@@ -233,45 +243,68 @@ export function AddCustomer(props) {
 							setValidDate(new Date);
 							setCurrent(0);
 							setAdding(false);
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("success");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						} else {
 							setAdding(false);
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("warning");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						}
 					} else {
 						setAdding(false);
-						setDialogOpen(true);
-						setDialogTitle('Kesalahan Sistem');
-						setDialogContent(
-							'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle('Kesalahan Sistem');
+						setMsg('Terjadi kesalahan pada sistem, silahkan hubungi customer service');
 					}
 				}
 			);
-		} else {	
+		} else {
 			setAdding(false);
-			setDialogOpen(true);
-			setDialogTitle('Kesalahan Validasi');
-			setDialogContent(
-				'Nama & Kode Wajib Diisi'
-			);
-			return;
+			//let type = 'warning';
+			//let title = 'Kesalahan Validasi';
+			//let desc = 'Kode dan Nama Customer wajib diisi!';
+			//toaster.push(
+			//	<Message showIcon type={type} header={title}>
+			//		{desc}
+			//	</Message>
+			//	, { placement })
+			setOpenSnackbar(true);
+			setSeverity("warning");
+			setMsgTitle('Kesalahan Validasi');
+			setMsg('Kode dan Nama Customer wajib diisi!');
 		}
-
-		
 	};
 
-	const dataGender = ['Laki - laki','Perempuan'].map(
-		(item, index) => ({ label: item, value: ( index + 1 ) })
+	const dataGender = ['Laki - laki', 'Perempuan'].map(
+		(item, index) => ({ label: item, value: (index + 1) })
 	);
 
 	return (
 		<>
 			<div className="mainContainerRoot">
+
+				<Snackbar
+					anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+					open={openSnackbar}
+					onClose={() => { setOpenSnackbar(false); }}
+					autoHideDuration={3000}
+					key={'top' + 'center'}
+				>
+					<Alert
+						onClose={() => { setOpenSnackbar(false); }}
+						severity={severity}
+						sx={{ width: '100%' }}
+					>
+						<AlertTitle>{msgTitle}</AlertTitle>
+						{msg}
+					</Alert>
+				</Snackbar>
+
 				<Modal
 					backdrop={true}
 					keyboard={false}
@@ -315,7 +348,7 @@ export function AddCustomer(props) {
 						disabled={adding}
 						layout="horizontal"
 					>
-						<Form.Group controlId="code" style={{ marginBottom: 0}}>
+						<Form.Group controlId="code" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kode Customer</Form.ControlLabel>
 							<Form.Control
 								name="code"
@@ -328,7 +361,7 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="name" style={{ marginBottom: 0}}>
+						<Form.Group controlId="name" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Nama Customer</Form.ControlLabel>
 							<Form.Control
 								name="name"
@@ -341,7 +374,7 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="identityNumber" style={{ marginBottom: 0}}>
+						<Form.Group controlId="identityNumber" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">No. KTP</Form.ControlLabel>
 							<Form.Control
 								name="identityNumber"
@@ -356,7 +389,7 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="NPWPNumber" style={{ marginBottom: 0}}>
+						<Form.Group controlId="NPWPNumber" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">No. NPWP</Form.ControlLabel>
 							<Form.Control
 								name="NPWPNumber"
@@ -371,7 +404,7 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="birthPlace" style={{ marginBottom: 0}}>
+						<Form.Group controlId="birthPlace" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Tempat Lahir</Form.ControlLabel>
 							<Form.Control
 								name="birthPlace"
@@ -383,26 +416,26 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="birthDate" style={{ marginBottom: 0}}>
+						<Form.Group controlId="birthDate" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">
 								Tanggal Lahir
 							</Form.ControlLabel>
-							<Form.Control 
-								name="birthDate" 
-								accepter={DatePicker} 
+							<Form.Control
+								name="birthDate"
+								accepter={DatePicker}
 								value={birthDate}
 								onChange={(e) => {
 									setBirthDate(e);
 								}}
 								disabled={adding}
-								/>
+							/>
 						</Form.Group>
-						<Form.Group controlId="gender" style={{ marginBottom: 0}}>
+						<Form.Group controlId="gender" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Jenis Kelamin</Form.ControlLabel>
 							<Form.Control
 								name="gender"
 								accepter={SelectPicker}
-								searchable={false} 
+								searchable={false}
 								style={{ width: 224 }}
 								data={dataGender}
 								value={gender}
@@ -415,7 +448,7 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="phoneNumber" style={{ marginBottom: 0}}>
+						<Form.Group controlId="phoneNumber" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Nomor Telepon</Form.ControlLabel>
 							<Form.Control
 								name="phoneNumber"
@@ -427,7 +460,7 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="mobileNumber" style={{ marginBottom: 0}}>
+						<Form.Group controlId="mobileNumber" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left"> Nomor Handphone </Form.ControlLabel>
 							<Form.Control
 								name="mobileNumber"
@@ -439,14 +472,14 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="address" style={{ marginBottom: 5}}>
+						<Form.Group controlId="address" style={{ marginBottom: 5 }}>
 							<Form.ControlLabel className="text-left">Alamat Customer</Form.ControlLabel>
 							<Input
 								as="textarea"
 								rows={3}
 								name="address"
 								placeholder="Alamat Customer"
-								style={{width: 500}}
+								style={{ width: 500 }}
 								value={address}
 								onChange={(e) => {
 									setAddress(e);
@@ -454,7 +487,7 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="kelurahan" style={{ marginBottom: 0}}>
+						<Form.Group controlId="kelurahan" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kelurahan</Form.ControlLabel>
 							<Form.Control
 								name="kelurahan"
@@ -466,7 +499,7 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="kecamatan" style={{ marginBottom: 0}}>
+						<Form.Group controlId="kecamatan" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kecamatan</Form.ControlLabel>
 							<Form.Control
 								name="kecamatan"
@@ -478,7 +511,7 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="cityName" style={{ marginBottom: 0}}>
+						<Form.Group controlId="cityName" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kota</Form.ControlLabel>
 							<SelectPicker
 								placeholder="Kota"
@@ -501,8 +534,8 @@ export function AddCustomer(props) {
 								}}
 								renderMenu={renderCitiesLoading}
 							/>
-						</Form.Group>		
-						<Form.Group controlId="stateCode" style={{ marginBottom: 0}}>
+						</Form.Group>
+						<Form.Group controlId="stateCode" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Provinsi</Form.ControlLabel>
 							<SelectPicker
 								placeholder="Provinsi"
@@ -526,7 +559,7 @@ export function AddCustomer(props) {
 								renderMenu={renderStatesLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="countryCode" style={{ marginBottom: 0}}>
+						<Form.Group controlId="countryCode" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Negara</Form.ControlLabel>
 							<SelectPicker
 								placeholder="Negara"
@@ -548,8 +581,8 @@ export function AddCustomer(props) {
 								}}
 								renderMenu={renderCountriesLoading}
 							/>
-						</Form.Group>		
-						<Form.Group controlId="postalCode" style={{ marginBottom: 0}}>
+						</Form.Group>
+						<Form.Group controlId="postalCode" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kode Pos</Form.ControlLabel>
 							<Form.Control
 								name="postalCode"
@@ -561,21 +594,21 @@ export function AddCustomer(props) {
 								disabled={adding}
 							/>
 						</Form.Group>
-						<Form.Group controlId="validDate" style={{ marginBottom: 0}}>
+						<Form.Group controlId="validDate" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">
 								Tanggal Berlaku
 							</Form.ControlLabel>
-							<Form.Control 
-								name="validDate" 
-								accepter={DatePicker} 
+							<Form.Control
+								name="validDate"
+								accepter={DatePicker}
 								value={validDate}
 								onChange={(e) => {
 									setValidDate(e);
 								}}
 								disabled={adding}
-								/>
+							/>
 						</Form.Group>
-						<Form.Group controlId="current" style={{ marginBottom: 0}}>
+						<Form.Group controlId="current" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Poin</Form.ControlLabel>
 							<Form.Control
 								name="current"

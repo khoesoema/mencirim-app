@@ -11,7 +11,6 @@ import Breadcrumb from 'rsuite/Breadcrumb';
 import Button from 'rsuite/Button';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Form from 'rsuite/Form';
-import IconButton from 'rsuite/IconButton';
 import Input from 'rsuite/Input';
 import Modal from 'rsuite/Modal';
 import SelectPicker from 'rsuite/SelectPicker';
@@ -20,14 +19,27 @@ import DatePicker from 'rsuite/DatePicker';
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
 
-import { CustomersCollections  } from '../../../../../db/Customers';
+import { CustomersCollections } from '../../../../../db/Customers';
 import { CitiesCollections } from '../../../../../db/Cities';
 import { CountriesCollections } from '../../../../../db/Countries';
 import { StatesCollections } from '../../../../../db/States';
 
+import MuiAlert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Snackbar from '@mui/material/Snackbar';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+	return <MuiAlert elevation={6} ref={ref} {...props} />;
+});
+
 export function EditCustomer() {
 	let navigate = useNavigate();
 	let { _id } = useParams();
+
+	const [openSnackbar, setOpenSnackbar] = useState(false);
+	const [severity, setSeverity] = useState('info');
+	const [msg, setMsg] = useState('');
+	const [msgTitle, setMsgTitle] = useState('');
 
 	const [customerData, customerDataLoading] = useTracker(() => {
 		let isLoading = true;
@@ -55,7 +67,7 @@ export function EditCustomer() {
 	const [birthDate, setBirthDate] = useState(new Date);
 	const [birthPlace, setBirthPlace] = useState('')
 	const [gender, setGender] = useState(0);
-	
+
 	const [phoneNumber, setPhoneNumber] = useState('');
 	const [mobileNumber, setMobileNumber] = useState('');
 
@@ -76,7 +88,7 @@ export function EditCustomer() {
 	const [selectedID, setSelectedID] = useState('');
 	const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = useState(false);
 	const [deleteConfirmationDialogTitle, setDeleteConfirmationDialogTitle] = useState('');
-	const [deleteConfirmationDialogContent,setDeleteConfirmationDialogContent] = useState('');
+	const [deleteConfirmationDialogContent, setDeleteConfirmationDialogContent] = useState('');
 
 	const [searchCountriesText, setSearchCountriesText] = useState('');
 	const [searchStatesText, setSearchStatesText] = useState('');
@@ -163,7 +175,7 @@ export function EditCustomer() {
 	useEffect(() => {
 		if (customerData && customerDataLoading === false) {
 			setPreviousName(customerData.name);
-			
+
 			setCode(customerData.code);
 			setName(customerData.name);
 
@@ -175,7 +187,7 @@ export function EditCustomer() {
 			setMobileNumber(customerData.mobileNumber);
 
 			setAddress(customerData.address);
-			
+
 			setKelurahan(customerData.kelurahan);
 			setKecamatan(customerData.kecamatan);
 			setCountryCode(customerData.countryCode);
@@ -249,38 +261,54 @@ export function EditCustomer() {
 			(err, res) => {
 				if (err) {
 					setEditing(false);
-					setDialogOpen(true);
-					setDialogTitle(err.error);
-					setDialogContent(err.reason);
+					//setDialogOpen(true);
+					//setDialogTitle(err.error);
+					//setDialogContent(err.reason);
+					setOpenSnackbar(true);
+					setSeverity("error");
+					setMsgTitle(err.error);
+					setMsg(err.reason);
 				} else if (res) {
 					let resultCode = res.code;
 					let resultTitle = res.title;
 					let resultMessage = res.message;
 					if (resultCode === 200) {
 						setEditing(false);
-						setDialogOpen(true);
-						setDialogTitle(resultTitle);
-						setDialogContent(resultMessage);
+						//setDialogOpen(true);
+						//setDialogTitle(resultTitle);
+						//setDialogContent(resultMessage);
+						setOpenSnackbar(true);
+						setSeverity("success");
+						setMsgTitle(resultTitle);
+						setMsg(resultMessage);
 					} else {
 						setEditing(false);
-						setDialogOpen(true);
-						setDialogTitle(resultTitle);
-						setDialogContent(resultMessage);
+						//setDialogOpen(true);
+						//setDialogTitle(resultTitle);
+						//setDialogContent(resultMessage);
+						setOpenSnackbar(true);
+						setSeverity("warning");
+						setMsgTitle(resultTitle);
+						setMsg(resultMessage);
 					}
 				} else {
 					setEditing(false);
-					setDialogOpen(true);
-					setDialogTitle('Kesalahan Sistem');
-					setDialogContent(
-						'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-					);
+					//setDialogOpen(true);
+					//setDialogTitle('Kesalahan Sistem');
+					//setDialogContent(
+					//	'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
+					//);
+					setOpenSnackbar(true);
+					setSeverity("error");
+					setMsgTitle('Kesalahan Sistem');
+					setMsg('Terjadi kesalahan pada sistem, silahkan hubungi customer service');
 				}
 			}
 		);
 	};
 
 	const [selectedDeleteID, setSelectedDeleteID] = useState('');
-	
+
 	useEffect(() => {
 		if (selectedDeleteID) {
 			Meteor.call(
@@ -292,9 +320,13 @@ export function EditCustomer() {
 					if (err) {
 						setSelectedID('');
 						setSelectedDeleteID('');
-						setDialogOpen(true);
-						setDialogTitle(err.error);
-						setDialogContent(err.reason);
+						//setDialogOpen(true);
+						//setDialogTitle(err.error);
+						//setDialogContent(err.reason);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle(err.error);
+						setMsg(err.reason);
 					} else if (res) {
 						let resultCode = res.code;
 						let resultTitle = res.title;
@@ -302,24 +334,36 @@ export function EditCustomer() {
 						if (resultCode === 200) {
 							setSelectedID('');
 							setSelectedDeleteID('');
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							//setDialogOpen(true);
+							//setDialogTitle(resultTitle);
+							//setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("success");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						} else {
 							setSelectedID('');
 							setSelectedDeleteID('');
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							//setDialogOpen(true);
+							//setDialogTitle(resultTitle);
+							//setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("warning");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						}
 					} else {
 						setSelectedID('');
 						setSelectedDeleteID('');
-						setDialogOpen(true);
-						setDialogTitle('Kesalahan Sistem');
-						setDialogContent(
-							'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						);
+						//setDialogOpen(true);
+						//setDialogTitle('Kesalahan Sistem');
+						//setDialogContent(
+						//	'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
+						//);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle('Kesalahan Sistem');
+						setMsg('Terjadi kesalahan pada sistem, silahkan hubungi customer service');
 					}
 				}
 			);
@@ -357,13 +401,31 @@ export function EditCustomer() {
 		return menu;
 	};
 
-	const dataGender = ['Laki - laki','Perempuan'].map(
-		(item, index) => ({ label: item, value: ( index + 1 ) })
+	const dataGender = ['Laki - laki', 'Perempuan'].map(
+		(item, index) => ({ label: item, value: (index + 1) })
 	);
-	
+
 	return (
 		<>
 			<div className="mainContainerRoot">
+
+				<Snackbar
+					anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+					open={openSnackbar}
+					onClose={() => { setOpenSnackbar(false); }}
+					autoHideDuration={3000}
+					key={'top' + 'center'}
+				>
+					<Alert
+						onClose={() => { setOpenSnackbar(false); }}
+						severity={severity}
+						sx={{ width: '100%' }}
+					>
+						<AlertTitle>{msgTitle}</AlertTitle>
+						{msg}
+					</Alert>
+				</Snackbar>
+
 				{selectedID && (
 					<Modal
 						backdrop={true}
@@ -450,7 +512,7 @@ export function EditCustomer() {
 						disabled={editing || customerDataLoading}
 						layout="horizontal"
 					>
-						<Form.Group controlId="code" style={{ marginBottom: 0}}>
+						<Form.Group controlId="code" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kode Customer</Form.ControlLabel>
 							<Form.Control
 								name="code"
@@ -463,7 +525,7 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="name" style={{ marginBottom: 0}}>
+						<Form.Group controlId="name" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Nama Customer</Form.ControlLabel>
 							<Form.Control
 								name="name"
@@ -476,7 +538,7 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="identityNumber" style={{ marginBottom: 0}}>
+						<Form.Group controlId="identityNumber" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">No. KTP</Form.ControlLabel>
 							<Form.Control
 								name="identityNumber"
@@ -491,7 +553,7 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="NPWPNumber" style={{ marginBottom: 0}}>
+						<Form.Group controlId="NPWPNumber" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">No. NPWP</Form.ControlLabel>
 							<Form.Control
 								name="NPWPNumber"
@@ -506,7 +568,7 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="birthPlace" style={{ marginBottom: 0}}>
+						<Form.Group controlId="birthPlace" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Tempat Lahir</Form.ControlLabel>
 							<Form.Control
 								name="birthPlace"
@@ -518,26 +580,26 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="birthDate" style={{ marginBottom: 0}}>
+						<Form.Group controlId="birthDate" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">
 								Tanggal Lahir
 							</Form.ControlLabel>
-							<Form.Control 
-								name="birthDate" 
-								accepter={DatePicker} 
+							<Form.Control
+								name="birthDate"
+								accepter={DatePicker}
 								value={birthDate}
 								onChange={(e) => {
 									setBirthDate(e);
 								}}
 								disabled={editing || customerDataLoading}
-								/>
+							/>
 						</Form.Group>
-						<Form.Group controlId="gender" style={{ marginBottom: 0}}>
+						<Form.Group controlId="gender" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Jenis Kelamin</Form.ControlLabel>
 							<Form.Control
 								name="gender"
 								accepter={SelectPicker}
-								searchable={false} 
+								searchable={false}
 								style={{ width: 224 }}
 								data={dataGender}
 								value={gender}
@@ -550,7 +612,7 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="phoneNumber" style={{ marginBottom: 0}}>
+						<Form.Group controlId="phoneNumber" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Nomor Telepon</Form.ControlLabel>
 							<Form.Control
 								name="phoneNumber"
@@ -562,7 +624,7 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="mobileNumber" style={{ marginBottom: 0}}>
+						<Form.Group controlId="mobileNumber" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left"> Nomor Handphone </Form.ControlLabel>
 							<Form.Control
 								name="mobileNumber"
@@ -574,14 +636,14 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="address" style={{ marginBottom: 5}}>
+						<Form.Group controlId="address" style={{ marginBottom: 5 }}>
 							<Form.ControlLabel className="text-left">Alamat Customer</Form.ControlLabel>
 							<Input
 								as="textarea"
 								rows={3}
 								name="address"
 								placeholder="Alamat Customer"
-								style={{width: 500}}
+								style={{ width: 500 }}
 								value={address}
 								onChange={(e) => {
 									setAddress(e);
@@ -589,7 +651,7 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="kelurahan" style={{ marginBottom: 0}}>
+						<Form.Group controlId="kelurahan" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kelurahan</Form.ControlLabel>
 							<Form.Control
 								name="kelurahan"
@@ -601,7 +663,7 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="kecamatan" style={{ marginBottom: 0}}>
+						<Form.Group controlId="kecamatan" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kecamatan</Form.ControlLabel>
 							<Form.Control
 								name="kecamatan"
@@ -613,7 +675,7 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="cityName" style={{ marginBottom: 0}}>
+						<Form.Group controlId="cityName" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kota</Form.ControlLabel>
 							<SelectPicker
 								placeholder="Kota"
@@ -636,8 +698,8 @@ export function EditCustomer() {
 								}}
 								renderMenu={renderCitiesLoading}
 							/>
-						</Form.Group>		
-						<Form.Group controlId="stateCode" style={{ marginBottom: 0}}>
+						</Form.Group>
+						<Form.Group controlId="stateCode" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Provinsi</Form.ControlLabel>
 							<SelectPicker
 								placeholder="Provinsi"
@@ -661,7 +723,7 @@ export function EditCustomer() {
 								renderMenu={renderStatesLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="countryCode" style={{ marginBottom: 0}}>
+						<Form.Group controlId="countryCode" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Negara</Form.ControlLabel>
 							<SelectPicker
 								placeholder="Negara"
@@ -683,8 +745,8 @@ export function EditCustomer() {
 								}}
 								renderMenu={renderCountriesLoading}
 							/>
-						</Form.Group>		
-						<Form.Group controlId="postalCode" style={{ marginBottom: 0}}>
+						</Form.Group>
+						<Form.Group controlId="postalCode" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Kode Pos</Form.ControlLabel>
 							<Form.Control
 								name="postalCode"
@@ -696,21 +758,21 @@ export function EditCustomer() {
 								disabled={editing || customerDataLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="validDate" style={{ marginBottom: 0}}>
+						<Form.Group controlId="validDate" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">
 								Tanggal Berlaku
 							</Form.ControlLabel>
-							<Form.Control 
-								name="validDate" 
-								accepter={DatePicker} 
+							<Form.Control
+								name="validDate"
+								accepter={DatePicker}
 								value={validDate}
 								onChange={(e) => {
 									setValidDate(e);
 								}}
 								disabled={editing || customerDataLoading}
-								/>
+							/>
 						</Form.Group>
-						<Form.Group controlId="current" style={{ marginBottom: 0}}>
+						<Form.Group controlId="current" style={{ marginBottom: 0 }}>
 							<Form.ControlLabel className="text-left">Poin</Form.ControlLabel>
 							<Form.Control
 								name="current"
@@ -752,11 +814,11 @@ export function EditCustomer() {
 										);
 										setDeleteConfirmationDialogContent(
 											'Anda akan menghapus data Customer ' +
-												'[' +
-												code +
-												']' +
-												name +
-												'. Semua data yang berhubungan dengan Customer ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
+											'[' +
+											code +
+											']' +
+											name +
+											'. Semua data yang berhubungan dengan Customer ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
 										);
 									}}
 									disabled={editing || customerDataLoading}

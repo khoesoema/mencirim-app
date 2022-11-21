@@ -71,7 +71,7 @@ export function AddPurchaseOrder() {
 
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
-	
+
 	const [page, setPage] = useState(1);
 	const [maxPage, setMaxPage] = useState(1);
 	const [orderBy, setOrderBy] = useState('itemNo');
@@ -132,10 +132,10 @@ export function AddPurchaseOrder() {
 				},
 			],
 		}).fetch();
-		
+
 		return [data, !subs.ready()];
 	}, [searchVendorText, vendorID]);
-	
+
 	const [currencies, currenciesLoading] = useTracker(() => {
 		let subs = Meteor.subscribe('currencies.search', {
 			searchText: searchCurrencyText,
@@ -223,8 +223,8 @@ export function AddPurchaseOrder() {
 		}
 
 		let grandttl = 0;
-		if (pembelianDetail.length > 0 ) {
-			pembelianDetail.map( (item) => {
+		if (pembelianDetail.length > 0) {
+			pembelianDetail.map((item) => {
 				grandttl += item.hargaNetto;
 				return grandttl;
 			})
@@ -315,25 +315,25 @@ export function AddPurchaseOrder() {
 			return false;
 		}
 	};
-	
+
 	const formatNum = (input) => {
 		if (input) {
 			return parseFloat(input)
-					.toFixed(2)
-					.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+				.toFixed(2)
+				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
 		} else {
 			return 0;
-		}	
+		}
 	};
 
 	const formatNum0 = (input) => {
 		if (input) {
 			return parseFloat(input)
-					.toFixed(0)
-					.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+				.toFixed(0)
+				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
 		} else {
 			return 0;
-		}	
+		}
 	};
 
 	return (
@@ -388,6 +388,7 @@ export function AddPurchaseOrder() {
 					onClose={(e) => {
 						setDialogOpen(false);
 					}}
+					style={{ marginTop: 35 }}
 				>
 					<Modal.Header>
 						<Modal.Title>{dialogTitle}</Modal.Title>
@@ -395,21 +396,21 @@ export function AddPurchaseOrder() {
 
 					<Modal.Body>{dialogContent}</Modal.Body>
 				</Modal>
-				
+
 				{updateDetail === false
-				 	?	<DetailPurchase 
-							open={open} 
-							handleClose={() => handleClose()}
-							itemNo={itemNo}
-							noFaktur={noFaktur}
-						/>
-					:	<EditDetailPurchase 
-							open={open} 
-							handleClose={() => handleClose()}
-							noFaktur={noFaktur}
-							selectedID={selectedID}
-						/>
-				}	
+					? <DetailPurchase
+						open={open}
+						handleClose={handleClose}
+						itemNo={itemNo}
+						noFaktur={noFaktur}
+					/>
+					: <EditDetailPurchase
+						open={open}
+						handleClose={handleClose}
+						noFaktur={noFaktur}
+						selectedID={selectedID}
+					/>
+				}
 
 				<div className="mainContent">
 					<div className="breadcrumContainer">
@@ -441,8 +442,8 @@ export function AddPurchaseOrder() {
 						disabled={adding}
 						layout="horizontal"
 					>
-						<Form.Group controlId="noNoOrder" style={{ marginBottom: 10}}>
-							<Form.ControlLabel className="text-left"> 
+						<Form.Group controlId="noNoOrder" style={{ marginBottom: 10 }}>
+							<Form.ControlLabel className="text-left">
 								Nomor Order
 							</Form.ControlLabel>
 							<Form.Control
@@ -456,32 +457,31 @@ export function AddPurchaseOrder() {
 							/>
 							<Form.HelpText tooltip>Akan otomatis digenerate oleh sistem jika kosong</Form.HelpText>
 						</Form.Group>
-						<Form.Group controlId="transactionDate" style={{ marginBottom: 10}}>
+						<Form.Group controlId="transactionDate" style={{ marginBottom: 10 }}>
 							<Form.ControlLabel className="text-left">
 								Tanggal Transaksi
 							</Form.ControlLabel>
-							<Form.Control 
-								name="tglupdate" 
-								accepter={DatePicker} 
+							<Form.Control
+								name="tglupdate"
+								accepter={DatePicker}
 								value={transactionDate}
 								onChange={(e) => {
 									setTransactionDate(e);
 								}}
 								disabled={adding}
-								/>
+							/>
 						</Form.Group>
-						<Form.Group controlId="vendorID" style={{ marginBottom: 10}}>
+						<Form.Group controlId="vendorID" style={{ marginBottom: 10 }}>
 							<Form.ControlLabel className="text-left">Supplier</Form.ControlLabel>
 							<SelectPicker
 								placeholder="Supplier"
-								required
 								disabled={adding}
-								style={{width: 300}}
+								style={{ width: 300 }}
 								data={vendors.map((s) => ({
 									label: '[' + s.code + '] ' + s.name,
 									value: s._id,
 								}))}
-								
+
 								value={vendorID}
 								onChange={(input) => {
 									setVendorID(input);
@@ -495,12 +495,12 @@ export function AddPurchaseOrder() {
 								renderMenu={renderVendorsLoading}
 							/>
 						</Form.Group>
-						<Form.Group controlId="currencyID" style={{ marginBottom: 10}}>
+						<Form.Group controlId="currencyID" style={{ marginBottom: 10 }}>
 							<Form.ControlLabel className="text-left">Currency</Form.ControlLabel>
 							<SelectPicker
 								placeholder="Currency"
 								disabled={adding}
-								style={{width: 300}}
+								style={{ width: 300 }}
 								data={currencies.map((s) => ({
 									label: '[' + s.code + '] ' + s.name,
 									value: s.code,
@@ -520,11 +520,11 @@ export function AddPurchaseOrder() {
 						</Form.Group>
 						<Form.Group controlId="selectedProducts">
 							<Form.ControlLabel className="text-left" >Tambah Item </Form.ControlLabel>
-							<IconButton 
+							<IconButton
 								color="blue" appearance="primary"
-								icon={<PlusIcon />} 
+								icon={<PlusIcon />}
 								onClick={(e) => {
-									if(noFaktur===''){
+									if (noFaktur === '') {
 										setDialogOpen(true);
 										setDialogTitle('Kesalahan Sistem');
 										setDialogContent('Nomor Order Pembelian belum diisi!');
@@ -534,8 +534,8 @@ export function AddPurchaseOrder() {
 									}
 								}}
 							>Add New</IconButton>
-							
-							<Table responsive striped bordered hover style={{ fontSize: "12px", marginBottom: 10, marginTop: 10}}>
+
+							<Table responsive striped bordered hover style={{ fontSize: "12px", marginBottom: 10, marginTop: 10 }}>
 								<thead>
 									<tr>
 										<th>#</th>
@@ -568,45 +568,45 @@ export function AddPurchaseOrder() {
 												<>
 													{pembelianDetail.map((item, index) => (
 														<tr key={index}>
-															<td> { item.itemNo} </td>
+															<td> {item.itemNo} </td>
 															<td>{item.kodeBarang}</td>
 															<td>{item.namaBarang}</td>
 															<td className="text-right">{item.ktsKecil}</td>
-															<td>{item.satuanKecil}</td>	
-															<td className="text-right">{ formatNum(item.hargaBeliSatuan)}</td>
-															<td className="text-right">{ formatNum( ((item.diskonHarga1 + item.diskonHarga2 + item.diskonHarga3 + item.diskonHarga4 + item.diskonHarga5) / item.ktsKecil)/item.hargaBeliSatuan * 100)} %</td>
-															<td className="text-right">{ formatNum( (item.diskonHarga1 + item.diskonHarga2 + item.diskonHarga3 + item.diskonHarga4 + item.diskonHarga5) / item.ktsKecil) }</td>		
-															<td className="text-right">{ formatNum0(item.ppnPersen) } %</td>
-															<td className="text-right">{ formatNum(item.ppnHarga / item.ktsKecil)}</td>
-															<td className="text-right">{ formatNum(item.hargaNetto / item.ktsKecil)}</td>
-															<td className="text-right">{ formatNum(item.hargaNetto)}</td>
+															<td>{item.satuanKecil}</td>
+															<td className="text-right">{formatNum(item.hargaBeliSatuan)}</td>
+															<td className="text-right">{formatNum(((item.diskonHarga1 + item.diskonHarga2 + item.diskonHarga3 + item.diskonHarga4 + item.diskonHarga5) / item.ktsKecil) / item.hargaBeliSatuan * 100)} %</td>
+															<td className="text-right">{formatNum((item.diskonHarga1 + item.diskonHarga2 + item.diskonHarga3 + item.diskonHarga4 + item.diskonHarga5) / item.ktsKecil)}</td>
+															<td className="text-right">{formatNum0(item.ppnPersen)} %</td>
+															<td className="text-right">{formatNum(item.ppnHarga / item.ktsKecil)}</td>
+															<td className="text-right">{formatNum(item.hargaNetto / item.ktsKecil)}</td>
+															<td className="text-right">{formatNum(item.hargaNetto)}</td>
 															<td style={{ textAlign: "center" }}>
-																<a 	className ="fakeLink"
+																<a className="fakeLink"
 																	onClick={(e) => {
-																		setSelectedID( item._id );
+																		setSelectedID(item._id);
 																		setUpdateDetail(true);
 																		handleOpen(e);
 																	}}
-																	>
-																	<FaPencilAlt /> 
+																>
+																	<FaPencilAlt />
 																</a>
-																<Divider vertical/>
-																<a 	className ="fakeLink"
-																	style={{color: "red"}}
+																<Divider vertical />
+																<a className="fakeLink"
+																	style={{ color: "red" }}
 																	onClick={(e) => {
-																		setSelectedID( item._id );
-																		setDeleteConfirmationDialogOpen( true);
-																		setDeleteConfirmationDialogTitle( 'Hapus data Pembelian Detail');
+																		setSelectedID(item._id);
+																		setDeleteConfirmationDialogOpen(true);
+																		setDeleteConfirmationDialogTitle('Hapus data Pembelian Detail');
 																		setDeleteConfirmationDialogContent(
 																			'Anda akan menghapus data Pembelian Detail ' +
-																				'[' +
-																				item.kodeBarang +
-																				']' +
-																				item.namaBarang +
-																				'. Semua data yang berhubungan dengan Pembelian Detail ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
+																			'[' +
+																			item.kodeBarang +
+																			']' +
+																			item.namaBarang +
+																			'. Semua data yang berhubungan dengan Pembelian Detail ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
 																		);
 																	}}
-																	>
+																>
 																	<FaTrashAlt />
 																</a>
 															</td>
@@ -625,46 +625,46 @@ export function AddPurchaseOrder() {
 								</tbody>
 							</Table>
 						</Form.Group>
-						<Row style={{ marginBottom: 10}}>
+						<Row style={{ marginBottom: 10 }}>
 							<Col sm={6}>
 							</Col>
 							<Col sm={6}>
-							<Form.Group controlId="grandTotal" >
-								<Form.ControlLabel>Grand Total</Form.ControlLabel>
-								<Form.Control
-									name="grandTotal"
-									placeholder="Grand Total"
-									readOnly
-									className ="text-right"
-									value={grandTotal}
-									style={{color: "#1675e0" }}
-								/>
-							</Form.Group>
-							<Form.Group>
-								<ButtonToolbar>
-									<Button
-										type="submit"
-										appearance="primary"
-										loading={adding}
-									>
-										Simpan
-									</Button>
-									<Button
-										appearance="default"
-										onClick={(e) => {
-											navigate('/PurchaseOrder');
-										}}
-										disabled={adding}
-									>
-										Batal
-									</Button>
-								</ButtonToolbar>
-							</Form.Group>				
+								<Form.Group controlId="grandTotal" >
+									<Form.ControlLabel>Grand Total</Form.ControlLabel>
+									<Form.Control
+										name="grandTotal"
+										placeholder="Grand Total"
+										readOnly
+										className="text-right"
+										value={grandTotal}
+										style={{ color: "#1675e0" }}
+									/>
+								</Form.Group>
+								<Form.Group>
+									<ButtonToolbar>
+										<Button
+											type="submit"
+											appearance="primary"
+											loading={adding}
+										>
+											Simpan
+										</Button>
+										<Button
+											appearance="default"
+											onClick={(e) => {
+												navigate('/PurchaseOrder');
+											}}
+											disabled={adding}
+										>
+											Batal
+										</Button>
+									</ButtonToolbar>
+								</Form.Group>
 							</Col>
 						</Row>
-						
-						
-						
+
+
+
 					</Form>
 				</div>
 			</div>

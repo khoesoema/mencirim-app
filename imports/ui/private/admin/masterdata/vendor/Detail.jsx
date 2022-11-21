@@ -385,7 +385,6 @@ export function EditSupplier() {
 
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

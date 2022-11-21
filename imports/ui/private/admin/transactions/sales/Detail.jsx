@@ -445,7 +445,7 @@ export function EditSalesInvoice() {
 						onClose={(e) => {
 							setDeleteConfirmationDialogOpen(false);
 						}}
-						style={{fontSize: 14}}
+						style={{fontSize: 14, marginTop : 35}}
 					>
 						<Modal.Header>
 							<Modal.Title className="text-center">
@@ -506,6 +506,7 @@ export function EditSalesInvoice() {
 					onClose={(e) => {
 						setDialogOpen(false);
 					}}
+					style={{ marginTop: 35 }}
 				>
 					<Modal.Header>
 						<Modal.Title>{dialogTitle}</Modal.Title>

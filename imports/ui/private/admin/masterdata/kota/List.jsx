@@ -148,7 +148,6 @@ export function ListKota(props) {
 	}, [selectedDeleteID]);
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
 				{selectedID && (
 					<Modal

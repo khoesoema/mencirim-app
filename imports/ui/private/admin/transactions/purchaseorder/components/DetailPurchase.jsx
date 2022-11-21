@@ -881,8 +881,8 @@ const DetailPurchase = (props) => {
 				overflow={overflow}
 				open={props.open}
 				onClose={props.handleClose}
-				size="large"
-				style={{ marginLeft: 50, marginTop: 40, marginRight: 50, marginBottom: 150 }}>
+				size="full"
+				style={{ marginTop: 35, marginLeft: 50 }}>
 				<Modal.Header>
 					<Modal.Title>
 						<Row xs="auto">

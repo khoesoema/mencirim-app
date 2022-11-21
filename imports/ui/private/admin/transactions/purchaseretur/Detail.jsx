@@ -424,7 +424,7 @@ export function EditPurchaseRetur() {
 						onClose={(e) => {
 							setDeleteConfirmationDialogOpen(false);
 						}}
-						style={{fontSize: 14}}
+						style={{fontSize: 14, marginTop: 35}}
 					>
 						<Modal.Header>
 							<Modal.Title className="text-center">

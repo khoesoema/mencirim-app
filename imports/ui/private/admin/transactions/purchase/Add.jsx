@@ -350,6 +350,7 @@ export function AddPurchaseInvoice(props) {
 						onClose={(e) => {
 							setDeleteConfirmationDialogOpen(false);
 						}}
+						style={{ marginTop: 35 }}
 					>
 						<Modal.Header>
 							<Modal.Title>
@@ -391,6 +392,7 @@ export function AddPurchaseInvoice(props) {
 					onClose={(e) => {
 						setDialogOpen(false);
 					}}
+					style={{ marginTop: 35 }}
 				>
 					<Modal.Header>
 						<Modal.Title>{dialogTitle}</Modal.Title>

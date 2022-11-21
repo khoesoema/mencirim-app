@@ -71,7 +71,7 @@ export function EditPromotion() {
 
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
-	
+
 	const [page, setPage] = useState(1);
 	const [orderBy, setOrderBy] = useState('itemNo');
 	const [order, setOrder] = useState(1);
@@ -94,21 +94,21 @@ export function EditPromotion() {
 		setStartDate(new Date());
 		setEndDate(new Date());
 		setTarget('');
-		setKeterangan('');	
-	} 
+		setKeterangan('');
+	}
 
 
-	useEffect(()=>{
-		if (promotionsData && promotionsDataLoading === false ){
+	useEffect(() => {
+		if (promotionsData && promotionsDataLoading === false) {
 			setPromoNo(promotionsData.promoNo);
 			setStartDate(moment(promotionsData.startDate).toDate());
 			setEndDate(moment(promotionsData.endDate).toDate());
 			setTarget(promotionsData.target);
 			setKeterangan(promotionsData.keterangan);
-		}else if (!promotionsData && promotionsDataLoading === false ) {
+		} else if (!promotionsData && promotionsDataLoading === false) {
 			resetvalue();
 		};
-	},[promotionsData, promotionsDataLoading])
+	}, [promotionsData, promotionsDataLoading])
 
 
 	const [promotionsDetailCount, promotionsDetailCountLoading] = useTracker(() => {
@@ -144,11 +144,11 @@ export function EditPromotion() {
 	const formatNum = (input, dec) => {
 		if (input) {
 			return parseFloat(input)
-					.toFixed(dec)
-					.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+				.toFixed(dec)
+				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
 		} else {
 			return 0;
-		}	
+		}
 	};
 
 	useEffect(() => {
@@ -170,8 +170,8 @@ export function EditPromotion() {
 						toaster.push(
 							<Message showIcon type={type} header={title}>
 								{desc}
-							  </Message>
-							,{placement})
+							</Message>
+							, { placement })
 					} else if (res) {
 						let resultCode = res.code;
 						let resultTitle = res.title;
@@ -186,8 +186,8 @@ export function EditPromotion() {
 							toaster.push(
 								<Message showIcon type={type} header={title}>
 									{desc}
-								  </Message>
-								,{placement})
+								</Message>
+								, { placement })
 						} else {
 							setSelectedID('');
 							setSelectedDeleteID('');
@@ -197,8 +197,8 @@ export function EditPromotion() {
 							toaster.push(
 								<Message showIcon type={type} header={title}>
 									{desc}
-								  </Message>
-								,{placement})
+								</Message>
+								, { placement })
 						}
 					} else {
 						setSelectedID('');
@@ -209,8 +209,8 @@ export function EditPromotion() {
 						toaster.push(
 							<Message showIcon type={type} header={title}>
 								{desc}
-							  </Message>
-							,{placement})
+							</Message>
+							, { placement })
 					}
 				}
 			);
@@ -220,7 +220,7 @@ export function EditPromotion() {
 
 	const edit = () => {
 		setEditing(true);
-		if ( promoNo ) {
+		if (promoNo) {
 			Meteor.call(
 				'promotions.edit',
 				{
@@ -240,8 +240,8 @@ export function EditPromotion() {
 						toaster.push(
 							<Message showIcon type={type} header={title}>
 								{desc}
-							  </Message>
-							,{placement})
+							</Message>
+							, { placement })
 					} else if (res) {
 						let resultCode = res.code;
 						let resultTitle = res.title;
@@ -255,8 +255,8 @@ export function EditPromotion() {
 							toaster.push(
 								<Message showIcon type={type} header={title}>
 									{desc}
-								  </Message>
-								,{placement})
+								</Message>
+								, { placement })
 						} else {
 							setEditing(false);
 							let type = 'warning';
@@ -265,8 +265,8 @@ export function EditPromotion() {
 							toaster.push(
 								<Message showIcon type={type} header={title}>
 									{desc}
-								  </Message>
-								,{placement})
+								</Message>
+								, { placement })
 						}
 					} else {
 						setEditing(false);
@@ -276,8 +276,8 @@ export function EditPromotion() {
 						toaster.push(
 							<Message showIcon type={type} header={title}>
 								{desc}
-							  </Message>
-							,{placement})
+							</Message>
+							, { placement })
 					}
 				}
 			);
@@ -289,8 +289,8 @@ export function EditPromotion() {
 			toaster.push(
 				<Message showIcon type={type} header={title}>
 					{desc}
-				  </Message>
-				,{placement})
+				</Message>
+				, { placement })
 		}
 	};
 
@@ -305,6 +305,7 @@ export function EditPromotion() {
 						onClose={(e) => {
 							setDeleteConfirmationDialogOpen(false);
 						}}
+						style={{ marginTop: 35 }}
 					>
 						<Modal.Header>
 							<Modal.Title>
@@ -346,6 +347,7 @@ export function EditPromotion() {
 					onClose={(e) => {
 						setDialogOpen(false);
 					}}
+					style={{ marginTop: 35 }}
 				>
 					<Modal.Header>
 						<Modal.Title>{dialogTitle}</Modal.Title>
@@ -353,21 +355,21 @@ export function EditPromotion() {
 
 					<Modal.Body>{dialogContent}</Modal.Body>
 				</Modal>
-				
+
 				{updateDetail === false
-				 	?	<DetailPurchase 
-							open={open} 
-							handleClose={() => handleClose()}
-							itemNo={itemNo}
-							promoNo={promoNo}
-						/>
-					:	<EditDetailPurchase 
-							open={open} 
-							handleClose={() => handleClose()}
-							promoNo={promoNo}
-							selectedID={selectedID}
-						/>
-				}	
+					? <DetailPurchase
+						open={open}
+						handleClose={() => handleClose()}
+						itemNo={itemNo}
+						promoNo={promoNo}
+					/>
+					: <EditDetailPurchase
+						open={open}
+						handleClose={() => handleClose()}
+						promoNo={promoNo}
+						selectedID={selectedID}
+					/>
+				}
 
 				<div className="mainContent">
 					<div className="breadcrumContainer">
@@ -399,8 +401,8 @@ export function EditPromotion() {
 						disabled={editing || promotionsDataLoading}
 						layout="horizontal"
 					>
-						<Form.Group controlId="promoNo" style={{ marginBottom: 10}}>
-							<Form.ControlLabel className="text-left"> 
+						<Form.Group controlId="promoNo" style={{ marginBottom: 10 }}>
+							<Form.ControlLabel className="text-left">
 								Nomor Promosi
 							</Form.ControlLabel>
 							<Form.Control
@@ -414,51 +416,51 @@ export function EditPromotion() {
 							/>
 							<Form.HelpText tooltip>Akan otomatis digenerate oleh sistem jika kosong</Form.HelpText>
 						</Form.Group>
-						<Form.Group controlId="startDate" style={{ marginBottom: 10}}>
+						<Form.Group controlId="startDate" style={{ marginBottom: 10 }}>
 							<Form.ControlLabel className="text-left">
 								Tanggal Mulai
 							</Form.ControlLabel>
-							<Form.Control 
-								name="startDate" 
-								accepter={DatePicker} 
+							<Form.Control
+								name="startDate"
+								accepter={DatePicker}
 								value={startDate}
 								onChange={(e) => {
 									setStartDate(e);
 								}}
 								disabled={editing || promotionsDataLoading}
-								/>
+							/>
 						</Form.Group>
-						<Form.Group controlId="endDate" style={{ marginBottom: 10}}>
+						<Form.Group controlId="endDate" style={{ marginBottom: 10 }}>
 							<Form.ControlLabel className="text-left">
 								Tanggal Berakhir
 							</Form.ControlLabel>
-							<Form.Control 
-								name="endDate" 
-								accepter={DatePicker} 
+							<Form.Control
+								name="endDate"
+								accepter={DatePicker}
 								value={endDate}
 								onChange={(e) => {
 									setEndDate(e);
 								}}
 								disabled={editing || promotionsDataLoading}
-								/>
+							/>
 						</Form.Group>
-						<Form.Group controlId="target" style={{ marginBottom: 10}}>
+						<Form.Group controlId="target" style={{ marginBottom: 10 }}>
 							<Form.ControlLabel className="text-left">
 								Target Konsumen
 							</Form.ControlLabel>
-  						  	<RadioGroup name="target" inline value={target} onChange={(e)=> setTarget(e)}>
-  						    	<Radio value={1}>Semua</Radio>
-  						    	<Radio value={2}>Member</Radio>
-  						    	<Radio value={3}>Umum</Radio>
-  						  	</RadioGroup>
-  						</Form.Group>
-						<Form.Group controlId="selectedProducts" style={{ marginBottom: 10}}>
+							<RadioGroup name="target" inline value={target} onChange={(e) => setTarget(e)}>
+								<Radio value={1}>Semua</Radio>
+								<Radio value={2}>Member</Radio>
+								<Radio value={3}>Umum</Radio>
+							</RadioGroup>
+						</Form.Group>
+						<Form.Group controlId="selectedProducts" style={{ marginBottom: 10 }}>
 							<Form.ControlLabel className="text-left" >Tambah Item </Form.ControlLabel>
-							<IconButton 
+							<IconButton
 								color="blue" appearance="primary"
-								icon={<PlusIcon />} 
+								icon={<PlusIcon />}
 								onClick={(e) => {
-									if(promoNo ===''){
+									if (promoNo === '') {
 										setDialogOpen(true);
 										setDialogTitle('Kesalahan Sistem');
 										setDialogContent('Nomor Promosi belum diisi!');
@@ -468,8 +470,8 @@ export function EditPromotion() {
 									}
 								}}
 							>Add New</IconButton>
-							
-							<Table responsive striped bordered hover style={{ fontSize: "12px", marginBottom: 10, marginTop: 10}}>
+
+							<Table responsive striped bordered hover style={{ fontSize: "12px", marginBottom: 10, marginTop: 10 }}>
 								<thead>
 									<tr>
 										<th>#</th>
@@ -501,35 +503,35 @@ export function EditPromotion() {
 															<td>{item.itemNo}</td>
 															<td>{item.kodeBarang}</td>
 															<td>{item.namaBarang}</td>
-															<td className="text-right">{ formatNum(item.diskonPersen,2)}</td>
-															<td className="text-right">{ formatNum(item.diskonHarga,2)}</td>
+															<td className="text-right">{formatNum(item.diskonPersen, 2)}</td>
+															<td className="text-right">{formatNum(item.diskonHarga, 2)}</td>
 															<td style={{ textAlign: "center" }}>
-																<a 	className ="fakeLink"
+																<a className="fakeLink"
 																	onClick={(e) => {
-																		setSelectedID( item._id );
+																		setSelectedID(item._id);
 																		setUpdateDetail(true);
 																		handleOpen(e);
 																	}}
-																	>
-																	<FaPencilAlt /> 
+																>
+																	<FaPencilAlt />
 																</a>
-																<Divider vertical/>
-																<a 	className ="fakeLink"
-																	style={{color: "red"}}
+																<Divider vertical />
+																<a className="fakeLink"
+																	style={{ color: "red" }}
 																	onClick={() => {
-																		setSelectedID( item._id );
-																		setDeleteConfirmationDialogOpen( true);
-																		setDeleteConfirmationDialogTitle( 'Hapus data Promosi Barang Detail');
+																		setSelectedID(item._id);
+																		setDeleteConfirmationDialogOpen(true);
+																		setDeleteConfirmationDialogTitle('Hapus data Promosi Barang Detail');
 																		setDeleteConfirmationDialogContent(
 																			'Anda akan menghapus data Promosi Barang Detail ' +
-																				'[' +
-																				item.kodeBarang +
-																				']' +
-																				item.namaBarang +
-																				'. Semua data yang berhubungan dengan Promosi Barang Detail ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
+																			'[' +
+																			item.kodeBarang +
+																			']' +
+																			item.namaBarang +
+																			'. Semua data yang berhubungan dengan Promosi Barang Detail ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
 																		);
 																	}}
-																	>
+																>
 																	<FaTrashAlt />
 																</a>
 															</td>
@@ -548,14 +550,14 @@ export function EditPromotion() {
 								</tbody>
 							</Table>
 						</Form.Group>
-						<Form.Group controlId="keterangan" style={{ marginBottom: 10}}>
+						<Form.Group controlId="keterangan" style={{ marginBottom: 10 }}>
 							<Form.ControlLabel className="text-left">Keterangan</Form.ControlLabel>
 							<Input
 								as="textarea"
 								rows={3}
 								name="keterangan"
 								placeholder="Keterangan"
-								style={{width: 400}}
+								style={{ width: 400 }}
 								value={keterangan}
 								onChange={(e) => {
 									setKeterangan(e);
@@ -582,7 +584,7 @@ export function EditPromotion() {
 									Batal
 								</Button>
 							</ButtonToolbar>
-						</Form.Group>	
+						</Form.Group>
 					</Form>
 				</div>
 			</div>

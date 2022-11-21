@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter as Router, Switch, Route, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -22,10 +22,15 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ListSubheader from '@mui/material/ListSubheader';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import HailIcon from '@mui/icons-material/Hail';
@@ -36,7 +41,6 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
 import Collapse from '@mui/material/Collapse';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Category from '@mui/icons-material/Category';
@@ -60,28 +64,13 @@ import { FaUserTie } from 'react-icons/fa'
 import { GrMoney } from 'react-icons/gr';
 import { GiWorld } from 'react-icons/gi';
 import { GiPaperBagOpen } from 'react-icons/gi';
-import { CiDiscount1 } from 'react-icons/ci';
 
 import { Icon } from '@rsuite/icons';
 import GearIcon from '@rsuite/icons/Gear';
 
 import Form from 'rsuite/Form';
-import Modal from 'rsuite/Modal';
 
 import { PageRoutes } from './Routers';
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mantapagungsejati.com/">
-        mantapagungsejati.com
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 const drawerWidth = 300;
 
@@ -139,7 +128,6 @@ const darkTheme = createTheme({
     },
   },
 });
-
 
 function DashboardContent() {
   let navigate = useNavigate();
@@ -242,39 +230,16 @@ function DashboardContent() {
     setOpenMenu(!openMenu);
   };
 
-
-
   return (
     <>
-      <Modal
-        backdrop={true}
-        keyboard={false}
-        open={dialogOpen}
-        onClose={(e) => {
-          setDialogOpen(false);
-        }}
-      >
-        <Modal.Header>
-          <Modal.Title>{dialogTitle}</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>{dialogContent}</Modal.Body>
-      </Modal>
-      <Modal
-        size="lg"
-        backdrop={true}
-        keyboard={false}
-        open={changePasswordDialogOpen}
-        onClose={(e) => {
-          setChangePasswordDialogOpen(false);
-        }}
-      >
-        <Modal.Header>
-          <Modal.Title>Reset Password</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>
-          <Form
+      <Dialog 
+        fullWidth={true}
+        maxWidth="md"
+        open={changePasswordDialogOpen} 
+        onClose={()=> setChangePasswordDialogOpen(false)}>
+        <DialogTitle>Change Password</DialogTitle>
+        <DialogContent>
+        <Form
             fluid
             onSubmit={() => {
               changePassword();
@@ -325,26 +290,13 @@ function DashboardContent() {
                 disabled={changing}
               />
             </Form.Group>
-            <Button
-              type="submit"
-              appearance="primary"
-              loading={changing}
-            >
-              Ubah Password
-            </Button>
           </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            onClick={(e) => {
-              setChangePasswordDialogOpen(false);
-            }}
-            appearance="subtle"
-          >
-            Tutup
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {setChangePasswordDialogOpen(false);}}>Cancel</Button>
+          <Button loading={changing} onClick={() => {changePassword();} }>Change</Button>
+        </DialogActions>
+      </Dialog>
       <ThemeProvider theme={mdTheme}>
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />

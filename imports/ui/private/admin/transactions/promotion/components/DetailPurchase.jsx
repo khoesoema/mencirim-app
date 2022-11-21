@@ -20,26 +20,26 @@ import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
 import { CategoriesCollections } from '../../../../../../db/Categories';
 import { ProductsCollections } from '../../../../../../db/Products';
 import { VendorsCollections } from '../../../../../../db/Vendors';
- 
-const DetailPurchase = (props) => { 
-	
-    //const [open, setOpen] = React.u	seState(props.open);
-    const [overflow, setOverflow] = React.useState(true);
 
-    //const handleClose = () => setOpen(false);
+const DetailPurchase = (props) => {
+
+	//const [open, setOpen] = React.u	seState(props.open);
+	const [overflow, setOverflow] = React.useState(true);
+
+	//const handleClose = () => setOpen(false);
 
 	const [addingDetail, setAddingDetail] = useState(false);
 	const [editingDetail, setEditingDetail] = useState(false);
 
 	const promoNo = props.promoNo;
-    // supplier = props.vendorID;
-    const [tglLastTrx, setTglLastTrx] = useState(new Date());
+	// supplier = props.vendorID;
+	const [tglLastTrx, setTglLastTrx] = useState(new Date());
 
 	const itemNo = props.itemNo;
 
-	useEffect(()=>{
+	useEffect(() => {
 		setItemNum(itemNo);
-	},[itemNo]);
+	}, [itemNo]);
 
 	const [itemNum, setItemNum] = useState(0);
 	const [kodeBarang, setKodeBarang] = useState('');
@@ -51,15 +51,15 @@ const DetailPurchase = (props) => {
 	const [diskonHarga, setDiskonHarga] = useState(0);
 
 	const [currentImage, setCurrentImage] = useState('');
-	
-    const [searchKodeBarangText, setSearchKodeBarangText] = useState('');
+
+	const [searchKodeBarangText, setSearchKodeBarangText] = useState('');
 	const [searchCategoriesText, setSearchCategoriesText] = useState('');
 	const [searchSuppliersText, setSearchSuppliersText] = useState('');
 
 	const toaster = useToaster();
 	const [placement, setPlacement] = useState('topCenter');
 
-    const [productData, productDataLoading] = useTracker(() => {
+	const [productData, productDataLoading] = useTracker(() => {
 		let isLoading = true;
 		let data = {};
 
@@ -71,25 +71,25 @@ const DetailPurchase = (props) => {
 
 			isLoading = !subs.ready();
 		}
-		
+
 		isLoading = false;
 		return [data, isLoading];
 	}, [kodeBarang]);
-    
-    useEffect(()=>{
 
-        if (productData && productDataLoading === false) {
+	useEffect(() => {
+
+		if (productData && productDataLoading === false) {
 			setBarcode(productData.barcode);
-			setNamaBarang (productData.namaBarang);
-			setCategoryID (productData.categoryID);
+			setNamaBarang(productData.namaBarang);
+			setCategoryID(productData.categoryID);
 			setSupplierID(productData.supplier);
 			setCurrentImage(productData.imageBase64);
 		} else if (!productData && productDataLoading === false) {
 			resetvalue();
 		}
-    },[productData, productDataLoading])
-    
-    const [categories, categoriesLoading] = useTracker(() => {
+	}, [productData, productDataLoading])
+
+	const [categories, categoriesLoading] = useTracker(() => {
 		let subs = Meteor.subscribe('categories.search', {
 			searchText: searchCategoriesText,
 			selectedID: categoryID,
@@ -117,10 +117,10 @@ const DetailPurchase = (props) => {
 		return [data, !subs.ready()];
 	}, [searchCategoriesText, categoryID]);
 
-    const [products, productsLoading] = useTracker(() => {
+	const [products, productsLoading] = useTracker(() => {
 
 		let isLoading = true;
-		
+
 		let subs = Meteor.subscribe('products.search', {
 			searchText: searchKodeBarangText,
 			selectedID: kodeBarang,
@@ -170,7 +170,7 @@ const DetailPurchase = (props) => {
 		return [data, !subs.ready()];
 	}, [searchSuppliersText, supplierID]);
 
-    const renderProductsLoading = (menu) => {
+	const renderProductsLoading = (menu) => {
 		if (productsLoading) {
 			return (
 				<p style={{ padding: 4, color: '#999', textAlign: 'center' }}>
@@ -181,7 +181,7 @@ const DetailPurchase = (props) => {
 		return menu;
 	};
 
-    const validateNumber = (input) => {
+	const validateNumber = (input) => {
 		let regex = /^[0-9]*$/;
 
 		if (input === '' || regex.test(input)) {
@@ -191,21 +191,21 @@ const DetailPurchase = (props) => {
 		}
 	};
 
-    const formatNum = (input, dec) => {
+	const formatNum = (input, dec) => {
 		if (input) {
 			return parseFloat(input)
-					.toFixed(dec)
-					.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+				.toFixed(dec)
+				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
 		} else {
 			return 0;
-		}	
+		}
 	};
 
 	const resetvalue = () => {
 		setKodeBarang('');
 		setBarcode('');
-		setNamaBarang ('');
-		setCategoryID ('');
+		setNamaBarang('');
+		setCategoryID('');
 
 		setSupplierID('');
 		setDiskonPersen('');
@@ -215,16 +215,16 @@ const DetailPurchase = (props) => {
 	};
 
 	const isDisabled = () => {
-		if (addingDetail || productDataLoading){
-            return true;
-        } else {
-            return false;
-        } 
+		if (addingDetail || productDataLoading) {
+			return true;
+		} else {
+			return false;
+		}
 	};
 
 	const addDetail = () => {
 		setAddingDetail(true);
-		if ( kodeBarang && ( diskonHarga || diskonPersen ) ) {
+		if (kodeBarang && (diskonHarga || diskonPersen)) {
 			Meteor.call(
 				'promotionsdetail.add',
 				{
@@ -251,8 +251,8 @@ const DetailPurchase = (props) => {
 						toaster.push(
 							<Message showIcon type={type} header={title}>
 								{desc}
-							  </Message>
-							,{placement})
+							</Message>
+							, { placement })
 					} else if (res) {
 						let resultCode = res.code;
 						let resultTitle = res.title;
@@ -267,8 +267,8 @@ const DetailPurchase = (props) => {
 							toaster.push(
 								<Message showIcon type={type} header={title}>
 									{desc}
-								  </Message>
-								,{placement})
+								</Message>
+								, { placement })
 						} else {
 							setAddingDetail(false);
 							let type = 'warning';
@@ -277,8 +277,8 @@ const DetailPurchase = (props) => {
 							toaster.push(
 								<Message showIcon type={type} header={title}>
 									{desc}
-								  </Message>
-								,{placement})
+								</Message>
+								, { placement })
 						}
 					} else {
 						setAddingDetail(false);
@@ -288,8 +288,8 @@ const DetailPurchase = (props) => {
 						toaster.push(
 							<Message showIcon type={type} header={title}>
 								{desc}
-							  </Message>
-							,{placement})
+							</Message>
+							, { placement })
 					}
 				}
 			);
@@ -301,209 +301,210 @@ const DetailPurchase = (props) => {
 			toaster.push(
 				<Message showIcon type={type} header={title}>
 					{desc}
-				  </Message>
-				,{placement})
+				</Message>
+				, { placement })
 		}
-		
+
 	};
 
-    return (
-        <>
-            <Modal 
-                overflow={overflow} 
-                open={props.open} 
-                onClose={ ()=> props.handleClose()} 
-                size="lg">
-     		  <Modal.Header>
-     		    <Modal.Title>
-					<Row xs="auto">
-						<Col>
-							Tambah Item Promotions #
-						</Col>
-						<Col>
-							<Input
-								size="sm"
-								className="text-right"
-								style={{width: 100}}
-								value={itemNum}
-								onChange={(e) => { 
-									e = e.toString().split(',').join('');
-									const validateNumber = e.match(/^(\d*\.{0,1}\d{0,2}$)/);
-									if (validateNumber) {
-										setItemNum(e);
-									} 
-								}}
-							/>
-						</Col>
-					</Row>
-				</Modal.Title>
-     		  </Modal.Header>
-			  <hr />
-     		  <Modal.Body>
-			    <Form 
-					layout="horizontal"
-					//onSubmit={() => { addDetail();}}
-					disabled={ isDisabled() }
+	return (
+		<>
+			<Modal
+				overflow={overflow}
+				open={props.open}
+				onClose={() => props.handleClose()}
+				size="lg"
+				style={{ marginTop: 35, marginLeft: 50 }}>
+				<Modal.Header>
+					<Modal.Title>
+						<Row xs="auto">
+							<Col>
+								Tambah Item Promotions #
+							</Col>
+							<Col>
+								<Input
+									size="sm"
+									className="text-right"
+									style={{ width: 100 }}
+									value={itemNum}
+									onChange={(e) => {
+										e = e.toString().split(',').join('');
+										const validateNumber = e.match(/^(\d*\.{0,1}\d{0,2}$)/);
+										if (validateNumber) {
+											setItemNum(e);
+										}
+									}}
+								/>
+							</Col>
+						</Row>
+					</Modal.Title>
+				</Modal.Header>
+				<hr />
+				<Modal.Body>
+					<Form
+						layout="horizontal"
+						//onSubmit={() => { addDetail();}}
+						disabled={isDisabled()}
 					>
-					<Row style={{marginRight: 10}}>
-						<Col xs={8}>
-							<Form.Group controlId="kodebrg" style={{ marginBottom: 0}}> 
-								<Form.ControlLabel className="text-left">Barang</Form.ControlLabel>
-								<SelectPicker
-									placeholder="Produk"
-									disabled={ isDisabled() }
-									data={products.map((s) => ({
-										label: '[' + s.kodeBarang + '] ' + s.namaBarang,
-										value: s.kodeBarang,
-									}))}
-									style={{ minWidth: 400 }}
-									value={kodeBarang}
-									onSelect={( e) => {
-										setKodeBarang(e);
-									}}
-									onClean={() => {
-										resetvalue();
-									}}
-									onSearch={(e) => {
-										setSearchKodeBarangText(e);
-									}}
-									renderMenu={renderProductsLoading}
-								/>
-        					</Form.Group>
-							<Form.Group controlId="barcode" style={{ marginBottom: 0}}>
-								<Form.ControlLabel className="text-left">Barcode</Form.ControlLabel>
-								<Form.Control
-									readOnly
-									name="barcode"
-									placeholder="Barcode"
-									value={barcode}
-									style={{color: "#1675e0" }}
-									disabled={isDisabled()}
-								/>
-							</Form.Group>
-							<Form.Group controlId="categoryID" style={{ marginBottom: 0}}>
-								<Form.ControlLabel 
-									className="text-left"
-								> Kategori
-								</Form.ControlLabel>
-								<SelectPicker
-									name="categoryID"
-									placeholder="Kategori"
-									readOnly
-									disabled={isDisabled()}
-									data={categories.map((s) => ({
-										label: '[' + s.code + '] ' + s.name,
-										value: s.code,
-									}))}
-									style={{ width: 300 }}
-									value={categoryID}
-									onChange={(input) => {
-										setCategoryID(input);
-									}}
-								/>
-							</Form.Group>
-							<Form.Group controlId="supplierID" style={{ marginBottom: 0}}>
-								<Form.ControlLabel className="text-left">Supplier</Form.ControlLabel>
-								<SelectPicker
-									placeholder="Supplier"
-									required
-									disabled={isDisabled()}
-									data={suppliers.map((s) => ({
-										label: '[' + s.code + '] ' + s.name,
-										value: s.code,
-									}))}
-									style={{ width: 300 }}
-									value={supplierID}
-									onClean={() => {
-										setSupplierID('');
-									}}
-								/>
-							</Form.Group>
-							<Form.Group controlId="diskonPersen" style={{ marginBottom: 0}}>
-								<Form.ControlLabel className="text-left">Diskon %</Form.ControlLabel>
-								<InputGroup inside style={{ width: 300 }}>
-									<Form.Control
-										name="diskonPersen"
-										placeholder="Diskon Persen"
-										value={diskonPersen}
-										className="text-right"
+						<Row style={{ marginRight: 10 }}>
+							<Col xs={8}>
+								<Form.Group controlId="kodebrg" style={{ marginBottom: 0 }}>
+									<Form.ControlLabel className="text-left">Barang</Form.ControlLabel>
+									<SelectPicker
+										placeholder="Produk"
 										disabled={isDisabled()}
-										onChange={(e) => {
-											e = e.toString().split(',').join('');
-											const validateNumber = e.match(/^(\d*\.{0,1}\d{0,2}$)/);
-											if (validateNumber) {
-												let n = e.toString().replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
-												setDiskonPersen(n);
-												setDiskonHarga(0);
-											}
+										data={products.map((s) => ({
+											label: '[' + s.kodeBarang + '] ' + s.namaBarang,
+											value: s.kodeBarang,
+										}))}
+										style={{ minWidth: 400 }}
+										value={kodeBarang}
+										onSelect={(e) => {
+											setKodeBarang(e);
+										}}
+										onClean={() => {
+											resetvalue();
+										}}
+										onSearch={(e) => {
+											setSearchKodeBarangText(e);
+										}}
+										renderMenu={renderProductsLoading}
+									/>
+								</Form.Group>
+								<Form.Group controlId="barcode" style={{ marginBottom: 0 }}>
+									<Form.ControlLabel className="text-left">Barcode</Form.ControlLabel>
+									<Form.Control
+										readOnly
+										name="barcode"
+										placeholder="Barcode"
+										value={barcode}
+										style={{ color: "#1675e0" }}
+										disabled={isDisabled()}
+									/>
+								</Form.Group>
+								<Form.Group controlId="categoryID" style={{ marginBottom: 0 }}>
+									<Form.ControlLabel
+										className="text-left"
+									> Kategori
+									</Form.ControlLabel>
+									<SelectPicker
+										name="categoryID"
+										placeholder="Kategori"
+										readOnly
+										disabled={isDisabled()}
+										data={categories.map((s) => ({
+											label: '[' + s.code + '] ' + s.name,
+											value: s.code,
+										}))}
+										style={{ width: 300 }}
+										value={categoryID}
+										onChange={(input) => {
+											setCategoryID(input);
 										}}
 									/>
-									<InputGroup.Addon>%</InputGroup.Addon>
-								</InputGroup>
-							</Form.Group>
-							<Form.Group controlId="diskonHarga" style={{ marginBottom: 0}}>
-								<Form.ControlLabel className="text-left">Diskon #</Form.ControlLabel>
-								<InputGroup inside style={{ width: 300 }}>
-									<InputGroup.Addon>Rp</InputGroup.Addon>
-									<Form.Control
-										name="diskonHarga"
-										placeholder="Diskon Harga"
-										className="text-right"
-										value={diskonHarga}
+								</Form.Group>
+								<Form.Group controlId="supplierID" style={{ marginBottom: 0 }}>
+									<Form.ControlLabel className="text-left">Supplier</Form.ControlLabel>
+									<SelectPicker
+										placeholder="Supplier"
+										required
 										disabled={isDisabled()}
-										onChange={(e) => {
-											e = e.toString().split(',').join('');
-											const validateNumber = e.match(/^(\d*\.{0,1}\d{0,2}$)/);
-											if (validateNumber) {
-												let n = e.toString().replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,')
-												setDiskonHarga(n);
-												setDiskonPersen(0);
-											}
+										data={suppliers.map((s) => ({
+											label: '[' + s.code + '] ' + s.name,
+											value: s.code,
+										}))}
+										style={{ width: 300 }}
+										value={supplierID}
+										onClean={() => {
+											setSupplierID('');
 										}}
 									/>
-								</InputGroup>
-							</Form.Group>
-						</Col>
-						<Col xs={4}>
-							{currentImage && (
-								<>
-									<div 
-										className="d-flex flex-row flex-nowrap justify-content-end align-content-end fullWidth"
-										style={{height:180}}
+								</Form.Group>
+								<Form.Group controlId="diskonPersen" style={{ marginBottom: 0 }}>
+									<Form.ControlLabel className="text-left">Diskon %</Form.ControlLabel>
+									<InputGroup inside style={{ width: 300 }}>
+										<Form.Control
+											name="diskonPersen"
+											placeholder="Diskon Persen"
+											value={diskonPersen}
+											className="text-right"
+											disabled={isDisabled()}
+											onChange={(e) => {
+												e = e.toString().split(',').join('');
+												const validateNumber = e.match(/^(\d*\.{0,1}\d{0,2}$)/);
+												if (validateNumber) {
+													let n = e.toString().replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+													setDiskonPersen(n);
+													setDiskonHarga(0);
+												}
+											}}
+										/>
+										<InputGroup.Addon>%</InputGroup.Addon>
+									</InputGroup>
+								</Form.Group>
+								<Form.Group controlId="diskonHarga" style={{ marginBottom: 0 }}>
+									<Form.ControlLabel className="text-left">Diskon #</Form.ControlLabel>
+									<InputGroup inside style={{ width: 300 }}>
+										<InputGroup.Addon>Rp</InputGroup.Addon>
+										<Form.Control
+											name="diskonHarga"
+											placeholder="Diskon Harga"
+											className="text-right"
+											value={diskonHarga}
+											disabled={isDisabled()}
+											onChange={(e) => {
+												e = e.toString().split(',').join('');
+												const validateNumber = e.match(/^(\d*\.{0,1}\d{0,2}$)/);
+												if (validateNumber) {
+													let n = e.toString().replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,')
+													setDiskonHarga(n);
+													setDiskonPersen(0);
+												}
+											}}
+										/>
+									</InputGroup>
+								</Form.Group>
+							</Col>
+							<Col xs={4}>
+								{currentImage && (
+									<>
+										<div
+											className="d-flex flex-row flex-nowrap justify-content-end align-content-end fullWidth"
+											style={{ height: 180 }}
 										>
-										<img
-											src={currentImage}
-											className="img-fluid img-thumbnail rounded mx-auto d-block"
-											alt="Responsive image"
-										></img>
-									</div>
-								</>
-							)}
-						</Col>
-					</Row>
-					
-			   	</Form>
-					
-     		  </Modal.Body>
-     		  <Modal.Footer>
-     		    <Button 
-					onClick={ () => { 
-						addDetail();
-					}} 
-					appearance="primary">
-     		      Add
-     		    </Button>
-     		    <Button onClick={() => props.handleClose() } appearance="subtle">
-     		      Cancel
-     		    </Button>
-     		  </Modal.Footer>
-     		</Modal>
-        </>
-    )
+											<img
+												src={currentImage}
+												className="img-fluid img-thumbnail rounded mx-auto d-block"
+												alt="Responsive image"
+											></img>
+										</div>
+									</>
+								)}
+							</Col>
+						</Row>
+
+					</Form>
+
+				</Modal.Body>
+				<Modal.Footer>
+					<Button
+						onClick={() => {
+							addDetail();
+						}}
+						appearance="primary">
+						Add
+					</Button>
+					<Button onClick={() => props.handleClose()} appearance="subtle">
+						Cancel
+					</Button>
+				</Modal.Footer>
+			</Modal>
+		</>
+	)
 }
 
 DetailPurchase.defaultProps = {
-    open: false
+	open: false
 }
 
 export default DetailPurchase;

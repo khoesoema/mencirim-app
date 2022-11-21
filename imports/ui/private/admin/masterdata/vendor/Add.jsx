@@ -299,6 +299,7 @@ export function AddSupplier(props) {
 					onClose={(e) => {
 						setDialogOpen(false);
 					}}
+					style={{marginTop: 35}}
 				>
 					<Modal.Header>
 						<Modal.Title>{dialogTitle}</Modal.Title>

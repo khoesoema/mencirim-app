@@ -9,7 +9,6 @@ import Button from 'rsuite/Button';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Form from 'rsuite/Form';
 import Input from 'rsuite/Input';
-import Modal from 'rsuite/Modal';
 import SelectPicker from 'rsuite/SelectPicker';
 import DatePicker from 'rsuite/DatePicker';
 
@@ -305,20 +304,6 @@ export function AddCustomer(props) {
 					</Alert>
 				</Snackbar>
 
-				<Modal
-					backdrop={true}
-					keyboard={false}
-					open={dialogOpen}
-					onClose={(e) => {
-						setDialogOpen(false);
-					}}
-				>
-					<Modal.Header>
-						<Modal.Title>{dialogTitle}</Modal.Title>
-					</Modal.Header>
-
-					<Modal.Body>{dialogContent}</Modal.Body>
-				</Modal>
 				<div className="mainContent">
 					<div className="breadcrumContainer">
 						<Breadcrumb

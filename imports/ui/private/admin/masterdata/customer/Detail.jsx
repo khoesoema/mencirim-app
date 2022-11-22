@@ -434,6 +434,7 @@ export function EditCustomer() {
 						onClose={(e) => {
 							setDeleteConfirmationDialogOpen(false);
 						}}
+						style={{marginTop: 35}}
 					>
 						<Modal.Header>
 							<Modal.Title>
@@ -468,21 +469,7 @@ export function EditCustomer() {
 						</Modal.Footer>
 					</Modal>
 				)}
-
-				<Modal
-					backdrop={true}
-					keyboard={false}
-					open={dialogOpen}
-					onClose={(e) => {
-						setDialogOpen(false);
-					}}
-				>
-					<Modal.Header>
-						<Modal.Title>{dialogTitle}</Modal.Title>
-					</Modal.Header>
-
-					<Modal.Body>{dialogContent}</Modal.Body>
-				</Modal>
+				
 				<div className="mainContent">
 					<div className="breadcrumContainer">
 						<Breadcrumb

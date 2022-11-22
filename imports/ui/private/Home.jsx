@@ -58,15 +58,16 @@ import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBoxes } from '@fortawesome/free-solid-svg-icons/faBoxes';
-import { faPercent } from '@fortawesome/free-solid-svg-icons/faPercent';
 
 import { FaUserTie } from 'react-icons/fa'
 import { GrMoney } from 'react-icons/gr';
 import { GiWorld } from 'react-icons/gi';
 import { GiPaperBagOpen } from 'react-icons/gi';
+import { CiDiscount1 } from 'react-icons/ci';
 
 import { Icon } from '@rsuite/icons';
 import GearIcon from '@rsuite/icons/Gear';
+import MemberIcon from '@rsuite/icons/Member';
 
 import Form from 'rsuite/Form';
 
@@ -377,42 +378,42 @@ function DashboardContent() {
 
               <ListItemButton onClick={() => navigate('/')}>
                 <ListItemIcon>
-                  <DashboardIcon />
+                  <DashboardIcon sx= {{ color:"#2196f3" }}/>
                 </ListItemIcon>
                 <ListItemText primary="Dashboard" />
               </ListItemButton>
 
               <ListItemButton onClick={() => navigate('/CashierOnBoarding')}>
                 <ListItemIcon>
-                  <PointOfSaleIcon />
+                  <PointOfSaleIcon sx= {{ color:"#2196f3" }}/>
                 </ListItemIcon>
                 <ListItemText primary="Cashier" />
               </ListItemButton>
 
               <ListItemButton onClick={() => navigate('/Products')}>
                 <ListItemIcon>
-                  <FontAwesomeIcon icon={faBoxes} />
+                  <FontAwesomeIcon icon={faBoxes} style= {{ color:"#2196f3" }}/>
                 </ListItemIcon>
                 <ListItemText primary="Products" />
               </ListItemButton>
 
               <ListItemButton onClick={() => navigate('/Customers')}>
                 <ListItemIcon>
-                  <HailIcon />
+                <Icon as={MemberIcon} style= {{ color:"#2196f3", fontSize: 20 }}/>
                 </ListItemIcon>
                 <ListItemText primary="Customers" />
               </ListItemButton>
 
               <ListItemButton onClick={() => navigate('/Supplier')}>
                 <ListItemIcon>
-                  <Icon as={FaUserTie} />
+                  <Icon as={FaUserTie} style= {{ color:"#2196f3", fontSize: 20}}/>
                 </ListItemIcon>
                 <ListItemText primary="Supplier" />
               </ListItemButton>
 
               <ListItemButton onClick={handleClick}>
                 <ListItemIcon>
-                  <LayersIcon />
+                  <LayersIcon sx= {{ color:"#2196f3" }}/>
                 </ListItemIcon>
                 <ListItemText primary="Data" />
                 {openMenu ? <ExpandLess /> : <ExpandMore />}
@@ -429,7 +430,7 @@ function DashboardContent() {
 
                   <ListItemButton sx={{ pl: 4 }} divider onClick={() => navigate('/UOM')}>
                     <ListItemIcon>
-                      <Icon as={GiPaperBagOpen} />
+                      <Icon as={GiPaperBagOpen} style={{fontSize: 22 }}/>
                     </ListItemIcon>
                     <ListItemText primary="Satuan" />
                   </ListItemButton>
@@ -443,7 +444,7 @@ function DashboardContent() {
 
                   <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Negara')}>
                     <ListItemIcon>
-                      <Icon as={GiWorld} />
+                      <Icon as={GiWorld} style={{fontSize: 22 }}/>
                     </ListItemIcon>
                     <ListItemText primary="Negara" />
                   </ListItemButton>
@@ -481,7 +482,7 @@ function DashboardContent() {
 
               <ListItemButton onClick={() => { setOpenTrx(!openTrx); }}>
                 <ListItemIcon>
-                  <StoreIcon />
+                  <StoreIcon sx= {{ color:"#2196f3" }}/>
                 </ListItemIcon>
                 <ListItemText primary="Transactions" />
                 {openTrx ? <ExpandLess /> : <ExpandMore />}
@@ -526,7 +527,7 @@ function DashboardContent() {
 
                   <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Promotions')}>
                     <ListItemIcon>
-                      <FontAwesomeIcon icon={faPercent} />
+                      <Icon as={CiDiscount1} style={{fontSize: 22}} />
                     </ListItemIcon>
                     <ListItemText primary="Promo Barang" />
                   </ListItemButton>
@@ -536,7 +537,7 @@ function DashboardContent() {
 
               <ListItemButton onClick={() => { setOpenReports(!openReports); }}>
                 <ListItemIcon>
-                  <BarChartIcon />
+                  <BarChartIcon sx= {{ color:"#2196f3" }}/>
                 </ListItemIcon>
                 <ListItemText primary="Reports" />
                 {openReports ? <ExpandLess /> : <ExpandMore />}
@@ -592,7 +593,7 @@ function DashboardContent() {
               <Divider sx={{ my: 1 }} />
               <ListItemButton onClick={() => { setOpenAcc(!openAcc); }}>
                 <ListItemIcon>
-                  <LibraryBooksIcon />
+                  <LibraryBooksIcon sx= {{ color:"#2196f3" }}/>
                 </ListItemIcon>
                 <ListItemText primary="Accounting" />
                 {openAcc ? <ExpandLess /> : <ExpandMore />}
@@ -634,7 +635,7 @@ function DashboardContent() {
 
               <ListItemButton onClick={() => { setOpenSettings(!openSettings); }}>
                 <ListItemIcon>
-                  <Icon as={GearIcon} spin />
+                  <Icon as={GearIcon} spin style= {{ color:"#2196f3", fontSize: 20 }}/>
                 </ListItemIcon>
                 <ListItemText primary="Settings" />
                 {openSettings ? <ExpandLess /> : <ExpandMore />}

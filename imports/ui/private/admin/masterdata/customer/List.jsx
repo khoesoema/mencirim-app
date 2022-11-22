@@ -163,6 +163,7 @@ export function CustomerLists(props) {
 						onClose={(e) => {
 							setDeleteConfirmationDialogOpen(false);
 						}}
+						style={{marginTop: 35}}
 					>
 						<Modal.Header>
 							<Modal.Title>
@@ -179,6 +180,7 @@ export function CustomerLists(props) {
 									setSelectedDeleteID(selectedID);
 								}}
 								appearance="primary"
+								color="red"
 							>
 								Hapus
 							</Button>

@@ -56,6 +56,9 @@ class CashierClass extends React.Component {
 }
 
 export function Cashier(props) {
+	const [value, setValue] = React.useState([0]);
+	const [inputValue, setInputValue] = React.useState('');
+	
 	const myRefs = useRef();
 
 	let scannedBarcode = '';
@@ -68,10 +71,10 @@ export function Cashier(props) {
 	const changeDescriptionRef = useRef();
 
 	const [addingDetail, setAddingDetail] = useState(false);
-	const [ tglTrx, setTglTrx] = useState(new Date());
+	const [tglTrx, setTglTrx] = useState(new Date());
 
 	let { _id } = useParams();
-	let  kassaID = _id;
+	let kassaID = _id;
 
 	const [kassaCode, setKassaCode] = useState('');
 	const [kassaName, setKassaName] = useState('');
@@ -86,7 +89,7 @@ export function Cashier(props) {
 
 			data = KassaCollections.findOne({ _id });
 		}
-		return [data, isLoading];	
+		return [data, isLoading];
 	}, [_id]);
 
 
@@ -100,9 +103,9 @@ export function Cashier(props) {
 		}
 	}, [kassaData, kassaDataLoading]);
 
-	
+
 	let userID = Meteor.user()._id;
-	
+
 	const [userData, userDataLoading] = useTracker(() => {
 		let isLoading = true;
 		let data = {};
@@ -121,13 +124,13 @@ export function Cashier(props) {
 	const [barcode, setBarcode] = useState('');
 	const [namaBarang, setNamaBarang] = useState('');
 	const [categoryID, setCategoryID] = useState('');
-	
+
 	const [ktsBesar, setKtsBesar] = useState(0);
 	const [ktsKecil, setKtsKecil] = useState(0);
 	const [kts, setKts] = useState(0);
 	const [satuanBesar, setSatuanBesar] = useState('');
 	const [satuanKecil, setSatuanKecil] = useState('');
-	
+
 	const [jenisDiskon1, setJenisDiskon1] = useState('Discount');
 	const [diskonPersen1, setDiskonPersen1] = useState(0);
 	const [diskonHarga1, setDiskonHarga1] = useState(0);
@@ -146,8 +149,8 @@ export function Cashier(props) {
 	const [hargaModal, setHargaModal] = useState(0);
 	const [hargaJual, setHargaJual] = useState(0);
 	const [hargaJualMember, setHargaJualMember] = useState(0);
-	
-    const [searchKodeBarangText, setSearchKodeBarangText] = useState('');
+
+	const [searchKodeBarangText, setSearchKodeBarangText] = useState('');
 	const [searchCategoriesText, setSearchCategoriesText] = useState('');
 
 	const [currentImage, setCurrentImage] = useState('');
@@ -164,47 +167,47 @@ export function Cashier(props) {
 
 			isLoading = !subs.ready();
 		}
-		
+
 		isLoading = false;
 		return [data, isLoading];
 	}, [kodeBarang]);
-    
-    useEffect(()=>{
-		let isMember='';
-        if (productData && productDataLoading === false) {
-			setBarcode(productData.barcode);
-			setNamaBarang (productData.namaBarang);
-			setCategoryID (productData.categoryID);
 
-			if(productData.kts === undefined) {
+	useEffect(() => {
+		let isMember = '';
+		if (productData && productDataLoading === false) {
+			setBarcode(productData.barcode);
+			setNamaBarang(productData.namaBarang);
+			setCategoryID(productData.categoryID);
+
+			if (productData.kts === undefined) {
 				setKts(0);
 			} else {
 				setKts(productData.kts);
 			}
 
 			if (productData.satuanBesar === undefined) {
-				setSatuanBesar ('');
+				setSatuanBesar('');
 			} else {
-				setSatuanBesar (productData.satuanBesar);
+				setSatuanBesar(productData.satuanBesar);
 			}
-			
+
 			if (productData.satuanKecil === undefined) {
-				setSatuanKecil ('');
+				setSatuanKecil('');
 			} else {
-				setSatuanKecil (productData.satuanKecil);
+				setSatuanKecil(productData.satuanKecil);
 			}
-			
+
 			setHargaJual(formatNum(productData.hargajual));
 			setHargaJualMember(formatNum(productData.hargajualmember));
 
-			if(isMember != '') {
+			if (isMember != '') {
 				setHargaJual(formatNum(productData.hargajualmember));
 			}
 			setCurrentImage(productData.imageBase64);
 		} else if (!productData && productDataLoading === false) {
 			resetvalue();
 		}
-    },[productData, productDataLoading])
+	}, [productData, productDataLoading])
 
 	const [categoryData, categoryDataLoading] = useTracker(() => {
 		let isLoading = true;
@@ -219,10 +222,10 @@ export function Cashier(props) {
 		return [data, isLoading];
 	}, [categoryID]);
 
-    const [products, productsLoading] = useTracker(() => {
+	const [products, productsLoading] = useTracker(() => {
 
 		let isLoading = true;
-		
+
 		let subs = Meteor.subscribe('products.search', {
 			searchText: searchKodeBarangText,
 			selectedID: kodeBarang,
@@ -256,7 +259,23 @@ export function Cashier(props) {
 		return [data, isLoading];
 	}, [searchKodeBarangText, kodeBarang]);
 
-    const renderProductsLoading = (menu) => {
+	const [optionsProd, setOptionsProd] = useState([]);
+
+	useEffect(()=>{
+		let baris = [];
+		if(products && productsLoading === false) {
+			products.map((item, index) => {
+				baris[index]={
+					label: item.kodeBarang
+				};
+			})
+			setOptionsProd(baris);
+		} else if(!products && productsLoading === false) {
+			baris = [];
+		}
+	},[products, productsLoading]);
+
+	const renderProductsLoading = (menu) => {
 		if (productsLoading) {
 			return (
 				<p style={{ padding: 4, color: '#999', textAlign: 'center' }}>
@@ -267,7 +286,7 @@ export function Cashier(props) {
 		return menu;
 	};
 
-    const validateNumber = (input) => {
+	const validateNumber = (input) => {
 		let regex = /^[0-9]*$/;
 
 		if (input === '' || regex.test(input)) {
@@ -277,14 +296,14 @@ export function Cashier(props) {
 		}
 	};
 
-    const formatNum = (input) => {
+	const formatNum = (input) => {
 		if (input) {
 			return parseFloat(input)
-					.toFixed(2)
-					.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+				.toFixed(2)
+				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
 		} else {
 			return 0;
-		}	
+		}
 	};
 
 	const [promotionsDetailData, promotionsDetailDataLoading] = useTracker(() => {
@@ -292,28 +311,28 @@ export function Cashier(props) {
 		let data = {};
 
 		if (kodeBarang && tglTrx) {
-			let subs = Meteor.subscribe('promotionsdetail.getByTgl', { kodeBarang, tglTrx});
+			let subs = Meteor.subscribe('promotionsdetail.getByTgl', { kodeBarang, tglTrx });
 			isLoading = !subs.ready();
 
 			data = PromotionsDetailCollections.find({}).fetch();
 
 			isLoading = !subs.ready();
 		}
-		
+
 		isLoading = false;
 		return [data, isLoading];
 	}, [kodeBarang, tglTrx]);
 
-	useEffect(()=> {
-		if(promotionsDetailData && promotionsDetailDataLoading === false){
-			if (promotionsDetailData.length > 0 ){
-				promotionsDetailData.map((item)=> {
-					if (item.target === 1 ) {
-						if (item.diskonPersen > 0 ) {
+	useEffect(() => {
+		if (promotionsDetailData && promotionsDetailDataLoading === false) {
+			if (promotionsDetailData.length > 0) {
+				promotionsDetailData.map((item) => {
+					if (item.target === 1) {
+						if (item.diskonPersen > 0) {
 							setDiskonPersen1(item.diskonPersen);
-						} else if (item.diskonHarga > 0 ) {
+						} else if (item.diskonHarga > 0) {
 							let hrgJual = hargaJual.toString().split(',').join('')
-							let diskonP = item.diskonHarga / hrgJual * 100 ;
+							let diskonP = item.diskonHarga / hrgJual * 100;
 							console.log(diskonP, hrgJual);
 							setDiskonPersen1(formatNum(diskonP))
 							setDiskonHarga1(formatNum(item.diskonHarga));
@@ -326,19 +345,19 @@ export function Cashier(props) {
 			setDiskonPersen1(0);
 			setDiskonHarga1(0);
 		};
-	},[promotionsDetailData, promotionsDetailDataLoading]);
+	}, [promotionsDetailData, promotionsDetailDataLoading]);
 
 	const resetvalue = () => {
 		setKodeBarang('');
 		setBarcode('');
-		setNamaBarang ('');
-		setCategoryID ('');
+		setNamaBarang('');
+		setCategoryID('');
 
 		setKts(0);
 		setQtyBonus(0);
 
 		//setSupplier ('');
-		
+
 		setHargaBruto(0);
 		setHargaNetto(0);
 		setHargaModal(0);
@@ -395,7 +414,7 @@ export function Cashier(props) {
 		}).fetch();
 		return [data, !subs.ready()];
 	}, [kassaID]);
-	
+
 	const [itemsCount, itemsCountLoading] = useTracker(() => {
 		let subs = Meteor.subscribe('cashierOnGoingTransactions.countList', {
 			kassaID,
@@ -452,165 +471,165 @@ export function Cashier(props) {
 	// 	}
 	// }, [changeDescriptionDialogOpen, changeQuantityDialogOpen]);
 	+
-	useEffect(() => {
-		/**
-		 * Alert if clicked on outside of element
-		 */
-		function handleKeyboardButon(event) {
-			let currentKey = event.key;
-			if (currentKey === 'Escape') {
-				event.preventDefault();
-				if (
-					changeDescriptionDialogOpen === false &&
-					changeQuantityDialogOpen === false &&
-					deleteItemDialogOpen === false &&
-					logoutDialogOpen === false
-				) {
-					setLogoutDialogOpen(true);
-				}
+		useEffect(() => {
+			/**
+			 * Alert if clicked on outside of element
+			 */
+			function handleKeyboardButon(event) {
+				let currentKey = event.key;
+				if (currentKey === 'Escape') {
+					event.preventDefault();
+					if (
+						changeDescriptionDialogOpen === false &&
+						changeQuantityDialogOpen === false &&
+						deleteItemDialogOpen === false &&
+						logoutDialogOpen === false
+					) {
+						setLogoutDialogOpen(true);
+					}
 
-				if (logoutDialogOpen === true) {
-					navigate('/');
-				}
-			} else if (currentKey === 'ArrowUp') {
-				if (
-					changeDescriptionDialogOpen === false &&
-					changeQuantityDialogOpen === false &&
-					deleteItemDialogOpen === false &&
-					logoutDialogOpen === false
-				) {
-					event.preventDefault();
-					setCurrentIndex((prev) => {
-						if (prev <= 0) {
-							return 0;
-						} else {
-							return prev - 1;
-						}
-					});
-				}
-				// let currIndex = currentIndex - 1;
-				// if (currentIndex > 0) {
-				// 	setCurrentIndex(currIndex);
-				// }
-			} else if (currentKey === 'ArrowDown') {
-				if (
-					changeDescriptionDialogOpen === false &&
-					changeQuantityDialogOpen === false &&
-					deleteItemDialogOpen === false &&
-					logoutDialogOpen === false
-				) {
-					event.preventDefault();
-					setCurrentIndex((prev) => {
-						if (prev >= itemsCount - 1) {
-							return itemsCount - 1;
-						} else {
-							return prev + 1;
-						}
-					});
-				}
-				// let currIndex = currentIndex + 1;
-				// setCurrentIndex(currIndex);
-			} else if (currentKey === 'F2') {
-				if (
-					currentIndex !== -1 &&
-					changeDescriptionDialogOpen === false &&
-					changeQuantityDialogOpen === false &&
-					deleteItemDialogOpen === false &&
-					logoutDialogOpen === false
-				) {
-					event.preventDefault();
-					setChangeQtyAmount(items[currentIndex].productQuantity);
-					setChangeQuantityDialogOpen(true);
-				}
-				// let currIndex = currentIndex + 1;
-				// setCurrentIndex(currIndex);
-			} else if (currentKey === 'F3') {
-				if (
-					currentIndex !== -1 &&
-					changeDescriptionDialogOpen === false &&
-					changeQuantityDialogOpen === false &&
-					deleteItemDialogOpen === false &&
-					logoutDialogOpen === false
-				) {
-					event.preventDefault();
-					setDeleteItemDialogOpen(true);
-				}
+					if (logoutDialogOpen === true) {
+						navigate('/');
+					}
+				} else if (currentKey === 'ArrowUp') {
+					if (
+						changeDescriptionDialogOpen === false &&
+						changeQuantityDialogOpen === false &&
+						deleteItemDialogOpen === false &&
+						logoutDialogOpen === false
+					) {
+						event.preventDefault();
+						setCurrentIndex((prev) => {
+							if (prev <= 0) {
+								return 0;
+							} else {
+								return prev - 1;
+							}
+						});
+					}
+					// let currIndex = currentIndex - 1;
+					// if (currentIndex > 0) {
+					// 	setCurrentIndex(currIndex);
+					// }
+				} else if (currentKey === 'ArrowDown') {
+					if (
+						changeDescriptionDialogOpen === false &&
+						changeQuantityDialogOpen === false &&
+						deleteItemDialogOpen === false &&
+						logoutDialogOpen === false
+					) {
+						event.preventDefault();
+						setCurrentIndex((prev) => {
+							if (prev >= itemsCount - 1) {
+								return itemsCount - 1;
+							} else {
+								return prev + 1;
+							}
+						});
+					}
+					// let currIndex = currentIndex + 1;
+					// setCurrentIndex(currIndex);
+				} else if (currentKey === 'F2') {
+					if (
+						currentIndex !== -1 &&
+						changeDescriptionDialogOpen === false &&
+						changeQuantityDialogOpen === false &&
+						deleteItemDialogOpen === false &&
+						logoutDialogOpen === false
+					) {
+						event.preventDefault();
+						setChangeQtyAmount(items[currentIndex].productQuantity);
+						setChangeQuantityDialogOpen(true);
+					}
+					// let currIndex = currentIndex + 1;
+					// setCurrentIndex(currIndex);
+				} else if (currentKey === 'F3') {
+					if (
+						currentIndex !== -1 &&
+						changeDescriptionDialogOpen === false &&
+						changeQuantityDialogOpen === false &&
+						deleteItemDialogOpen === false &&
+						logoutDialogOpen === false
+					) {
+						event.preventDefault();
+						setDeleteItemDialogOpen(true);
+					}
 
-				if (currentIndex !== -1 && deleteItemDialogOpen === true) {
+					if (currentIndex !== -1 && deleteItemDialogOpen === true) {
+						event.preventDefault();
+						deleteItem();
+					}
+					// let currIndex = currentIndex + 1;
+					// setCurrentIndex(currIndex);
+				} else if (currentKey === 'F4') {
+					if (
+						currentIndex !== -1 &&
+						changeDescriptionDialogOpen === false &&
+						changeQuantityDialogOpen === false &&
+						deleteItemDialogOpen === false &&
+						logoutDialogOpen === false
+					) {
+						event.preventDefault();
+						setChangeDescriptionValue(
+							items[currentIndex].productDescription
+						);
+						setChangeDescriptionDialogOpen(true);
+					}
+					// let currIndex = currentIndex + 1;
+					// setCurrentIndex(currIndex);
+				} else if (currentKey === 'F1') {
 					event.preventDefault();
-					deleteItem();
-				}
-				// let currIndex = currentIndex + 1;
-				// setCurrentIndex(currIndex);
-			} else if (currentKey === 'F4') {
-				if (
-					currentIndex !== -1 &&
-					changeDescriptionDialogOpen === false &&
-					changeQuantityDialogOpen === false &&
-					deleteItemDialogOpen === false &&
-					logoutDialogOpen === false
-				) {
+					scanRef.current.focus();
+
+					//scanRef.current.focus();
+					//if (productCode) {
+					//	add();
+					//} else {
+					//	scanRef.current.focus();
+					//}
+					// let currIndex = currentIndex + 1;
+					// setCurrentIndex(currIndex);
+				} else if (currentKey === 'F12') {
 					event.preventDefault();
-					setChangeDescriptionValue(
-						items[currentIndex].productDescription
-					);
-					setChangeDescriptionDialogOpen(true);
+					if (logoutDialogOpen === true) {
+						setLogoutDialogOpen(false);
+					}
+					// let currIndex = currentIndex + 1;
+					// setCurrentIndex(currIndex);
 				}
-				// let currIndex = currentIndex + 1;
-				// setCurrentIndex(currIndex);
-			} else if (currentKey === 'F1') {
-				event.preventDefault();
-				scanRef.current.focus();
-				
-				//scanRef.current.focus();
-				//if (productCode) {
-				//	add();
-				//} else {
-				//	scanRef.current.focus();
-				//}
-				// let currIndex = currentIndex + 1;
-				// setCurrentIndex(currIndex);
-			} else if (currentKey === 'F12') {
-				event.preventDefault();
-				if (logoutDialogOpen === true) {
-					setLogoutDialogOpen(false);
-				}
-				// let currIndex = currentIndex + 1;
-				// setCurrentIndex(currIndex);
 			}
-		}
 
-		function handleBarcode(e) {
-			e.stopImmediatePropagation();
-			let barcode = '';
-			let code = e.keyCode ? e.keyCode : e.which;
+			function handleBarcode(e) {
+				e.stopImmediatePropagation();
+				let barcode = '';
+				let code = e.keyCode ? e.keyCode : e.which;
 
-			if (code === 13) {
-				add(scannedBarcode);
-				scannedBarcode = '';
-			} else {
-				barcode = barcode + String.fromCharCode(code);
-				scannedBarcode += barcode;
+				if (code === 13) {
+					add(scannedBarcode);
+					scannedBarcode = '';
+				} else {
+					barcode = barcode + String.fromCharCode(code);
+					scannedBarcode += barcode;
+				}
 			}
-		}
 
-		// Bind the event listener
-		document.addEventListener('keydown', handleKeyboardButon);
-		window.addEventListener('keypress', handleBarcode);
-		return () => {
-			// Unbind the event listener on clean upproductCode
-			document.removeEventListener('keydown', handleKeyboardButon);
-			window.removeEventListener('keypress', handleBarcode);
-		};
-	}, [
-		itemsCount,
-		changeQuantityDialogOpen,
-		changeDescriptionDialogOpen,
-		deleteItemDialogOpen,
-		logoutDialogOpen,
-		currentIndex,
-		productCode,
-	]);
+			// Bind the event listener
+			document.addEventListener('keydown', handleKeyboardButon);
+			window.addEventListener('keypress', handleBarcode);
+			return () => {
+				// Unbind the event listener on clean upproductCode
+				document.removeEventListener('keydown', handleKeyboardButon);
+				window.removeEventListener('keypress', handleBarcode);
+			};
+		}, [
+			itemsCount,
+			changeQuantityDialogOpen,
+			changeDescriptionDialogOpen,
+			deleteItemDialogOpen,
+			logoutDialogOpen,
+			currentIndex,
+			productCode,
+		]);
 
 	const add = (inputCode = undefined) => {
 		setAdding(true);
@@ -840,11 +859,11 @@ export function Cashier(props) {
 			format: (value) => value.toFixed(2),
 		},
 		{
-		  id: 'hargaBarang',
-		  label: 'Harga Barang',
-		  minWidth: 100,
-		  align: 'right',
-		  format: (value) => value.toFixed(2),
+			id: 'hargaBarang',
+			label: 'Harga Barang',
+			minWidth: 100,
+			align: 'right',
+			format: (value) => value.toFixed(2),
 		},
 		{
 			id: 'discHarga',
@@ -875,22 +894,22 @@ export function Cashier(props) {
 	}
 
 	const rows = [
-		createData(1, 1324171354,'Indomie Goreng Spesial 85Gr', 5, 2570, 0,0),
+		createData(1, 1324171354, 'Indomie Goreng Spesial 85Gr', 5, 2570, 0, 0),
 	];
-	
+
 	const isDisabled = () => {
-		if (addingDetail || productDataLoading){
-            return true;
-        } else {
-            return false;
-        } 
+		if (addingDetail || productDataLoading) {
+			return true;
+		} else {
+			return false;
+		}
 	};
 
 	const addDetail = () => {
 		setAddingDetail(true);
 		if (
 			kodeBarang &&
-			ktsKecil 
+			ktsKecil
 		) {
 			Meteor.call(
 				'penjualandetail.add',
@@ -906,7 +925,7 @@ export function Cashier(props) {
 					ktsBesar,
 					ktsKecil,
 					satuanBesar,
-				 	satuanKecil,
+					satuanKecil,
 
 					qtyBonus,
 
@@ -919,7 +938,7 @@ export function Cashier(props) {
 
 					ppnPersen,
 					ppnHarga,
-						
+
 					hargaBruto,
 					hargaNetto,
 
@@ -937,8 +956,8 @@ export function Cashier(props) {
 						toaster.push(
 							<Message showIcon type={type} header={title}>
 								{desc}
-							  </Message>
-							,{placement})
+							</Message>
+							, { placement })
 						//setDialogOpen(true);
 						//setDialogTitle(err.error);
 						//setDialogContent(err.reason);
@@ -956,8 +975,8 @@ export function Cashier(props) {
 							toaster.push(
 								<Message showIcon type={type} header={title}>
 									{desc}
-								  </Message>
-								,{placement})
+								</Message>
+								, { placement })
 							//setDialogOpen(true);
 							//setDialogTitle(resultTitle);
 							//setDialogContent(resultMessage);
@@ -969,8 +988,8 @@ export function Cashier(props) {
 							toaster.push(
 								<Message showIcon type={type} header={title}>
 									{desc}
-								  </Message>
-								,{placement})
+								</Message>
+								, { placement })
 							//setDialogOpen(true);
 							//setDialogTitle(resultTitle);
 							//setDialogContent(resultMessage);
@@ -983,8 +1002,8 @@ export function Cashier(props) {
 						toaster.push(
 							<Message showIcon type={type} header={title}>
 								{desc}
-							  </Message>
-							,{placement})
+							</Message>
+							, { placement })
 						//setDialogOpen(true);
 						//setDialogTitle('Kesalahan Sistem');
 						//setDialogContent(
@@ -1001,15 +1020,15 @@ export function Cashier(props) {
 			toaster.push(
 				<Message showIcon type={type} header={title}>
 					{desc}
-				  </Message>
-				,{placement})
+				</Message>
+				, { placement })
 			//setDialogOpen(true);
 			//setDialogTitle('Kesalahan Validasi');
 			//setDialogContent(
 			//	'Kode Barang, Kuantitas dan Harga Beli Wajib Diisi'
 			//);
 		}
-		
+
 	};
 
 	return (
@@ -1017,7 +1036,7 @@ export function Cashier(props) {
 			<Container
 				fluid
 				className="kasir-container"
-				style={{ height: '100%', margin:0, backgroundColor: '#0d47a1'}}
+				style={{ height: '100%', margin: 0, backgroundColor: '#eceff1' }}
 			>
 				<Modal
 					backdrop={true}
@@ -1034,7 +1053,7 @@ export function Cashier(props) {
 
 					<Modal.Body>{dialogContent}</Modal.Body>
 				</Modal>
-				
+
 				<Modal
 					backdrop={true}
 					keyboard={true}
@@ -1486,35 +1505,43 @@ export function Cashier(props) {
 					</Modal.Footer>
 				</Modal>
 
-				<Grid container spacing={2} sx={{ pt: 2, pb:2, backgroundColor: '#0d47a1', height: '100%', margin:0, maxWidth: '100%'}}>
+				<Grid container spacing={2} sx={{ pt: 2, pb: 2, backgroundColor: '#eceff1', height: '100%', margin: 0, maxWidth: '100%' }}>
 					<Grid item xs={9}>
-						<Card sx={{height:'100%', display: 'flex'}}>
+						<Card sx={{ height: '100%', display: 'flex' }}>
 							<CardContent>
 								<Row>
 									<Col>
 										<Autocomplete
-    									  id="searchProducts"
-    									  options={top100Films}
-    									  sx={{ width: 300 }}
-    									  renderInput={(params) => 
-										  	<TextField 
-												{...params} 
-												label="Search Products" 
-												onKeyDown={(e) => {
-													let currentKey = e.key;
-												}}
-												inputRef={(input) => (scanRef.current = input)}
-											/>}
-    									/>
+											id="searchProducts"
+											size="small"
+											options={optionsProd}
+											onChange={(event, newValue) => {
+												setValue(newValue);
+											}}
+											inputValue={inputValue}
+											onInputChange={(event, newInputValue) => {
+												setInputValue(newInputValue);
+											}}
+											sx={{ width: 300 }}
+											renderInput={(params) =>
+												<TextField
+													{...params}
+													label="Search Products"
+													onKeyDown={(e) => {
+														let currentKey = e.key;
+													}}
+													inputRef={(input) => (scanRef.current = input)}
+												/>}
+										/>
 									</Col>
 									<Col></Col>
 									<Col xs={3}>
 										{currentImage && (
 											<>
-												<div 
+												<div
 													className="d-flex flex-row flex-nowrap justify-content-end align-content-end fullWidth"
-													style={{height:120}}
-													>
+													style={{ height: 120 }}
+												>
 													<img
 														src={currentImage}
 														className="img-fluid img-thumbnail rounded mx-auto d-block"
@@ -1534,10 +1561,10 @@ export function Cashier(props) {
 								<Typography variant="h4" component="div">{kassaName}</Typography>
 								<Typography variant="body2" color="text.secondary">
 									<Clock format={'DD-MMMM-YYYY HH:mm:ss'} ticking={true} timezone={'Asia/Jakarta'} />
-        						</Typography>
+								</Typography>
 								<Typography variant="body">
-									{ Meteor.user().username + ' ' }
-									{ (userDataLoading === false ) && (<strong>{userData.name}</strong>) }
+									{Meteor.user().username + ' '}
+									{(userDataLoading === false) && (<strong>{userData.name}</strong>)}
 								</Typography>
 							</CardContent>
 						</Card>
@@ -1546,41 +1573,41 @@ export function Cashier(props) {
 						<Card>
 							<CardContent>
 								<TableContainer sx={{ height: 350, maxHeight: 350 }}>
-      							  <Table stickyHeader aria-label="sticky table">
-      							    <TableHead>
-      							      <TableRow>
-      							        {columns.map((column) => (
-      							          <TableCell
-      							            key={column.id}
-      							            align={column.align}
-      							            style={{ minWidth: column.minWidth }}
-      							          >
-      							            {column.label}
-      							          </TableCell>
-      							        ))}
-      							      </TableRow>
-      							    </TableHead>
-      							    <TableBody>
-      							      {rows
-      							        .map((row) => {
-      							          return (
-      							            <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-      							              {columns.map((column) => {
-      							                const value = row[column.id];
-      							                return (
-      							                  <TableCell key={column.id} align={column.align}>
-      							                    {column.format && typeof value === 'number'
-      							                      ? column.format(value)
-      							                      : value}
-      							                  </TableCell>
-      							                );
-      							              })}
-      							            </TableRow>
-      							          );
-      							        })}
-      							    </TableBody>
-      							  </Table>
-      							</TableContainer>
+									<Table stickyHeader aria-label="sticky table">
+										<TableHead>
+											<TableRow>
+												{columns.map((column) => (
+													<TableCell
+														key={column.id}
+														align={column.align}
+														style={{ minWidth: column.minWidth }}
+													>
+														{column.label}
+													</TableCell>
+												))}
+											</TableRow>
+										</TableHead>
+										<TableBody>
+											{rows
+												.map((row) => {
+													return (
+														<TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+															{columns.map((column) => {
+																const value = row[column.id];
+																return (
+																	<TableCell key={column.id} align={column.align}>
+																		{column.format && typeof value === 'number'
+																			? column.format(value)
+																			: value}
+																	</TableCell>
+																);
+															})}
+														</TableRow>
+													);
+												})}
+										</TableBody>
+									</Table>
+								</TableContainer>
 								<div className="row">
 									<div className="col-lg-8 mx-auto rounded">
 										<p>
@@ -1617,7 +1644,7 @@ export function Cashier(props) {
 						</Card>
 					</Grid>
 					<Grid item xs={3} >
-						<Card sx={{height: '100%'}}>
+						<Card sx={{ height: '100%' }}>
 							<CardContent></CardContent>
 						</Card>
 					</Grid>
@@ -1689,32 +1716,32 @@ const top100Films = [
 	{ label: "Schindler's List", year: 1993 },
 	{ label: 'Pulp Fiction', year: 1994 },
 	{
-	  label: 'The Lord of the Rings: The Return of the King',
-	  year: 2003,
+		label: 'The Lord of the Rings: The Return of the King',
+		year: 2003,
 	},
 	{ label: 'The Good, the Bad and the Ugly', year: 1966 },
 	{ label: 'Fight Club', year: 1999 },
 	{
-	  label: 'The Lord of the Rings: The Fellowship of the Ring',
-	  year: 2001,
+		label: 'The Lord of the Rings: The Fellowship of the Ring',
+		year: 2001,
 	},
 	{
-	  label: 'Star Wars: Episode V - The Empire Strikes Back',
-	  year: 1980,
+		label: 'Star Wars: Episode V - The Empire Strikes Back',
+		year: 1980,
 	},
 	{ label: 'Forrest Gump', year: 1994 },
 	{ label: 'Inception', year: 2010 },
 	{
-	  label: 'The Lord of the Rings: The Two Towers',
-	  year: 2002,
+		label: 'The Lord of the Rings: The Two Towers',
+		year: 2002,
 	},
 	{ label: "One Flew Over the Cuckoo's Nest", year: 1975 },
 	{ label: 'Goodfellas', year: 1990 },
 	{ label: 'The Matrix', year: 1999 },
 	{ label: 'Seven Samurai', year: 1954 },
 	{
-	  label: 'Star Wars: Episode IV - A New Hope',
-	  year: 1977,
+		label: 'Star Wars: Episode IV - A New Hope',
+		year: 1977,
 	},
 	{ label: 'City of God', year: 2002 },
 	{ label: 'Se7en', year: 1995 },
@@ -1749,8 +1776,8 @@ const top100Films = [
 	{ label: 'Alien', year: 1979 },
 	{ label: 'Sunset Boulevard', year: 1950 },
 	{
-	  label: 'Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb',
-	  year: 1964,
+		label: 'Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb',
+		year: 1964,
 	},
 	{ label: 'The Great Dictator', year: 1940 },
 	{ label: 'Cinema Paradiso', year: 1988 },
@@ -1772,8 +1799,8 @@ const top100Films = [
 	{ label: 'North by Northwest', year: 1959 },
 	{ label: 'Vertigo', year: 1958 },
 	{
-	  label: 'Star Wars: Episode VI - Return of the Jedi',
-	  year: 1983,
+		label: 'Star Wars: Episode VI - Return of the Jedi',
+		year: 1983,
 	},
 	{ label: 'Reservoir Dogs', year: 1992 },
 	{ label: 'Braveheart', year: 1995 },
@@ -1786,8 +1813,8 @@ const top100Films = [
 	{ label: 'Lawrence of Arabia', year: 1962 },
 	{ label: 'Double Indemnity', year: 1944 },
 	{
-	  label: 'Eternal Sunshine of the Spotless Mind',
-	  year: 2004,
+		label: 'Eternal Sunshine of the Spotless Mind',
+		year: 2004,
 	},
 	{ label: 'Amadeus', year: 1984 },
 	{ label: 'To Kill a Mockingbird', year: 1962 },
@@ -1805,4 +1832,4 @@ const top100Films = [
 	{ label: 'Snatch', year: 2000 },
 	{ label: '3 Idiots', year: 2009 },
 	{ label: 'Monty Python and the Holy Grail', year: 1975 },
-  ];
+];

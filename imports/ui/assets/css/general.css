@@ -9,6 +9,7 @@
 	display: flex !important;
 	flex-direction: row !important;
 	flex-wrap: nowrap !important;
+	font-family: Roboto;
 }
 .mainContent {
 	padding: 1rem !important;

@@ -377,4 +377,72 @@ if (Meteor.isServer) {
 			);
 		}
 	});
+
+	Meteor.publish('products.search2', function products_search(data) {
+		try {
+			console.log('publish.products.search2');
+
+			let selectedID = data.selectedID;
+			let searchText = data.searchText;
+
+			if (searchText.length > 2) {
+				let findOrObject = [
+					{
+						barcode: {
+							$regex: searchText,
+							$options: 'i',
+						},
+					},
+					{
+						namaBarang: {
+							$regex: searchText,
+							$options: 'i',
+						},
+					},
+				];
+
+				if (selectedID) {
+					findOrObject.push({
+						barcode: selectedID,
+					});
+				}
+
+				let datasCursor = ProductsCollections.find(
+					{
+						$or: findOrObject,
+					},
+					{
+						limit: 10,
+					}
+				);
+
+				return datasCursor;
+			} else {
+				if (selectedID) {
+					let datasCursor = ProductsCollections.find({
+						barcode: selectedID,
+					});
+
+					return datasCursor;
+				}
+			}
+		} catch (tryErr) {
+			console.log(tryErr);
+			let currLine = getCurrentLine();
+			let errorCode = addErrorLog(
+				currLine.line,
+				currLine.file,
+				this,
+				'AGENT',
+				'publish.products.search2',
+				tryErr.message
+			);
+			throw new Meteor.Error(
+				'Terjadi Kesalahan',
+				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
+					errorCode
+			);
+		}
+	});
+
 }

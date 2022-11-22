@@ -86,29 +86,29 @@ export function ListUserLog(props) {
 	}, [page, searchText, orderBy, order]);
 
 	const columns = [
-		{ field: 'id', headerName: 'ID', width: 90},
+		{ field: 'id', headerName: 'ID', width: 90 },
 		{
-		  field: 'createdAt',
-		  headerName: 'Tanggal',
-		  width: 200,
-		  valueFormatter: params => 
-     		moment(params?.value).format("YYYY-MM-DD hh:mm:ss"),
+			field: 'createdAt',
+			headerName: 'Tanggal',
+			width: 200,
+			valueFormatter: params =>
+				moment(params?.value).format("YYYY-MM-DD hh:mm:ss"),
 		},
 		{
-		  field: 'module',
-		  headerName: 'Module',
-		  width: 200,
+			field: 'module',
+			headerName: 'Module',
+			width: 200,
 		},
 		{
-		  field: 'username',
-		  headerName: 'Username',
-		  width: 200,
+			field: 'username',
+			headerName: 'Username',
+			width: 200,
 		},
 		{
-		  field: 'description',
-		  headerName: 'Description',
-		  sortable: false,
-		  width: 400,
+			field: 'description',
+			headerName: 'Description',
+			sortable: false,
+			width: 400,
 		},
 		{
 			field: '_id',
@@ -120,36 +120,36 @@ export function ListUserLog(props) {
 			renderCell: (params) => {
 				//console.log(params.value);
 				return (
-				  <>
-					<a className ="fakeLink"
-						onClick={( e ) => {
-							navigate('/ViewUserLog/' + params.value);
-						}}
-					>
-						<LaunchIcon /> 
-					</a>
-				  </>
+					<>
+						<a className="fakeLink"
+							onClick={(e) => {
+								navigate('/ViewUserLog/' + params.value);
+							}}
+						>
+							<LaunchIcon />
+						</a>
+					</>
 				);
-			  }
-		  },
+			}
+		},
 	];
 
 	const [rows, setRows] = useState([]);
 
-	useEffect(()=>{
+	useEffect(() => {
 		let baris = [];
-		if(userLog && userLogLoading === false) {
+		if (userLog && userLogLoading === false) {
 			userLog.map((item, index) => {
-				baris[index]={
+				baris[index] = {
 					id: (index + 1),
 					...item
 				};
 			})
 			setRows(baris);
-		} else if(!userLog && userLogLoading === false) {
+		} else if (!userLog && userLogLoading === false) {
 			baris = [];
 		}
-	},[userLog, userLogLoading]);
+	}, [userLog, userLogLoading]);
 
 
 	return (
@@ -176,37 +176,37 @@ export function ListUserLog(props) {
 					<Row>
 						<Col></Col>
 						<Col>
-						<InputGroup inside>
-							<Input
-								type="text"
-								placeholder="Cari Data"
-								style={{width:300}}
-								value={searchText}
-								onChange={(e) => {
-									setSearchText(e);
-								}}
-							/>
-							<InputGroup.Addon>
-        						<SearchIcon />
-      						</InputGroup.Addon>
-						</InputGroup>
+							<InputGroup inside>
+								<Input
+									type="text"
+									placeholder="Cari Data"
+									style={{ width: 300 }}
+									value={searchText}
+									onChange={(e) => {
+										setSearchText(e);
+									}}
+								/>
+								<InputGroup.Addon>
+									<SearchIcon />
+								</InputGroup.Addon>
+							</InputGroup>
 						</Col>
 					</Row>
 					<hr />
-					<Box sx={{ height: 500, width: '100%'}}>
-    				  	<DataGrid
+					<Box sx={{ height: 500, width: '100%' }}>
+						<DataGrid
 							components={{ Toolbar: GridToolbar }}
-							
+
 							loading={userLogLoading}
 							columns={columns}
-    				  	  	rows={rows}
-							
+							rows={rows}
+
 							pageSize={pageSize}
 							onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-							rowsPerPageOptions={[10,20,50]}
+							rowsPerPageOptions={[10, 20, 50]}
 							pagination
-    				  	/>
-    				</Box>
+						/>
+					</Box>
 				</div>
 			</div>
 		</>

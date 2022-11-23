@@ -35,7 +35,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -80,7 +80,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -140,7 +140,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -195,7 +195,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -223,7 +223,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -240,28 +240,28 @@ if (Meteor.isServer) {
 				ProductsCollections,
 				[{
 					$project: {
-					 	kodeBarang: 1,
-					 	namaBarang: 1,
-					 	qty: 1,
-					 	tglLastTrx: 1,
-					 	isoYear: {
-					 	 	$dateToString: {
-					 	 	 	format: '%G',
-					 	 	 	date: '$tglLastTrx'
-					 	 	}
-					 	}
+						kodeBarang: 1,
+						namaBarang: 1,
+						qty: 1,
+						tglLastTrx: 1,
+						isoYear: {
+							$dateToString: {
+								format: '%G',
+								date: '$tglLastTrx'
+							}
+						}
 					}
-				   	}, {
-						$match: {
-						 	qty: 0,
-						 	isoYear: tahun.toString()
-						}
-				   	}, {
-						$limit: 10
-				   	}, {
-						$sort: {
-							tglLastTrx: 1
-						}
+				}, {
+					$match: {
+						qty: 0,
+						isoYear: tahun.toString()
+					}
+				}, {
+					$limit: 10
+				}, {
+					$sort: {
+						tglLastTrx: 1
+					}
 				}]
 			)
 		} catch (tryErr) {
@@ -278,7 +278,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -306,7 +306,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -373,7 +373,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -385,47 +385,37 @@ if (Meteor.isServer) {
 			let selectedID = data.selectedID;
 			let searchText = data.searchText;
 
-			if (searchText.length > 2) {
-				let findOrObject = [
-					{
-						barcode: {
-							$regex: searchText,
-							$options: 'i',
-						},
+			let findOrObject = [
+				{
+					barcode: {
+						$regex: searchText,
+						$options: 'i',
 					},
-					{
-						namaBarang: {
-							$regex: searchText,
-							$options: 'i',
-						},
+				},
+				{
+					namaBarang: {
+						$regex: searchText,
+						$options: 'i',
 					},
-				];
+				},
+			];
 
-				if (selectedID) {
-					findOrObject.push({
-						barcode: selectedID,
-					});
-				}
-
-				let datasCursor = ProductsCollections.find(
-					{
-						$or: findOrObject,
-					},
-					{
-						limit: 10,
-					}
-				);
-
-				return datasCursor;
-			} else {
-				if (selectedID) {
-					let datasCursor = ProductsCollections.find({
-						barcode: selectedID,
-					});
-
-					return datasCursor;
-				}
+			if (selectedID) {
+				findOrObject.push({
+					barcode: selectedID,
+				});
 			}
+
+			let datasCursor = ProductsCollections.find(
+				{
+					$or: findOrObject,
+				},
+				{
+					limit: 10,
+				}
+			);
+
+			return datasCursor;
 		} catch (tryErr) {
 			console.log(tryErr);
 			let currLine = getCurrentLine();
@@ -440,7 +430,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});

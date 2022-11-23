@@ -137,7 +137,7 @@ export function Cashier(props) {
 	const [categoryID, setCategoryID] = useState('');
 
 	const [ktsBesar, setKtsBesar] = useState(0);
-	const [ktsKecil, setKtsKecil] = useState(0);
+	const [ktsKecil, setKtsKecil] = useState(1);
 	const [kts, setKts] = useState(0);
 	const [satuanBesar, setSatuanBesar] = useState('');
 	const [satuanKecil, setSatuanKecil] = useState('');
@@ -1566,7 +1566,9 @@ export function Cashier(props) {
 
 											sx={{ width: 500 }}
 
-											autoHighlight
+											//autoHighlight
+											disablePortal
+											clearOnEscape
 											getOptionLabel={(option) => option.label}
 											//isOptionEqualToValue={(option, value) => option.code === value.code}
 											filterOptions={filterOptions}
@@ -1579,7 +1581,7 @@ export function Cashier(props) {
 											renderInput={(params) =>
 												<TextField
 													{...params}
-													label="Search Products"
+													label="Search Product Barcode / Name"
 													onKeyDown={(e) => {
 														let currentKey = e.key;
 													}}
@@ -1591,14 +1593,14 @@ export function Cashier(props) {
 											justifyContent="flex-start"
 											alignItems="flex-end"
 											spacing={1}
+											mt={1}
+											mb={1}
 										>
 											<TextField
 												label="Barcode"
 												value={barcode ? barcode : ''}
 												variant="standard"
 												size="small"
-												fullWidth
-												margin="dense"
 												InputProps={{
 													readOnly: true,
 												}}
@@ -1608,12 +1610,30 @@ export function Cashier(props) {
 												value={kodeBarang ? kodeBarang : ''}
 												variant="standard"
 												size="small"
-												fullWidth
-												margin="dense"
 												InputProps={{
 													readOnly: true,
 												}}
 											/>
+										</Stack>
+										<Stack
+											direction="row"
+											justifyContent="flex-start"
+											alignItems="flex-end"
+											spacing={1}
+											mt={1}
+											mb={1}
+										>
+											<TextField
+												label="Qty"
+												value={ktsKecil}
+												variant="standard"
+												size="small"
+												className='text-right'
+												InputProps={{
+													readOnly: true,
+												}}
+											/>
+											<Button>Add</Button>
 										</Stack>
 									</Col>
 									<Col xs={3}>
@@ -1653,7 +1673,7 @@ export function Cashier(props) {
 					<Grid item xs={9}>
 						<Card>
 							<CardContent>
-								<TableContainer sx={{ height: 350, maxHeight: 350 }}>
+								<TableContainer sx={{ height: 300 }}>
 									<Table stickyHeader aria-label="sticky table">
 										<TableHead>
 											<TableRow>
@@ -1669,23 +1689,22 @@ export function Cashier(props) {
 											</TableRow>
 										</TableHead>
 										<TableBody>
-											{rows
-												.map((row) => {
-													return (
-														<TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-															{columns.map((column) => {
-																const value = row[column.id];
-																return (
-																	<TableCell key={column.id} align={column.align}>
-																		{column.format && typeof value === 'number'
-																			? column.format(value)
-																			: value}
-																	</TableCell>
-																);
-															})}
-														</TableRow>
-													);
-												})}
+											{rows.map((row) => {
+												return (
+													<TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+														{columns.map((column) => {
+															const value = row[column.id];
+															return (
+																<TableCell key={column.id} align={column.align}>
+																	{column.format && typeof value === 'number'
+																		? column.format(value)
+																		: value}
+																</TableCell>
+															);
+														})}
+													</TableRow>
+												);
+											})}
 										</TableBody>
 									</Table>
 								</TableContainer>
@@ -1703,7 +1722,7 @@ export function Cashier(props) {
 											<tbody>
 												<tr>
 													<td>Total :</td>
-													<td className="pe-4 text-right">
+													<td className="text-right">
 														<h3>
 															<b>
 																{grandTotal

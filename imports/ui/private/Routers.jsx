@@ -141,6 +141,8 @@ import { ListUserLog } from './admin/settings/userlog/List';
 import { ViewErrorLog } from './admin/settings/errorlog/Detail';
 import { ListErrorLog } from './admin/settings/errorlog/List';
 
+import { TestPage } from './Test';
+
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
@@ -153,6 +155,12 @@ export function PageRoutes(props) {
 						path="/"
 						render
 						element={<DashboardPage />}
+					/>
+					<Route
+						index
+						path="/Test"
+						render
+						element={<TestPage />}
 					/>
 					<Route
 						index

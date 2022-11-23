@@ -1586,6 +1586,7 @@ export function Cashier(props) {
 														let currentKey = e.key;
 													}}
 													inputRef={(input) => (scanRef.current = input)}
+													size="small"
 												/>}
 										/>
 										<Stack

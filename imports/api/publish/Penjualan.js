@@ -149,12 +149,12 @@ if (Meteor.isServer) {
 		try {
 			console.log('publish.penjualan.getLastNo');
 
-			let data = '/^'+ data.noFaktur + '/';
+			let noFaktur = '/^'+ data.noFaktur + '/';
 
 			let datasCursor = PenjualanCollections.find(
 				{
 					noFaktur: {
-						$regex: data
+						$regex: noFaktur
 					}
 				},
 				{ sort: { noFaktur: 1 } },

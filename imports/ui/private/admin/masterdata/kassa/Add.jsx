@@ -1,25 +1,33 @@
 import { Meteor } from 'meteor/meteor';
 
 import React, { useRef, useState } from 'react';
-import { Col, Form as BSForm, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 import Breadcrumb from 'rsuite/Breadcrumb';
 import Button from 'rsuite/Button';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Form from 'rsuite/Form';
-import Modal from 'rsuite/Modal';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
+import MuiAlert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Snackbar from '@mui/material/Snackbar';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+	return <MuiAlert elevation={6} ref={ref} {...props} />;
+});
+
 export function AddKassa() {
 	let navigate = useNavigate();
+
+	const [openSnackbar, setOpenSnackbar] = useState(false);
+	const [severity, setSeverity] = useState('info');
+	const [msg, setMsg] = useState('');
+	const [msgTitle, setMsgTitle] = useState('');
+
 	const [adding, setAdding] = useState(false);
 
-	const [dialogOpen, setDialogOpen] = useState(false);
-	const [dialogTitle, setDialogTitle] = useState('');
-	const [dialogContent, setDialogContent] = useState('');
-	
 	const [name, setName] = useState('');
 	const [code, setCode] = useState('');
 	const [desc, setDesc] = useState('');
@@ -37,9 +45,10 @@ export function AddKassa() {
 				(err, res) => {
 					if (err) {
 						setAdding(false);
-						setDialogOpen(true);
-						setDialogTitle(err.error);
-						setDialogContent(err.reason);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle(err.error);
+						setMsg(err.reason);
 					} else if (res) {
 						let resultCode = res.code;
 						let resultTitle = res.title;
@@ -49,50 +58,56 @@ export function AddKassa() {
 							setCode('');
 							setDesc('');
 							setAdding(false);
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("success");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						} else {
 							setAdding(false);
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("warning");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						}
 					} else {
 						setAdding(false);
-						setDialogOpen(true);
-						setDialogTitle('Kesalahan Sistem');
-						setDialogContent(
-							'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle('Kesalahan Sistem');
+						setMsg('Terjadi kesalahan pada sistem, silahkan hubungi customer service');
 					}
 				}
 			);
 		} else {
 			setAdding(false);
-			setDialogOpen(true);
-			setDialogTitle('Kesalahan Validasi');
-			setDialogContent('Nama, Kode Wajib Diisi');
+			setOpenSnackbar(true);
+			setSeverity("warning");
+			setMsgTitle('Kesalahan Validasi');
+			setMsg('Kode dan Nama Kassa wajib diisi!');
 		}
 	};
 
 	return (
 		<>
 			<div className="mainContainerRoot">
-				<Modal
-					backdrop={true}
-					keyboard={false}
-					open={dialogOpen}
-					onClose={(e) => {
-						setDialogOpen(false);
-					}}
-				>
-					<Modal.Header>
-						<Modal.Title>{dialogTitle}</Modal.Title>
-					</Modal.Header>
 
-					<Modal.Body>{dialogContent}</Modal.Body>
-				</Modal>
+				<Snackbar
+					anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+					open={openSnackbar}
+					onClose={() => { setOpenSnackbar(false); }}
+					autoHideDuration={3000}
+					key={'top' + 'center'}
+				>
+					<Alert
+						onClose={() => { setOpenSnackbar(false); }}
+						severity={severity}
+						sx={{ width: '100%' }}
+					>
+						<AlertTitle>{msgTitle}</AlertTitle>
+						{msg}
+					</Alert>
+				</Snackbar>
+
 				<div className="mainContent">
 					<div className="breadcrumContainer">
 						<Breadcrumb

@@ -4,92 +4,184 @@ import { useTracker } from 'meteor/react-meteor-data';
 import moment from 'moment-timezone';
 import 'moment/locale/id';
 
-import React, { useState } from 'react';
-import { Col, Row } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
 import Breadcrumb from 'rsuite/Breadcrumb';
-import Button from 'rsuite/Button';
-import Form from 'rsuite/Form';
-import Modal from 'rsuite/Modal';
-import SelectPicker from 'rsuite/SelectPicker';
+import Input from 'rsuite/Input';
+import InputGroup from 'rsuite/InputGroup';
 
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
-import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
+import SearchIcon from '@rsuite/icons/Search';
+
+import Box from '@mui/material/Box';
+import {
+	DataGrid,
+	GridToolbar,
+	gridPageCountSelector,
+	gridPageSelector,
+	useGridApiContext,
+	useGridSelector,
+} from '@mui/x-data-grid';
+import Pagination from '@mui/material/Pagination';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import LaunchIcon from '@mui/icons-material/Launch';
+import LinearProgress from '@mui/material/LinearProgress';
+import Button from '@mui/material/Button';
 
 import { KassaCollections } from '../../../db/Kassa';
-import { Topbar } from '../template/Topbar';
+
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
 
-export function CashierOnBoarding(props) {
+function CustomPagination() {
+	const apiRef = useGridApiContext();
+	const page = useGridSelector(apiRef, gridPageSelector);
+	const pageCount = useGridSelector(apiRef, gridPageCountSelector);
+
+	return (
+		<Pagination
+			color="primary"
+			count={pageCount}
+			page={page + 1}
+			onChange={(event, value) => apiRef.current.setPage(value - 1)}
+			showFirstButton
+			showLastButton
+		/>
+	);
+};
+
+function SortedDescendingIcon() {
+	return <ExpandMoreIcon className="icon" />;
+}
+
+function SortedAscendingIcon() {
+	return <ExpandLessIcon className="icon" />;
+}
+
+export function CashierOnBoarding() {
 	let navigate = useNavigate();
 
-	const [openDrawer, setOpenDrawer] = React.useState(false);
-	const [dialogOpen, setDialogOpen] = useState(false);
-	const [dialogTitle, setDialogTitle] = useState('');
-	const [dialogContent, setDialogContent] = useState('');
-	const [selecting, setSelecting] = useState(false);
-	const [kassaID, setKassaID] = useState('');
+	const [pageSize, setPageSize] = useState(10);
 
-	const [searchKassaText, setSearchKassaText] = useState('');
+	const [searchText, setSearchText] = useState('');
+
+	const [limit, setLimit] = useState(20);
+
+	const [page, setPage] = useState(1);
+	const [maxPage, setMaxPage] = useState(1);
+	const [orderBy, setOrderBy] = useState('code');
+	const [order, setOrder] = useState(1);
 
 	const [kassa, kassaLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('kassa.search', {
-			searchText: searchKassaText,
-			selectedID: kassaID,
+		let subs = Meteor.subscribe('kassa.list', {
+			page,
+			searchText,
+			orderByColumn: orderBy,
+			order,
 		});
 
-		let data = KassaCollections.find({
-			$or: [
-				{
-					_id: kassaID,
-				},
-				{
-					code: {
-						$regex: searchKassaText,
-						$options: 'i',
-					},
-				},
-				{
-					name: {
-						$regex: searchKassaText,
-						$options: 'i',
-					},
-				},
-			],
-		}).fetch();
-		return [data, !subs.ready()];
-	}, [searchKassaText, kassaID]);
+		let sortObject = {};
 
-	const renderKassaLoading = (menu) => {
-		if (kassaLoading) {
-			return (
-				<p style={{ padding: 4, color: '#999', textAlign: 'center' }}>
-					<SpinnerIcon spin /> Loading...
-				</p>
-			);
+		sortObject[orderBy] = order;
+
+		let data = KassaCollections.find(
+			{
+				$or: [
+					{
+						code: {
+							$regex: searchText,
+							$options: 'i',
+						},
+					},
+					{
+						name: {
+							$regex: searchText,
+							$options: 'i',
+						},
+					},
+				],
+			},
+			{
+				sort: sortObject,
+			}
+		).fetch();
+		return [data, !subs.ready()];
+	}, [page, searchText, orderBy, order]);
+
+	const [kassaCount, kassaCountLoading] = useTracker(() => {
+		let subs = Meteor.subscribe('kassa.countList', { searchText });
+
+		let data = Counts.get('kassa.countList.' + searchText);
+		return [data, !subs.ready()];
+	}, [searchText]);
+
+	useEffect(() => {
+		setMaxPage(Math.ceil(kassaCount / 20));
+	}, [kassaCount]);
+
+	const columns = [
+		{ field: 'id', headerName: 'ID', width: 90 },
+		{
+			field: 'code',
+			headerName: 'Code',
+			width: 200,
+		},
+		{
+			field: 'name',
+			headerName: 'Name',
+			width: 200,
+		},
+		{
+			field: '_id',
+			headerName: 'Action',
+			sortable: false,
+			width: 100,
+			align: 'center',
+			filterable: false,
+			renderCell: (params) => {
+				//console.log(params.value);
+				return (
+					<>
+						<Button
+							onClick={(e) => {
+								navigate('/Cashier/' + params.value);
+							}}
+							endIcon={<LaunchIcon />}
+							variant="contained"
+						>
+							Open
+						</Button>
+					</>
+				);
+			}
+		},
+	];
+
+	const [rows, setRows] = useState([]);
+
+	useEffect(() => {
+		let baris = [];
+		if (kassa && kassaLoading === false) {
+			kassa.map((item, index) => {
+				baris[index] = {
+					id: (index + 1),
+					...item
+				};
+			})
+			setRows(baris);
+		} else if (!kassa && kassaLoading === false) {
+			baris = [];
 		}
-		return menu;
-	};
+	}, [kassa, kassaLoading]);
+
 	return (
 		<>
-			<Topbar />
 			<div className="mainContainerRoot">
-				<Modal
-					backdrop={true}
-					keyboard={false}
-					open={dialogOpen}
-					onClose={(e) => {
-						setDialogOpen(false);
-					}}
-				>
-					<Modal.Header>
-						<Modal.Title>{dialogTitle}</Modal.Title>
-					</Modal.Header>
-
-					<Modal.Body>{dialogContent}</Modal.Body>
-				</Modal>
 				<div className="mainContent">
 					<div className="breadcrumContainer">
 						<Breadcrumb
@@ -100,61 +192,58 @@ export function CashierOnBoarding(props) {
 								Dashboard
 							</Breadcrumb.Item>
 							<Breadcrumb.Item active>
-								Mulai Kasir
+								Cashier
 							</Breadcrumb.Item>
 						</Breadcrumb>
 					</div>
 					<h6>
-						<b>Mulai Kasir</b>
+						<b>Cashier</b>
 					</h6>
 					<hr />
 					<Row>
-						<Col sm={12}>
-							<Form.Group controlId="kassaID">
-								<Form.ControlLabel>Kassa</Form.ControlLabel>
-								<SelectPicker
-									placeholder="Kassa"
-									disabled={selecting}
-									value={kassaID}
-									data={kassa.map((s) => ({
-										label: '[' + s.code + '] ' + s.name,
-										value: s._id,
-									}))}
-									style={{ width: '100%' }}
-									onSelect={(value, item, e) => {
-										setKassaID(value);
+						<Col>
+						</Col>
+						<Col>
+							<InputGroup inside>
+								<Input
+									type="text"
+									placeholder="Cari Data"
+									style={{ width: 300 }}
+									value={searchText}
+									onChange={(e) => {
+										setSearchText(e);
 									}}
-									onClean={() => {
-										setKassaID('');
-									}}
-									onSearch={(input) => {
-										setSearchKassaText(input);
-									}}
-									renderMenu={renderKassaLoading}
 								/>
-							</Form.Group>
-							<br />
-							<Button
-								type="submit"
-								appearance="primary"
-								loading={selecting}
-								onClick={() => {
-									if (kassaID) {
-										navigate('/Cashier/' + kassaID);
-									} else {
-										setSelecting(false);
-										setDialogOpen(true);
-										setDialogTitle('Kesalahan Validasi');
-										setDialogContent(
-											'Silahkan Pilih Kassa'
-										);
-									}
-								}}
-							>
-								Buka
-							</Button>
+								<InputGroup.Addon>
+									<SearchIcon />
+								</InputGroup.Addon>
+							</InputGroup>
 						</Col>
 					</Row>
+					<hr />
+					<Box sx={{ height: 500, width: '100%' }}>
+						<DataGrid
+							loading={kassaLoading}
+							columns={columns}
+							rows={rows}
+
+							initialState={{
+								pagination: {
+									pageSize: 20,
+								},
+							}}
+
+							pageSize={pageSize}
+							pagination
+							rowsPerPageOptions={[20]}
+							components={{
+								LoadingOverlay: LinearProgress,
+								Pagination: CustomPagination,
+								ColumnSortedDescendingIcon: SortedDescendingIcon,
+								ColumnSortedAscendingIcon: SortedAscendingIcon,
+							}}
+						/>
+					</Box>
 				</div>
 			</div>
 		</>

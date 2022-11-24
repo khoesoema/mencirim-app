@@ -83,6 +83,7 @@ export function Cashier(props) {
 
 	const [addingDetail, setAddingDetail] = useState(false);
 	const [tglTrx, setTglTrx] = useState(new Date());
+	const [noFaktur, setNoFaktur] = useState('');
 
 	let { _id } = useParams();
 	let kassaID = _id;
@@ -134,36 +135,22 @@ export function Cashier(props) {
 
 	const [penjualanData, penjualanDataLoading] = useTracker(() => {
 		let isLoading = true;
-		let data = {};
+		let data = '';
 
 		if (noFaktur) {
 			let subs = Meteor.subscribe('penjualan.getLastNo', { noFaktur });
 			isLoading = !subs.ready();
 
-			data = PenjualanCollections.findOne({ noFaktur });
-		} else {
-			let last = kassaCode + '|' + moment(new Date()).format('YYYYMMDD');
-
-			let subs = Meteor.subscribe('penjualan.getLastNo', { noFaktur: last });
-			isLoading = !subs.ready();
-
 			data = PenjualanCollections.findOne(
-				{
-					noFaktur: {
-						$regex: list
-					}
-				},
+				{ noFaktur: { $regex: last } },
 				{ sort: { noFaktur: 1 } },
 				{ limit: 1 }
 			);
+		} else {
+			data = kassaCode + '-' + moment(new Date()).format('YYYYMMDD') + '-1';
 		}
-
 		return [data, isLoading];
 	}, [noFaktur]);
-
-	useEffect(()=>{
-
-	},[]);
 
 	const [itemNum, setItemNum] = useState(0);
 	const [kodeBarang, setKodeBarang] = useState('');
@@ -1665,9 +1652,12 @@ export function Cashier(props) {
 								<Typography variant="body2" color="text.secondary">
 									<Clock format={'DD-MMMM-YYYY HH:mm:ss'} ticking={true} timezone={'Asia/Jakarta'} />
 								</Typography>
-								<Typography variant="body">
+								<Typography variant="body" component="div">
 									{Meteor.user().username + ' '}
 									{(userDataLoading === false) && (<strong>{userData.name}</strong>)}
+								</Typography>
+								<Typography variant="body" component="div">
+									{penjualanDataLoading && 'No. ' + penjualanData}
 								</Typography>
 							</CardContent>
 						</Card>

@@ -24,13 +24,14 @@ import SearchIcon from '@rsuite/icons/Search';
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 
 import Box from '@mui/material/Box';
-import { 	DataGrid, 
-			GridToolbar, 
-			gridPageCountSelector,
-			gridPageSelector,
-			useGridApiContext,
-			useGridSelector, 
-		} from '@mui/x-data-grid';
+import {
+	DataGrid,
+	GridToolbar,
+	gridPageCountSelector,
+	gridPageSelector,
+	useGridApiContext,
+	useGridSelector,
+} from '@mui/x-data-grid';
 import Pagination from '@mui/material/Pagination';
 import Avatar from '@mui/material/Avatar';
 import { blue } from '@mui/material/colors';
@@ -62,11 +63,11 @@ export function ProductLists(props) {
 	function SortedDescendingIcon() {
 		return <ExpandMoreIcon className="icon" />;
 	}
-	  
+
 	function SortedAscendingIcon() {
 		return <ExpandLessIcon className="icon" />;
 	}
-	
+
 	const [products, productsLoading] = useTracker(() => {
 		let subs = Meteor.subscribe('products.list2', {
 			page,
@@ -121,9 +122,9 @@ export function ProductLists(props) {
 	const [selectedID, setSelectedID] = useState('');
 	const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = useState(false);
 	const [deleteConfirmationDialogTitle, setDeleteConfirmationDialogTitle] = useState('');
-	const [deleteConfirmationDialogContent,	setDeleteConfirmationDialogContent] = useState('');
+	const [deleteConfirmationDialogContent, setDeleteConfirmationDialogContent] = useState('');
 	const [selectedDeleteID, setSelectedDeleteID] = useState('');
-	
+
 	useEffect(() => {
 		if (selectedDeleteID) {
 			Meteor.call(
@@ -173,59 +174,59 @@ export function ProductLists(props) {
 		const apiRef = useGridApiContext();
 		const page = useGridSelector(apiRef, gridPageSelector);
 		const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-	  
+
 		return (
-		  <Pagination
-			color="primary"
-			count={pageCount}
-			page={page + 1}
-			onChange={(event, value) => apiRef.current.setPage(value - 1)}
-			showFirstButton 
-			showLastButton
-		  />
+			<Pagination
+				color="primary"
+				count={pageCount}
+				page={page + 1}
+				onChange={(event, value) => apiRef.current.setPage(value - 1)}
+				showFirstButton
+				showLastButton
+			/>
 		);
 	};
 
 	const columns = [
-		{ field: 'id', headerName: 'ID', width: 90},
+		{ field: 'id', headerName: 'ID', width: 90 },
 		{
-		  field: 'kodeBarang',
-		  headerName: 'Kode Barang',
-		  
-		  minWidth: 100,
+			field: 'kodeBarang',
+			headerName: 'Kode Barang',
+
+			minWidth: 100,
 		},
 		{
 			field: "imageBase64",
 			headerName: "Image",
 			width: 100,
 			renderCell: (params) => {
-			  //console.log(params);
-			  return (
-				<>
-				  { params.value 
-				  	? <Avatar src={params.value} variant="rounded"/>
-					: <Avatar sx={{ bgcolor: blue[400] }} variant="rounded"><ImageIcon /></Avatar>
-				  }
-				</>
-			  );
+				//console.log(params);
+				return (
+					<>
+						{params.value
+							? <Avatar src={params.value} variant="rounded" />
+							: <Avatar sx={{ bgcolor: blue[400] }} variant="rounded"><ImageIcon /></Avatar>
+						}
+					</>
+				);
 			}
 		},
 		{
-		  field: 'namaBarang',
-		  headerName: 'Nama Barang',
-		  
-          minWidth: 400,
+			field: 'namaBarang',
+			headerName: 'Nama Barang',
+
+			minWidth: 400,
 		},
 		{
-		  field: 'barcode',
-		  headerName: 'Barcode',
-		  
-		  minWidth: 150,
+			field: 'barcode',
+			headerName: 'Barcode',
+
+			minWidth: 150,
 		},
 		{
-		  field: 'categoryID',
-		  headerName: 'Kategori',
-		  width: 100,
+			field: 'categoryID',
+			headerName: 'Kategori',
+			width: 100,
 		},
 		{
 			field: 'supplier',
@@ -235,57 +236,57 @@ export function ProductLists(props) {
 		{
 			field: 'hargamodal',
 			headerName: 'Harga Modal',
-			
+
 			minWidth: 100,
 			align: 'right',
-			valueFormatter: params => 
-     			formatNum(params?.value),
+			valueFormatter: params =>
+				formatNum(params?.value),
 		},
 		{
 			field: 'hargajual',
 			headerName: 'Harga Jual',
-			
+
 			minWidth: 100,
 			align: 'right',
-			valueFormatter: params => 
-     			formatNum(params?.value),
+			valueFormatter: params =>
+				formatNum(params?.value),
 		},
 		{
 			field: 'profitjual',
 			headerName: 'Profit',
-			
+
 			minWidth: 100,
 			align: 'right',
-			valueFormatter: params => 
-     			(params?.value + ' %'),
+			valueFormatter: params =>
+				(params?.value + ' %'),
 		},
 		{
 			field: 'qty',
 			headerName: 'Qty',
-			
+
 			minWidth: 100,
 			align: 'right',
 		},
 		{
 			field: 'satuanKecil',
 			headerName: 'Satuan',
-			
+
 			minWidth: 100,
 		},
 		{
 			field: 'modifiedBy',
 			headerName: 'Diubah Oleh',
-			
+
 			minWidth: 100,
 		},
 		{
 			field: 'modifiedAt',
 			headerName: 'Diubah Tanggal',
-			
+
 			minWidth: 200,
-			valueFormatter: params => 
-			   moment(params?.value).format("YYYY-MM-DD hh:mm:ss"),
-		  },
+			valueFormatter: params =>
+				moment(params?.value).format("YYYY-MM-DD hh:mm:ss"),
+		},
 		{
 			field: '_id',
 			headerName: 'Action',
@@ -296,61 +297,61 @@ export function ProductLists(props) {
 			renderCell: (params) => {
 				//console.log(params.value);
 				return (
-				  <>
-					<a className ="fakeLink"
-						onClick={( e ) => {
-							navigate('/EditProduct/' + params.value);
-						}}
-					>
-						<FaPencilAlt /> 
-					</a>
-					<Divider vertical />
-					<a className ="fakeLink"
+					<>
+						<a className="fakeLink"
+							onClick={(e) => {
+								navigate('/EditProduct/' + params.value);
+							}}
+						>
+							<FaPencilAlt />
+						</a>
+						<Divider vertical />
+						<a className="fakeLink"
 							onClick={(e) => {
 								setSelectedID(params.value);
 								setDeleteConfirmationDialogOpen(true);
 								setDeleteConfirmationDialogTitle('Hapus data Product');
 								setDeleteConfirmationDialogContent(
 									'Anda akan menghapus data Product ' +
-									'[' + params.getValue(params.id, "kodeBarang") + ']' 
-									+  params.getValue(params.id, "namaBarang") +
+									'[' + params.getValue(params.id, "kodeBarang") + ']'
+									+ params.getValue(params.id, "namaBarang") +
 									'. Semua data yang berhubungan dengan Product ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
 								);
 							}}
 						>
-						<FaTrashAlt />
-					</a>
-				  </>
+							<FaTrashAlt />
+						</a>
+					</>
 				);
-			  }
-		  },
+			}
+		},
 	];
 
 	const [rows, setRows] = useState([]);
 
-	useEffect(()=>{
+	useEffect(() => {
 		let baris = [];
-		if(products && productsLoading === false) {
+		if (products && productsLoading === false) {
 			products.map((item, index) => {
-				baris[index]={
+				baris[index] = {
 					id: (index + 1),
 					...item
 				};
 			})
 			setRows(baris);
-		} else if(!products && productsLoading === false) {
+		} else if (!products && productsLoading === false) {
 			baris = [];
 		}
-	},[products, productsLoading]);
+	}, [products, productsLoading]);
 
 	const formatNum = (input) => {
 		if (input) {
 			return parseFloat(input)
-					.toFixed(2)
-					.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+				.toFixed(2)
+				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
 		} else {
 			return 0;
-		}	
+		}
 	};
 
 	return (
@@ -432,62 +433,62 @@ export function ProductLists(props) {
 					<hr />
 					<Row>
 						<Col>
-							<IconButton 
+							<IconButton
 								color="blue" appearance="primary"
-								icon={<PlusIcon />} 
-								onClick={(e) => {navigate('/AddProduct');}}
+								icon={<PlusIcon />}
+								onClick={(e) => { navigate('/AddProduct'); }}
 							>Add New</IconButton>
 						</Col>
 						<Col>
-						<InputGroup inside>
-							<Input
-								type="text"
-								placeholder="Cari Data"
-								style={{width:300}}
-								value={searchText}
-								onChange={(e) => {
-									setSearchText(e);
-								}}
-							/>
-							<InputGroup.Addon>
-        						<SearchIcon />
-      						</InputGroup.Addon>
-						</InputGroup>
+							<InputGroup inside>
+								<Input
+									type="text"
+									placeholder="Cari Data"
+									style={{ width: 300 }}
+									value={searchText}
+									onChange={(e) => {
+										setSearchText(e);
+									}}
+								/>
+								<InputGroup.Addon>
+									<SearchIcon />
+								</InputGroup.Addon>
+							</InputGroup>
 						</Col>
 					</Row>
 					<hr />
-					<Box sx={{ height: 500, width: '100%'}}>
-    				  	<DataGrid
+					<Box sx={{ height: 500, width: '100%' }}>
+						<DataGrid
 							sx={{
-							  boxShadow: 2,
-							  border: 2,
-							  borderColor: 'primary.light',
-							  '& .MuiDataGrid-cell:hover': {
-								color: 'primary.main',
-							  },
+								boxShadow: 2,
+								border: 2,
+								borderColor: 'primary.light',
+								'& .MuiDataGrid-cell:hover': {
+									color: 'primary.main',
+								},
 							}}
 							loading={productsLoading}
 							columns={columns}
-    				  	  	rows={rows}
-							
+							rows={rows}
+
 							initialState={{
 								pagination: {
-								  pageSize: 20,
+									pageSize: 20,
 								},
 							}}
 
 							pageSize={pageSize}
 							pagination
 							rowsPerPageOptions={[20]}
-        					components={{
+							components={{
 								Toolbar: GridToolbar,
 								LoadingOverlay: LinearProgress,
-        						Pagination: CustomPagination,
+								Pagination: CustomPagination,
 								ColumnSortedDescendingIcon: SortedDescendingIcon,
-          						ColumnSortedAscendingIcon: SortedAscendingIcon,
-        					}}
-    				  	/>
-    				</Box>
+								ColumnSortedAscendingIcon: SortedAscendingIcon,
+							}}
+						/>
+					</Box>
 				</div>
 			</div>
 		</>

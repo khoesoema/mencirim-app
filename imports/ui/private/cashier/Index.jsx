@@ -12,7 +12,8 @@ import { Element, scroller } from 'react-scroll';
 import Form from 'rsuite/Form';
 import { Col, Row } from 'react-bootstrap';
 
-import SelectPicker from 'rsuite/SelectPicker';
+import Clock from 'react-live-clock';
+
 import Modal from 'rsuite/Modal';
 import useWindowFocus from 'use-window-focus';
 
@@ -37,15 +38,14 @@ import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
 
 import { KassaCollections } from '../../../db/Kassa';
 import { DataUsersCollections } from '../../../db/Userscol';
-import { CashierOnGoingTransactionsCollections } from '../../../db/Cashier';
 
 import { CategoriesCollections } from '../../../db/Categories';
 import { ProductsCollections } from '../../../db/Products';
 import { PromotionsDetailCollections } from '../../../db/PromotionsDetail';
+import { PenjualanCollections } from '../../../db/Penjualan';
+import { PenjualanDetailCollections } from '../../../db/PenjualanDetail';
 
 import '../../assets/css/cashier.css';
-
-import Clock from 'react-live-clock';
 
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
@@ -417,40 +417,6 @@ export function Cashier(props) {
 	const [loggingOut, setLoggingOut] = useState(false);
 	const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
-	const [items, itemsLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('cashierOnGoingTransactions.list', {
-			kassaID,
-		});
-
-		let data = CashierOnGoingTransactionsCollections.find({
-			kassaID,
-		}).fetch();
-		return [data, !subs.ready()];
-	}, [kassaID]);
-
-	const [itemsCount, itemsCountLoading] = useTracker(() => {
-		let subs = Meteor.subscribe('cashierOnGoingTransactions.countList', {
-			kassaID,
-		});
-
-		let data = Counts.get(
-			'cashierOnGoingTransactions.countList.' + kassaID
-		);
-		return [data, !subs.ready()];
-	}, [kassaID]);
-
-	useEffect(() => {
-		let currDiscountTotal = items.reduce(
-			(a, b) => a + b.productDiscountTotal,
-			0
-		);
-		let currSubTotal = items.reduce((a, b) => a + b.productSubTotal, 0);
-
-		setDiscountTotal(currDiscountTotal);
-		setSubTotal(currSubTotal);
-		setGrandTotal(currSubTotal - currDiscountTotal);
-	}, [items]);
-
 	useEffect(() => {
 		if (currentIndex !== -1) {
 			scroller.scrollTo('myScrollToElement' + currentIndex, {
@@ -532,13 +498,13 @@ export function Cashier(props) {
 						logoutDialogOpen === false
 					) {
 						event.preventDefault();
-						setCurrentIndex((prev) => {
+						{/*setCurrentIndex((prev) => {
 							if (prev >= itemsCount - 1) {
 								return itemsCount - 1;
 							} else {
 								return prev + 1;
 							}
-						});
+						});*/}
 					}
 					// let currIndex = currentIndex + 1;
 					// setCurrentIndex(currIndex);
@@ -635,7 +601,6 @@ export function Cashier(props) {
 				window.removeEventListener('keypress', handleBarcode);
 			};
 		}, [
-			itemsCount,
 			changeQuantityDialogOpen,
 			changeDescriptionDialogOpen,
 			deleteItemDialogOpen,
@@ -755,7 +720,7 @@ export function Cashier(props) {
 		}
 	};
 
-	const changeDescription = (e) => {
+	{/*const changeDescription = (e) => {
 		setChangingDescription(true);
 		let selectedProduct = items[currentIndex];
 		if (selectedProduct) {
@@ -858,7 +823,7 @@ export function Cashier(props) {
 			// setDialogTitle('Kesalahan Validasi');
 			// setDialogContent('Silahkan Isi Scan Produk/Kode Produk');
 		}
-	};
+	}; */}
 
 	const columns = [
 		{ id: 'no', label: '#', minWidth: 50 },
@@ -1045,7 +1010,7 @@ export function Cashier(props) {
 		}
 
 	};
-
+	
 	return (
 		<>
 			<Container
@@ -1069,7 +1034,7 @@ export function Cashier(props) {
 					<Modal.Body>{dialogContent}</Modal.Body>
 				</Modal>
 
-				<Modal
+				{/*<Modal
 					backdrop={true}
 					keyboard={true}
 					open={changeQuantityDialogOpen}
@@ -1245,7 +1210,8 @@ export function Cashier(props) {
 							Batal (Escape)
 						</Button>
 					</Modal.Footer>
-				</Modal>
+						</Modal>
+
 				<Modal
 					backdrop={true}
 					keyboard={true}
@@ -1479,7 +1445,7 @@ export function Cashier(props) {
 							Batal (Escape)
 						</Button>
 					</Modal.Footer>
-				</Modal>
+				</Modal>*/}
 
 				<Modal
 					backdrop={true}
@@ -1712,9 +1678,7 @@ export function Cashier(props) {
 								<div className="row">
 									<div className="col-lg-8 mx-auto rounded">
 										<p>
-											Keterangan:{' '}
-											{items[currentIndex] &&
-												items[currentIndex].productDescription}
+											Keterangan:
 										</p>
 										<hr />
 									</div>

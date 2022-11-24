@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Meteor } from 'meteor/meteor';
+import { useTracker } from 'meteor/react-meteor-data';
+
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -72,6 +75,8 @@ import MemberIcon from '@rsuite/icons/Member';
 import Form from 'rsuite/Form';
 
 import { PageRoutes } from './Routers';
+
+import { DataUsersCollections } from '../../db/Userscol';
 
 const drawerWidth = 300;
 
@@ -158,6 +163,22 @@ function DashboardContent() {
   const logoutNow = (e) => {
     Meteor.logout();
   };
+
+  let userID = Meteor.user()._id;
+
+  const [userData, userDataLoading] = useTracker(() => {
+    let isLoading = true;
+    let data = {};
+
+    if (userID) {
+      let subs = Meteor.subscribe('dataUser.getByID', { _id: userID });
+      isLoading = !subs.ready();
+
+      data = DataUsersCollections.findOne({ _id: userID });
+    }
+    return [data, isLoading];
+  }, [userID]);
+
   const changePassword = (e) => {
     setChanging(true);
     if (newPassword && confirmNewPassword) {
@@ -233,14 +254,14 @@ function DashboardContent() {
 
   return (
     <>
-      <Dialog 
+      <Dialog
         fullWidth={true}
         maxWidth="md"
-        open={changePasswordDialogOpen} 
-        onClose={()=> setChangePasswordDialogOpen(false)}>
+        open={changePasswordDialogOpen}
+        onClose={() => setChangePasswordDialogOpen(false)}>
         <DialogTitle>Change Password</DialogTitle>
         <DialogContent>
-        <Form
+          <Form
             fluid
             onSubmit={() => {
               changePassword();
@@ -294,8 +315,8 @@ function DashboardContent() {
           </Form>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => {setChangePasswordDialogOpen(false);}}>Cancel</Button>
-          <Button loading={changing} onClick={() => {changePassword();} }>Change</Button>
+          <Button onClick={() => { setChangePasswordDialogOpen(false); }}>Cancel</Button>
+          <Button loading={changing} onClick={() => { changePassword(); }}>Change</Button>
         </DialogActions>
       </Dialog>
       <ThemeProvider theme={mdTheme}>
@@ -325,16 +346,9 @@ function DashboardContent() {
                 </Button>
               </Box>
               <div>
-                <IconButton
-                  size="large"
-                  aria-label="account of current user"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="true"
-                  onClick={handleMenu}
-                  color="inherit"
-                >
-                  <AccountCircle />
-                </IconButton>
+                <Button variant="text" endIcon={<AccountCircle />} onClick={handleMenu} color="inherit" >
+                  {(userDataLoading === false) && userData.name}
+                </Button>
                 <Menu
                   id="menu-appbar"
                   anchorEl={anchorEl}
@@ -378,42 +392,42 @@ function DashboardContent() {
 
               <ListItemButton onClick={() => navigate('/')}>
                 <ListItemIcon>
-                  <DashboardIcon sx= {{ color:"#2196f3" }}/>
+                  <DashboardIcon sx={{ color: "#2196f3" }} />
                 </ListItemIcon>
                 <ListItemText primary="Dashboard" />
               </ListItemButton>
 
               <ListItemButton onClick={() => navigate('/CashierOnBoarding')}>
                 <ListItemIcon>
-                  <PointOfSaleIcon sx= {{ color:"#2196f3" }}/>
+                  <PointOfSaleIcon sx={{ color: "#2196f3" }} />
                 </ListItemIcon>
                 <ListItemText primary="Cashier" />
               </ListItemButton>
 
               <ListItemButton onClick={() => navigate('/Products')}>
                 <ListItemIcon>
-                  <FontAwesomeIcon icon={faBoxes} style= {{ color:"#2196f3" }}/>
+                  <FontAwesomeIcon icon={faBoxes} style={{ color: "#2196f3" }} />
                 </ListItemIcon>
                 <ListItemText primary="Products" />
               </ListItemButton>
 
               <ListItemButton onClick={() => navigate('/Customers')}>
                 <ListItemIcon>
-                <Icon as={MemberIcon} style= {{ color:"#2196f3", fontSize: 20 }}/>
+                  <Icon as={MemberIcon} style={{ color: "#2196f3", fontSize: 20 }} />
                 </ListItemIcon>
                 <ListItemText primary="Customers" />
               </ListItemButton>
 
               <ListItemButton onClick={() => navigate('/Supplier')}>
                 <ListItemIcon>
-                  <Icon as={FaUserTie} style= {{ color:"#2196f3", fontSize: 20}}/>
+                  <Icon as={FaUserTie} style={{ color: "#2196f3", fontSize: 20 }} />
                 </ListItemIcon>
                 <ListItemText primary="Supplier" />
               </ListItemButton>
 
               <ListItemButton onClick={handleClick}>
                 <ListItemIcon>
-                  <LayersIcon sx= {{ color:"#2196f3" }}/>
+                  <LayersIcon sx={{ color: "#2196f3" }} />
                 </ListItemIcon>
                 <ListItemText primary="Data" />
                 {openMenu ? <ExpandLess /> : <ExpandMore />}
@@ -430,7 +444,7 @@ function DashboardContent() {
 
                   <ListItemButton sx={{ pl: 4 }} divider onClick={() => navigate('/UOM')}>
                     <ListItemIcon>
-                      <Icon as={GiPaperBagOpen} style={{fontSize: 22 }}/>
+                      <Icon as={GiPaperBagOpen} style={{ fontSize: 22 }} />
                     </ListItemIcon>
                     <ListItemText primary="Satuan" />
                   </ListItemButton>
@@ -444,7 +458,7 @@ function DashboardContent() {
 
                   <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Negara')}>
                     <ListItemIcon>
-                      <Icon as={GiWorld} style={{fontSize: 22 }}/>
+                      <Icon as={GiWorld} style={{ fontSize: 22 }} />
                     </ListItemIcon>
                     <ListItemText primary="Negara" />
                   </ListItemButton>
@@ -482,7 +496,7 @@ function DashboardContent() {
 
               <ListItemButton onClick={() => { setOpenTrx(!openTrx); }}>
                 <ListItemIcon>
-                  <StoreIcon sx= {{ color:"#2196f3" }}/>
+                  <StoreIcon sx={{ color: "#2196f3" }} />
                 </ListItemIcon>
                 <ListItemText primary="Transactions" />
                 {openTrx ? <ExpandLess /> : <ExpandMore />}
@@ -527,7 +541,7 @@ function DashboardContent() {
 
                   <ListItemButton sx={{ pl: 4 }} onClick={() => navigate('/Promotions')}>
                     <ListItemIcon>
-                      <Icon as={CiDiscount1} style={{fontSize: 22}} />
+                      <Icon as={CiDiscount1} style={{ fontSize: 22 }} />
                     </ListItemIcon>
                     <ListItemText primary="Promo Barang" />
                   </ListItemButton>
@@ -537,7 +551,7 @@ function DashboardContent() {
 
               <ListItemButton onClick={() => { setOpenReports(!openReports); }}>
                 <ListItemIcon>
-                  <BarChartIcon sx= {{ color:"#2196f3" }}/>
+                  <BarChartIcon sx={{ color: "#2196f3" }} />
                 </ListItemIcon>
                 <ListItemText primary="Reports" />
                 {openReports ? <ExpandLess /> : <ExpandMore />}
@@ -593,7 +607,7 @@ function DashboardContent() {
               <Divider sx={{ my: 1 }} />
               <ListItemButton onClick={() => { setOpenAcc(!openAcc); }}>
                 <ListItemIcon>
-                  <LibraryBooksIcon sx= {{ color:"#2196f3" }}/>
+                  <LibraryBooksIcon sx={{ color: "#2196f3" }} />
                 </ListItemIcon>
                 <ListItemText primary="Accounting" />
                 {openAcc ? <ExpandLess /> : <ExpandMore />}
@@ -635,7 +649,7 @@ function DashboardContent() {
 
               <ListItemButton onClick={() => { setOpenSettings(!openSettings); }}>
                 <ListItemIcon>
-                  <Icon as={GearIcon} spin style= {{ color:"#2196f3", fontSize: 20 }}/>
+                  <Icon as={GearIcon} spin style={{ color: "#2196f3", fontSize: 20 }} />
                 </ListItemIcon>
                 <ListItemText primary="Settings" />
                 {openSettings ? <ExpandLess /> : <ExpandMore />}

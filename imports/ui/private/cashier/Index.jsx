@@ -130,6 +130,41 @@ export function Cashier(props) {
 		return [data, isLoading];
 	}, [userID]);
 
+	const [lastNo, setLastNo] = useState('');
+
+	const [penjualanData, penjualanDataLoading] = useTracker(() => {
+		let isLoading = true;
+		let data = {};
+
+		if (noFaktur) {
+			let subs = Meteor.subscribe('penjualan.getLastNo', { noFaktur });
+			isLoading = !subs.ready();
+
+			data = PenjualanCollections.findOne({ noFaktur });
+		} else {
+			let last = kassaCode + '|' + moment(new Date()).format('YYYYMMDD');
+
+			let subs = Meteor.subscribe('penjualan.getLastNo', { noFaktur: last });
+			isLoading = !subs.ready();
+
+			data = PenjualanCollections.findOne(
+				{
+					noFaktur: {
+						$regex: list
+					}
+				},
+				{ sort: { noFaktur: 1 } },
+				{ limit: 1 }
+			);
+		}
+
+		return [data, isLoading];
+	}, [noFaktur]);
+
+	useEffect(()=>{
+
+	},[]);
+
 	const [itemNum, setItemNum] = useState(0);
 	const [kodeBarang, setKodeBarang] = useState('');
 	const [barcode, setBarcode] = useState('');
@@ -1010,7 +1045,7 @@ export function Cashier(props) {
 		}
 
 	};
-	
+
 	return (
 		<>
 			<Container

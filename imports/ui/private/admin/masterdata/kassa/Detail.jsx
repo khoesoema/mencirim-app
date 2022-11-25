@@ -14,9 +14,22 @@ import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
 import { KassaCollections } from '../../../../../db/Kassa';
 
+import MuiAlert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Snackbar from '@mui/material/Snackbar';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+	return <MuiAlert elevation={6} ref={ref} {...props} />;
+});
+
 export function EditKassa() {
 	let navigate = useNavigate();
 	let { _id } = useParams();
+
+	const [openSnackbar, setOpenSnackbar] = useState(false);
+	const [severity, setSeverity] = useState('info');
+	const [msg, setMsg] = useState('');
+	const [msgTitle, setMsgTitle] = useState('');
 
 	const [kassaData, kassaDataLoading] = useTracker(() => {
 		let isLoading = true;
@@ -79,39 +92,42 @@ export function EditKassa() {
 				(err, res) => {
 					if (err) {
 						setEditing(false);
-						setDialogOpen(true);
-						setDialogTitle(err.error);
-						setDialogContent(err.reason);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle(err.error);
+						setMsg(err.reason);
 					} else if (res) {
 						let resultCode = res.code;
 						let resultTitle = res.title;
 						let resultMessage = res.message;
 						if (resultCode === 200) {
 							setEditing(false);
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("success");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						} else {
 							setEditing(false);
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("warning");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						}
 					} else {
 						setEditing(false);
-						setDialogOpen(true);
-						setDialogTitle('Kesalahan Sistem');
-						setDialogContent(
-							'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle('Kesalahan Sistem');
+						setMsg('Terjadi kesalahan pada sistem, silahkan hubungi customer service');
 					}
 				}
 			);
 		} else {
 			setEditing(false);
-			setDialogOpen(true);
-			setDialogTitle('Kesalahan Validasi');
-			setDialogContent('Nama, Kode Wajib Diisi');
+			setOpenSnackbar(true);
+			setSeverity("warning");
+			setMsgTitle('Kesalahan Validasi');
+			setMsg('Kode dan Nama Kassa wajib diisi!');
 		}
 	};
 
@@ -127,9 +143,10 @@ export function EditKassa() {
 					if (err) {
 						setSelectedID('');
 						setSelectedDeleteID('');
-						setDialogOpen(true);
-						setDialogTitle(err.error);
-						setDialogContent(err.reason);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle(err.error);
+						setMsg(err.reason);
 					} else if (res) {
 						let resultCode = res.code;
 						let resultTitle = res.title;
@@ -137,24 +154,24 @@ export function EditKassa() {
 						if (resultCode === 200) {
 							setSelectedID('');
 							setSelectedDeleteID('');
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("success");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						} else {
 							setSelectedID('');
 							setSelectedDeleteID('');
-							setDialogOpen(true);
-							setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("warning");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						}
 					} else {
 						setSelectedID('');
-						setSelectedDeleteID('');
-						setDialogOpen(true);
-						setDialogTitle('Kesalahan Sistem');
-						setDialogContent(
-							'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle('Kesalahan Sistem');
+						setMsg('Terjadi kesalahan pada sistem, silahkan hubungi customer service');
 					}
 				}
 			);
@@ -164,6 +181,24 @@ export function EditKassa() {
 	return (
 		<>
 			<div className="mainContainerRoot">
+
+				<Snackbar
+					anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+					open={openSnackbar}
+					onClose={() => { setOpenSnackbar(false); }}
+					autoHideDuration={3000}
+					key={'top' + 'center'}
+				>
+					<Alert
+						onClose={() => { setOpenSnackbar(false); }}
+						severity={severity}
+						sx={{ width: '100%' }}
+					>
+						<AlertTitle>{msgTitle}</AlertTitle>
+						{msg}
+					</Alert>
+				</Snackbar>
+
 				{selectedID && (
 					<Modal
 						backdrop={true}
@@ -172,6 +207,7 @@ export function EditKassa() {
 						onClose={(e) => {
 							setDeleteConfirmationDialogOpen(false);
 						}}
+						style={{marginTop: 35}}
 					>
 						<Modal.Header>
 							<Modal.Title>
@@ -289,7 +325,7 @@ export function EditKassa() {
 								disabled={editing || kassaDataLoading}
 							/>
 						</Form.Group>
-						
+
 						<Form.Group>
 							<ButtonToolbar>
 								<Button
@@ -320,11 +356,11 @@ export function EditKassa() {
 										);
 										setDeleteConfirmationDialogContent(
 											'Anda akan menghapus data Kassa ' +
-												'[' +
-												code +
-												']' +
-												name +
-												'. Semua data yang berhubungan dengan Kassa ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
+											'[' +
+											code +
+											']' +
+											name +
+											'. Semua data yang berhubungan dengan Kassa ini juga akan dihapus. Data yang sudah dihapus, tidak dapat dikembalikan, apakah anda yakin?'
 										);
 									}}
 									disabled={editing || kassaDataLoading}

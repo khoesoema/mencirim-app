@@ -46,6 +46,15 @@ import { PenjualanCollections } from '../../../db/Penjualan';
 import { PenjualanDetailCollections } from '../../../db/PenjualanDetail';
 
 import '../../assets/css/cashier.css';
+import { FaBullseye } from 'react-icons/fa';
+
+import MuiAlert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Snackbar from '@mui/material/Snackbar';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+	return <MuiAlert elevation={6} ref={ref} {...props} />;
+});
 
 moment.locale('id');
 moment.tz.setDefault('Asia/Jakarta');
@@ -62,6 +71,12 @@ class CashierClass extends React.Component {
 }
 
 export function Cashier(props) {
+
+	const [openSnackbar, setOpenSnackbar] = useState(false);
+	const [severity, setSeverity] = useState('info');
+	const [msg, setMsg] = useState('');
+	const [msgTitle, setMsgTitle] = useState('');
+
 	const [value, setValue] = useState({
 		label: '',
 		code: '',
@@ -90,6 +105,7 @@ export function Cashier(props) {
 
 	const [kassaCode, setKassaCode] = useState('');
 	const [kassaName, setKassaName] = useState('');
+	const [formatLastNo, setFormatLastNo] = useState('');
 
 	const [kassaData, kassaDataLoading] = useTracker(() => {
 		let isLoading = true;
@@ -109,9 +125,12 @@ export function Cashier(props) {
 		if (kassaData && kassaDataLoading === false) {
 			setKassaCode(kassaData.code);
 			setKassaName(kassaData.name);
+			let lastNum = kassaData.code + '.' + moment(new Date()).format('YYMMDD') + '.';
+			setFormatLastNo(lastNum);
 		} else if (!kassaData && kassaDataLoading === false) {
 			setKassaCode('');
 			setKassaName('');
+			setFormatLastNo('');
 		}
 	}, [kassaData, kassaDataLoading]);
 
@@ -136,21 +155,41 @@ export function Cashier(props) {
 	const [penjualanData, penjualanDataLoading] = useTracker(() => {
 		let isLoading = true;
 		let data = '';
+		let searchText = formatLastNo;
 
-		if (noFaktur) {
-			let subs = Meteor.subscribe('penjualan.getLastNo', { noFaktur });
+		if (formatLastNo) {
+			let subs = Meteor.subscribe('penjualan.getLastNo', { searchText });
 			isLoading = !subs.ready();
 
 			data = PenjualanCollections.findOne(
-				{ noFaktur: { $regex: last } },
+				{
+					noFaktur:
+					{
+						$regex: searchText,
+						$options: 'i',
+					}
+				},
 				{ sort: { noFaktur: 1 } },
 				{ limit: 1 }
 			);
-		} else {
-			data = kassaCode + '-' + moment(new Date()).format('YYYYMMDD') + '-1';
 		}
+
 		return [data, isLoading];
-	}, [noFaktur]);
+	}, [formatLastNo]);
+
+	useEffect(() => {
+		let last = '';
+		if (penjualanData && penjualanDataLoading === false) {
+			let data = penjualanData.noFaktur;
+			const arr = data.split(".");
+			let num = arr[2] + 1;
+			last = arr[0] + '.' + arr[1] + '.' + num;
+		} else if (!penjualanData && penjualanDataLoading === false) {
+			last = kassaCode + '.' + moment(new Date()).format('YYMMDD') + '.1';
+		};
+		setLastNo(last);
+		setNoFaktur(last);
+	}, [penjualanData, penjualanDataLoading]);
 
 	const [itemNum, setItemNum] = useState(0);
 	const [kodeBarang, setKodeBarang] = useState('');
@@ -412,6 +451,76 @@ export function Cashier(props) {
 		setCurrentImage('');
 	};
 
+	var countDecimals = (value) => {
+		if (Math.floor(value) === value) return 0;
+
+		var str = value.toString();
+		if (str.indexOf(".") !== -1 && str.indexOf("-") !== -1) {
+			return str.split("-")[1] || 0;
+		} else if (str.indexOf(".") !== -1) {
+			return str.split(".")[1].length || 0;
+		}
+		return str.split("-")[1] || 0;
+	}
+
+	const calcHarga = (input) => {
+		let ktskcl = ktsKecil.toString().split(',').join('');
+		let ktsbsr = ktsBesar.toString().split(',').join('');
+		let bruto = 0;
+		let netto = 0;
+
+		let discpers1 = diskonPersen1.toString().split(',').join('');
+
+		let dischrg1 = 0;
+
+		let ppnpers = ppnPersen.toString().split(',').join('');
+		let ppnhrg = 0;
+
+		let hrgjual = hargaJual.toString().split(',').join('');
+
+		let hrgjualmbr = hargaJualMember.toString().split(',').join('');
+
+		if (input === "ktsKecil") {
+			ktskcl = ktsKecil;
+		} else {
+			ktskcl = ktsBesar * kts;
+		};
+
+		if (input === "ktsBesar") {
+			ktsbsr = ktsBesar;
+		} else {
+			ktsbsr = ktskcl / kts;
+		};
+
+		bruto = ktskcl * hrgjual;
+
+		if (input === "diskon1") { discpers1 = diskonPersen1.toString().split(',').join(''); }
+
+		dischrg1 = discpers1 / 100 * bruto;
+		ppnhrg = ppnpers / 100 * (bruto - dischrg1);
+
+		netto = bruto - dischrg1 + ppnhrg;
+
+		setKtsKecil(ktskcl);
+
+		if (countDecimals(ktsbsr) <= 1) {
+			setKtsBesar(ktsbsr);
+		} else {
+			setKtsBesar(parseFloat(ktsbsr)
+				.toFixed(2)
+				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,')
+			);
+		}
+
+
+		setHargaBruto(formatNum(bruto));
+		setDiskonHarga1(formatNum(dischrg1));
+		setHargaNetto(formatNum(netto));
+		setPpnHarga(formatNum(ppnhrg));
+
+		setHargaJual(formatNum(hrgjual));
+		setHargaJualMember(formatNum(hrgjualmbr));
+	};
 
 	const [changeQuantityDialogOpen, setChangeQuantityDialogOpen] =
 		useState(false);
@@ -597,6 +706,9 @@ export function Cashier(props) {
 					}
 					// let currIndex = currentIndex + 1;
 					// setCurrentIndex(currIndex);
+				} else if (currentKey === 'F5') {
+					event.preventDefault();
+					event.stopImmediatePropagation();
 				}
 			}
 
@@ -686,6 +798,49 @@ export function Cashier(props) {
 			// setDialogContent('Silahkan Isi Scan Produk/Kode Produk');
 		}
 	};
+
+	const [page, setPage] = useState(1);
+	const [orderBy, setOrderBy] = useState('itemNo');
+	const [order, setOrder] = useState(1);
+
+	const [penjualanDetail, penjualanDetailLoading] = useTracker(() => {
+		let subs = Meteor.subscribe('penjualandetail.list', {
+			page,
+			noFaktur,
+			orderByColumn: orderBy,
+			order,
+		});
+
+		let sortObject = {};
+
+		sortObject[orderBy] = order;
+
+		let data = PenjualanDetailCollections.find(
+			{
+				noFaktur: noFaktur,
+			},
+			{
+				sort: sortObject,
+			}
+		).fetch();
+		return [data, !subs.ready()];
+	}, [noFaktur, orderBy, order]);
+
+	const [penjualanDetailCount, penjualanDetailCountLoading] = useTracker(() => {
+		let subs = Meteor.subscribe('penjualandetail.countList', { noFaktur });
+
+		let data = Counts.get('penjualandetail.countList.' + noFaktur);
+		return [data, !subs.ready()];
+	}, [noFaktur]);
+
+	useEffect(() => {
+		if (penjualanDetailCount && penjualanDetailCountLoading === false) {
+			setItemNum(penjualanDetailCount + 1);
+		} else if (!penjualanDetailCount && penjualanDetailCountLoading === false) {
+			setItemNum(0);
+		};
+	}, [penjualanDetailCount, penjualanDetailCountLoading]);
+
 	const changeQty = (e) => {
 		setChangingQty(true);
 		let selectedProduct = items[currentIndex];
@@ -848,43 +1003,43 @@ export function Cashier(props) {
 	}; */}
 
 	const columns = [
-		{ id: 'no', label: '#', minWidth: 50 },
+		{ id: 'itemNo', label: '#', minWidth: 50 },
 		{ id: 'barcode', label: 'Barcode', minWidth: 120 },
 		{ id: 'namaBarang', label: 'Nama Barang', minWidth: 240 },
 		{
-			id: 'qty',
+			id: 'ktsKecil',
 			label: 'Qty',
 			minWidth: 100,
 			align: 'right',
-			format: (value) => value.toFixed(2),
+			format: (value) => value.toFixed(0),
 		},
 		{
-			id: 'hargaBarang',
+			id: 'hargaJual',
 			label: 'Harga Barang',
 			minWidth: 100,
 			align: 'right',
-			format: (value) => value.toFixed(2),
+			format: (value) => formatNum(value),
 		},
 		{
-			id: 'discHarga',
+			id: 'diskonHarga1',
 			label: '# Diskon',
 			minWidth: 80,
 			align: 'right',
-			format: (value) => value.toFixed(2),
+			format: (value) => formatNum(value),
 		},
 		{
-			id: 'discPersen',
+			id: 'diskonPersen1',
 			label: '% Diskon',
 			minWidth: 80,
 			align: 'right',
-			format: (value) => value.toFixed(2),
+			format: (value) => formatNum(value),
 		},
 		{
-			id: 'jumlahHarga',
+			id: 'hargaNetto',
 			label: 'Jumlah Harga',
 			minWidth: 120,
 			align: 'right',
-			format: (value) => value.toFixed(2),
+			format: (value) => formatNum(value),
 		},
 	];
 
@@ -893,7 +1048,30 @@ export function Cashier(props) {
 		return { no, barcode, namaBarang, qty, hargaBarang, discHarga, discPersen, jumlahHarga };
 	}
 
-	const rows = [];
+	const [rows, setRows] = useState([]);
+
+	useEffect(() => {
+		let baris = [];
+		if (penjualanDetail && penjualanDetailLoading === false) {
+			penjualanDetail.map((item, index) => {
+				baris[index] = {
+					...item
+				};
+			})
+			setRows(baris);
+		} else if (!penjualanDetail && penjualanDetailLoading === false) {
+			baris = [];
+		}
+
+		let grandttl = 0;
+		if (penjualanDetail.length > 0) {
+			penjualanDetail.map((item) => {
+				grandttl += item.hargaNetto;
+				return grandttl;
+			})
+		}
+		setGrandTotal(formatNum(grandttl));
+	}, [penjualanDetail, penjualanDetailLoading]);
 
 	//const rows = [
 	//	createData(1, 1324171354, 'Indomie Goreng Spesial 85Gr', 5, 2570, 0, 0),
@@ -949,20 +1127,9 @@ export function Cashier(props) {
 				(err, res) => {
 					if (err) {
 						setAddingDetail(false);
-						//setType('error');
-						//setHeader(err.error);
-						//setDesc(err.reason);
-						let type = 'error';
-						let title = err.error;
-						let desc = err.reason;
-						toaster.push(
-							<Message showIcon type={type} header={title}>
-								{desc}
-							</Message>
-							, { placement })
-						//setDialogOpen(true);
-						//setDialogTitle(err.error);
-						//setDialogContent(err.reason);
+						setSeverity("error");
+						setMsgTitle(err.error);
+						setMsg(err.reason);
 					} else if (res) {
 						let resultCode = res.code;
 						let resultTitle = res.title;
@@ -971,66 +1138,33 @@ export function Cashier(props) {
 							resetvalue();
 							setBarcode('');
 							setAddingDetail(false);
-							let type = 'success';
-							let title = resultTitle;
-							let desc = resultMessage;
-							toaster.push(
-								<Message showIcon type={type} header={title}>
-									{desc}
-								</Message>
-								, { placement })
-							//setDialogOpen(true);
-							//setDialogTitle(resultTitle);
-							//setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("success");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						} else {
 							setAddingDetail(false);
-							let type = 'warning';
-							let title = resultTitle;
-							let desc = resultMessage;
-							toaster.push(
-								<Message showIcon type={type} header={title}>
-									{desc}
-								</Message>
-								, { placement })
-							//setDialogOpen(true);
-							//setDialogTitle(resultTitle);
-							//setDialogContent(resultMessage);
+							setOpenSnackbar(true);
+							setSeverity("warning");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
 						}
 					} else {
 						setAddingDetail(false);
-						let type = 'error';
-						let title = 'Kesalahan Sistem';
-						let desc = 'Terjadi kesalahan pada sistem, silahkan hubungi customer service';
-						toaster.push(
-							<Message showIcon type={type} header={title}>
-								{desc}
-							</Message>
-							, { placement })
-						//setDialogOpen(true);
-						//setDialogTitle('Kesalahan Sistem');
-						//setDialogContent(
-						//	'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						//);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle('Kesalahan Sistem');
+						setMsg('Terjadi kesalahan pada sistem, silahkan hubungi customer service');
 					}
 				}
 			);
 		} else {
 			setAddingDetail(false);
-			let type = 'error';
-			let title = 'Kesalahan Sistem';
-			let desc = 'Kode Barang, Kuantitas dan Harga Beli Wajib Diisi';
-			toaster.push(
-				<Message showIcon type={type} header={title}>
-					{desc}
-				</Message>
-				, { placement })
-			//setDialogOpen(true);
-			//setDialogTitle('Kesalahan Validasi');
-			//setDialogContent(
-			//	'Kode Barang, Kuantitas dan Harga Beli Wajib Diisi'
-			//);
+			setOpenSnackbar(true);
+			setSeverity("warning");
+			setMsgTitle('Kesalahan Validasi');
+			setMsg('Kode Barang, Kuantitas dan Harga wajib diisi!');
 		}
-
 	};
 
 	return (
@@ -1040,6 +1174,24 @@ export function Cashier(props) {
 				className="kasir-container"
 				style={{ height: '100%', margin: 0, backgroundColor: '#eceff1' }}
 			>
+
+				<Snackbar
+					anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+					open={openSnackbar}
+					onClose={() => { setOpenSnackbar(false); }}
+					autoHideDuration={3000}
+					key={'top' + 'center'}
+				>
+					<Alert
+						onClose={() => { setOpenSnackbar(false); }}
+						severity={severity}
+						sx={{ width: '100%' }}
+					>
+						<AlertTitle>{msgTitle}</AlertTitle>
+						{msg}
+					</Alert>
+				</Snackbar>
+
 				<Modal
 					backdrop={true}
 					keyboard={false}
@@ -1525,7 +1677,7 @@ export function Cashier(props) {
 						<Card sx={{ height: '100%', display: 'flex' }}>
 							<CardContent>
 								<Row>
-									<Col xs={9}>
+									<Col xs={6}>
 										<Autocomplete
 											id="searchProducts"
 											size="small"
@@ -1551,8 +1703,6 @@ export function Cashier(props) {
 											onInputChange={(event, newInputValue) => {
 												setInputValue(newInputValue);
 											}}
-
-											sx={{ width: 500 }}
 
 											//autoHighlight
 											disablePortal
@@ -1622,8 +1772,45 @@ export function Cashier(props) {
 													readOnly: true,
 												}}
 											/>
-											<Button>Add</Button>
+											<Button
+												onClick={() => {
+													calcHarga();
+													addDetail();
+												}}
+											>Add</Button>
 										</Stack>
+									</Col>
+									<Col xs={3}>
+										<TextField
+											label="Harga Barang"
+											value={hargaJual}
+											variant="standard"
+											size="small"
+											className='text-right'
+											InputProps={{
+												readOnly: true,
+											}}
+										/>
+										<TextField
+											label="# Diskon"
+											value={diskonHarga1}
+											variant="standard"
+											size="small"
+											className='text-right'
+											InputProps={{
+												readOnly: true,
+											}}
+										/>
+										<TextField
+											label="% Diskon"
+											value={diskonPersen1}
+											variant="standard"
+											size="small"
+											className='text-right'
+											InputProps={{
+												readOnly: true,
+											}}
+										/>
 									</Col>
 									<Col xs={3}>
 										{currentImage && (
@@ -1657,7 +1844,7 @@ export function Cashier(props) {
 									{(userDataLoading === false) && (<strong>{userData.name}</strong>)}
 								</Typography>
 								<Typography variant="body" component="div">
-									{penjualanDataLoading && 'No. ' + penjualanData}
+									{(penjualanDataLoading === false) && ('No. ' + lastNo)}
 								</Typography>
 							</CardContent>
 						</Card>
@@ -1683,7 +1870,7 @@ export function Cashier(props) {
 										<TableBody>
 											{rows.map((row) => {
 												return (
-													<TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+													<TableRow hover role="checkbox" tabIndex={-1} key={row.itemNo}>
 														{columns.map((column) => {
 															const value = row[column.id];
 															return (

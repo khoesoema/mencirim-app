@@ -147,15 +147,17 @@ if (Meteor.isServer) {
 
 	Meteor.publish('penjualan.getLastNo', function penjualan_countAll(data) {
 		try {
-			console.log('publish.penjualan.getLastNo');
+			console.log('publish.penjualan.getLastNo', data.searchText);
 
-			let noFaktur = '/^'+ data.noFaktur + '/';
+			let searchText = data.searchText;
 
 			let datasCursor = PenjualanCollections.find(
 				{
-					noFaktur: {
-						$regex: noFaktur
-					}
+					noFaktur:
+					{
+						$regex: searchText,
+						$options: 'i',
+					},
 				},
 				{ sort: { noFaktur: 1 } },
 				{ limit: 1 }

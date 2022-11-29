@@ -39,12 +39,12 @@ if (Meteor.isServer) {
 
 	Meteor.publish('penjualandetail.countList', function penjualandetail_countAll(data) {
 		try {
-			console.log('publish.penjualandetail.countList');
+			console.log('publish.penjualandetail.countList', data.noFaktur);
 
 			let searchText = data.noFaktur;
 			Counts.publish(
 				this,
-				'penjualandetail.countList.' + searchText,
+				'penjualandetail.countList' + searchText,
 				PenjualanDetailCollections.find({
 					noFaktur: searchText,
 				}),

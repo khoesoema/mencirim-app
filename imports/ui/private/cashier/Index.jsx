@@ -53,7 +53,7 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Snackbar from '@mui/material/Snackbar';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
-	return <MuiAlert elevation={6} ref={ref} {...props} />;
+	return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 moment.locale('id');
@@ -99,6 +99,16 @@ export function Cashier(props) {
 	const [addingDetail, setAddingDetail] = useState(false);
 	const [tglTrx, setTglTrx] = useState(new Date());
 	const [noFaktur, setNoFaktur] = useState('');
+
+	const formatNum = (input) => {
+		if (input) {
+			return parseFloat(input)
+				.toFixed(2)
+				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+		} else {
+			return 0; kodeBarang
+		}
+	};
 
 	let { _id } = useParams();
 	let kassaID = _id;
@@ -360,26 +370,6 @@ export function Cashier(props) {
 		return menu;
 	};
 
-	const validateNumber = (input) => {
-		let regex = /^[0-9]*$/;
-
-		if (input === '' || regex.test(input)) {
-			return true;
-		} else {
-			return false;
-		}
-	};
-
-	const formatNum = (input) => {
-		if (input) {
-			return parseFloat(input)
-				.toFixed(2)
-				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
-		} else {
-			return 0; kodeBarang
-		}
-	};
-
 	const [promotionsDetailData, promotionsDetailDataLoading] = useTracker(() => {
 		let isLoading = true;
 		let data = {};
@@ -422,6 +412,13 @@ export function Cashier(props) {
 	}, [promotionsDetailData, promotionsDetailDataLoading]);
 
 	const resetvalue = () => {
+		setValue({
+			label: '',
+			code: '',
+			barcode: '',
+			name: ''
+		});
+		setInputValue('');
 		setKodeBarang('');
 		setBarcode('');
 		setNamaBarang('');
@@ -430,16 +427,12 @@ export function Cashier(props) {
 		setKts(0);
 		setQtyBonus(0);
 
-		//setSupplier ('');
-
 		setHargaBruto(0);
 		setHargaNetto(0);
 		setHargaModal(0);
 
 		setJenisDiskon1('Discount');
-
 		setDiskonPersen1(0);
-
 		setDiskonHarga1(0);
 
 		setPpnPersen(0);
@@ -463,38 +456,21 @@ export function Cashier(props) {
 		return str.split("-")[1] || 0;
 	}
 
-	const calcHarga = (input) => {
+	const calcHarga = () => {
 		let ktskcl = ktsKecil.toString().split(',').join('');
 		let ktsbsr = ktsBesar.toString().split(',').join('');
 		let bruto = 0;
 		let netto = 0;
 
 		let discpers1 = diskonPersen1.toString().split(',').join('');
-
 		let dischrg1 = 0;
-
 		let ppnpers = ppnPersen.toString().split(',').join('');
 		let ppnhrg = 0;
 
 		let hrgjual = hargaJual.toString().split(',').join('');
-
 		let hrgjualmbr = hargaJualMember.toString().split(',').join('');
 
-		if (input === "ktsKecil") {
-			ktskcl = ktsKecil;
-		} else {
-			ktskcl = ktsBesar * kts;
-		};
-
-		if (input === "ktsBesar") {
-			ktsbsr = ktsBesar;
-		} else {
-			ktsbsr = ktskcl / kts;
-		};
-
 		bruto = ktskcl * hrgjual;
-
-		if (input === "diskon1") { discpers1 = diskonPersen1.toString().split(',').join(''); }
 
 		dischrg1 = discpers1 / 100 * bruto;
 		ppnhrg = ppnpers / 100 * (bruto - dischrg1);
@@ -510,24 +486,23 @@ export function Cashier(props) {
 				.toFixed(2)
 				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,')
 			);
-		}
-
+		};
 
 		setHargaBruto(formatNum(bruto));
 		setDiskonHarga1(formatNum(dischrg1));
 		setHargaNetto(formatNum(netto));
 		setPpnHarga(formatNum(ppnhrg));
-
 		setHargaJual(formatNum(hrgjual));
 		setHargaJualMember(formatNum(hrgjualmbr));
+
+		console.log(ktsKecil, hargaJual, hargaBruto, diskonHarga1, diskonPersen1, hargaNetto);
 	};
 
-	const [changeQuantityDialogOpen, setChangeQuantityDialogOpen] =
-		useState(false);
-
+	const [changeQuantityDialogOpen, setChangeQuantityDialogOpen] = useState(false);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dialogTitle, setDialogTitle] = useState('');
 	const [dialogContent, setDialogContent] = useState('');
+
 	const [adding, setAdding] = useState(false);
 	const [productCode, setProductCode] = useState('');
 	const [currentIndex, setCurrentIndex] = useState(-1);
@@ -829,17 +804,13 @@ export function Cashier(props) {
 	const [penjualanDetailCount, penjualanDetailCountLoading] = useTracker(() => {
 		let subs = Meteor.subscribe('penjualandetail.countList', { noFaktur });
 
-		let data = Counts.get('penjualandetail.countList.' + noFaktur);
+		let data = Counts.get('penjualandetail.countList' + noFaktur);
 		return [data, !subs.ready()];
 	}, [noFaktur]);
 
 	useEffect(() => {
-		if (penjualanDetailCount && penjualanDetailCountLoading === false) {
-			setItemNum(penjualanDetailCount + 1);
-		} else if (!penjualanDetailCount && penjualanDetailCountLoading === false) {
-			setItemNum(0);
-		};
-	}, [penjualanDetailCount, penjualanDetailCountLoading]);
+		setItemNum(penjualanDetailCount + 1);
+	}, [penjualanDetailCount]);
 
 	const changeQty = (e) => {
 		setChangingQty(true);
@@ -897,115 +868,10 @@ export function Cashier(props) {
 		}
 	};
 
-	{/*const changeDescription = (e) => {
-		setChangingDescription(true);
-		let selectedProduct = items[currentIndex];
-		if (selectedProduct) {
-			Meteor.call(
-				'cashierOnGoingTransactions.changeDescription',
-				{
-					productCode: selectedProduct.productCode,
-					kassaID,
-					description: changeDescriptionValue,
-				},
-				(err, res) => {
-					if (err) {
-						setChangingDescription(false);
-						// setDialogOpen(true);
-						// setDialogTitle(err.error);
-						// setDialogContent(err.reason);
-					} else if (res) {
-						let resultCode = res.code;
-						let resultTitle = res.title;
-						let resultMessage = res.message;
-						if (resultCode === 200) {
-							setChangeDescriptionValue('');
-							setChangingDescription(false);
-							setChangeDescriptionDialogOpen(false);
-							// setDialogOpen(true);
-							// setDialogTitle(resultTitle);
-							// setDialogContent(resultMessage);
-						} else {
-							setChangingDescription(false);
-							// setDialogOpen(true);
-							// setDialogTitle(resultTitle);
-							// setDialogContent(resultMessage);
-						}
-					} else {
-						setChangingDescription(false);
-						// setDialogOpen(true);
-						// setDialogTitle('Kesalahan Sistem');
-						// setDialogContent(
-						// 	'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						// );
-					}
-				}
-			);
-		} else {
-			setChangingDescription(false);
-			setTimeout(() => {
-				changeDescriptionRef.current.focus();
-			}, 500);
-			// setDialogOpen(true);
-			// setDialogTitle('Kesalahan Validasi');
-			// setDialogContent('Silahkan Isi Scan Produk/Kode Produk');
-		}
-	};
-
-	const deleteItem = (e) => {
-		setDeletingItem(true);
-		let selectedProduct = items[currentIndex];
-		if (selectedProduct) {
-			Meteor.call(
-				'cashierOnGoingTransactions.deleteItem',
-				{
-					productCode: selectedProduct.productCode,
-					kassaID,
-				},
-				(err, res) => {
-					if (err) {
-						setDeletingItem(false);
-						// setDialogOpen(true);
-						// setDialogTitle(err.error);
-						// setDialogContent(err.reason);
-					} else if (res) {
-						let resultCode = res.code;
-						let resultTitle = res.title;
-						let resultMessage = res.message;
-						if (resultCode === 200) {
-							setDeletingItem(false);
-							setDeleteItemDialogOpen(false);
-							// setDialogOpen(true);
-							// setDialogTitle(resultTitle);
-							// setDialogContent(resultMessage);
-						} else {
-							setDeletingItem(false);
-							// setDialogOpen(true);
-							// setDialogTitle(resultTitle);
-							// setDialogContent(resultMessage);
-						}
-					} else {
-						setDeletingItem(false);
-						// setDialogOpen(true);
-						// setDialogTitle('Kesalahan Sistem');
-						// setDialogContent(
-						// 	'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						// );
-					}
-				}
-			);
-		} else {
-			setDeletingItem(false);
-			// setDialogOpen(true);
-			// setDialogTitle('Kesalahan Validasi');
-			// setDialogContent('Silahkan Isi Scan Produk/Kode Produk');
-		}
-	}; */}
-
 	const columns = [
 		{ id: 'itemNo', label: '#', minWidth: 50 },
 		{ id: 'barcode', label: 'Barcode', minWidth: 120 },
-		{ id: 'namaBarang', label: 'Nama Barang', minWidth: 240 },
+		{ id: 'namaBarang', label: 'NamaBarang', minWidth: 240 },
 		{
 			id: 'ktsKecil',
 			label: 'Qty',
@@ -1015,28 +881,28 @@ export function Cashier(props) {
 		},
 		{
 			id: 'hargaJual',
-			label: 'Harga Barang',
+			label: 'HargaBarang',
 			minWidth: 100,
 			align: 'right',
 			format: (value) => formatNum(value),
 		},
 		{
 			id: 'diskonHarga1',
-			label: '# Diskon',
+			label: '#Diskon',
 			minWidth: 80,
 			align: 'right',
 			format: (value) => formatNum(value),
 		},
 		{
 			id: 'diskonPersen1',
-			label: '% Diskon',
+			label: '%Diskon',
 			minWidth: 80,
 			align: 'right',
 			format: (value) => formatNum(value),
 		},
 		{
 			id: 'hargaNetto',
-			label: 'Jumlah Harga',
+			label: 'JumlahHarga',
 			minWidth: 120,
 			align: 'right',
 			format: (value) => formatNum(value),
@@ -1167,6 +1033,11 @@ export function Cashier(props) {
 		}
 	};
 
+	const handleClick = () => {
+		calcHarga();
+    //addDetail();
+  };
+
 	return (
 		<>
 			<Container
@@ -1176,11 +1047,11 @@ export function Cashier(props) {
 			>
 
 				<Snackbar
-					anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+					anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
 					open={openSnackbar}
 					onClose={() => { setOpenSnackbar(false); }}
 					autoHideDuration={3000}
-					key={'top' + 'center'}
+					key={'bottom' + 'left'}
 				>
 					<Alert
 						onClose={() => { setOpenSnackbar(false); }}
@@ -1207,419 +1078,6 @@ export function Cashier(props) {
 
 					<Modal.Body>{dialogContent}</Modal.Body>
 				</Modal>
-
-				{/*<Modal
-					backdrop={true}
-					keyboard={true}
-					open={changeQuantityDialogOpen}
-					onClose={(e) => {
-						setChangeQuantityDialogOpen(false);
-						// scanRef.current.focus();
-					}}
-				>
-					<Modal.Header>
-						<Modal.Title>Ubah Jumlah Produk </Modal.Title>
-					</Modal.Header>
-
-					<Modal.Body>
-						{items[currentIndex] && (
-							<>
-								<h6>
-									Produk :{' '}
-									<b>{items[currentIndex].productName}</b>
-								</h6>
-								<h6>
-									Kode :{' '}
-									<b>{items[currentIndex].productCode}</b>
-								</h6>
-								<h6>
-									Keterangan :{' '}
-									<b>
-										{items[currentIndex].productDescription}
-									</b>
-								</h6>
-								<h6>
-									Harga Barang :{' '}
-									<b>
-										{items[currentIndex].productPrice
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-								<h6>
-									Qty :{' '}
-									<b>
-										{items[currentIndex].productQuantity
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-								<h6>
-									Satuan :{' '}
-									<b>{items[currentIndex].productUOMName}</b>
-								</h6>
-								<h6>
-									Diskon :{' '}
-									<b>
-										{items[currentIndex].productDiscount
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-								<h6>
-									Jumlah Harga :{' '}
-									<b>
-										{items[currentIndex].productSubTotal
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-
-								<FormControl
-									ref={changeQtyRef}
-									autoFocus
-									type="text"
-									name="productPrice"
-									placeholder="Jumlah Produk"
-									defaultValue={items[
-										currentIndex
-									].productQuantity
-										.toString()
-										.replace('.', ',')
-										.replace(
-											/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-											'$1.'
-										)}
-									value={changeQtyAmount}
-									onChange={(e) => {
-										let input = e.currentTarget.value;
-										let regex = /^-?[0-9.]*,?[0-9.]*$/;
-										if (
-											input === '' ||
-											input === '-' ||
-											input === '0' ||
-											regex.test(input)
-										) {
-											let pureValue = input;
-
-											let firstChar = pureValue.substring(
-												0,
-												1
-											);
-											if (firstChar === '-') {
-												if (
-													pureValue.toString()
-														.length > 2
-												) {
-													pureValue =
-														pureValue.replace(
-															/^(-?)0+(?!,)/,
-															'$1'
-														);
-												}
-											} else {
-												if (
-													pureValue.toString()
-														.length > 1
-												) {
-													pureValue =
-														pureValue.replace(
-															/^(-?)0+(?!,)/,
-															'$1'
-														);
-												}
-											}
-											pureValue = Number(
-												pureValue
-													.split('.')
-													.join('')
-													.replace(',', '.')
-											);
-											setChangeQtyAmount(pureValue);
-										}
-									}}
-									disabled={changingQty}
-									onKeyDown={(e) => {
-										if (e.key === 'Enter') {
-											changeQty();
-										}
-									}}
-								/>
-							</>
-						)}
-					</Modal.Body>
-					<Modal.Footer>
-						<Button
-							disabled={changingQty}
-							onClick={(e) => {
-								changeQty();
-							}}
-							variant="primary"
-						>
-							Ok (Enter)
-						</Button>
-						<Button
-							disabled={changingQty}
-							onClick={(e) => {
-								setChangeQuantityDialogOpen(false);
-							}}
-							variant="warning"
-						>
-							Batal (Escape)
-						</Button>
-					</Modal.Footer>
-						</Modal>
-
-				<Modal
-					backdrop={true}
-					keyboard={true}
-					open={changeDescriptionDialogOpen}
-					onClose={(e) => {
-						setChangeDescriptionDialogOpen(false);
-						// scanRef.current.focus();
-					}}
-				>
-					<Modal.Header>
-						<Modal.Title>Ubah Deskripsi Produk </Modal.Title>
-					</Modal.Header>
-
-					<Modal.Body>
-						{items[currentIndex] && (
-							<>
-								<h6>
-									Produk :{' '}
-									<b>{items[currentIndex].productName}</b>
-								</h6>
-								<h6>
-									Kode :{' '}
-									<b>{items[currentIndex].productCode}</b>
-								</h6>
-								<h6>
-									Keterangan :{' '}
-									<b>
-										{items[currentIndex].productDescription}
-									</b>
-								</h6>
-								<h6>
-									Harga Barang :{' '}
-									<b>
-										{items[currentIndex].productPrice
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-								<h6>
-									Qty :{' '}
-									<b>
-										{items[currentIndex].productQuantity
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-								<h6>
-									Satuan :{' '}
-									<b>{items[currentIndex].productUOMName}</b>
-								</h6>
-								<h6>
-									Diskon :{' '}
-									<b>
-										{items[currentIndex].productDiscount
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-								<h6>
-									Jumlah Harga :{' '}
-									<b>
-										{items[currentIndex].productSubTotal
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-
-								<FormControl
-									ref={changeDescriptionRef}
-									disabled={changingDescription}
-									autoFocus
-									type="text"
-									name="productDescription"
-									placeholder="Keterangan Produk"
-									defaultValue={
-										items[currentIndex].productDescription
-									}
-									value={changeDescriptionValue}
-									onChange={(e) => {
-										let input = e.currentTarget.value;
-										setChangeDescriptionValue(input);
-									}}
-									onKeyDown={(e) => {
-										if (e.key === 'Enter') {
-											changeDescription();
-										}
-									}}
-								/>
-							</>
-						)}
-					</Modal.Body>
-					<Modal.Footer>
-						<Button
-							disabled={changingDescription}
-							onClick={(e) => {
-								changeDescription();
-							}}
-							variant="primary"
-						>
-							Ok (Enter)
-						</Button>
-						<Button
-							disabled={changingDescription}
-							onClick={(e) => {
-								setChangeDescriptionDialogOpen(false);
-							}}
-							variant="warning"
-						>
-							Batal (Escape)
-						</Button>
-					</Modal.Footer>
-				</Modal>
-				<Modal
-					backdrop={true}
-					keyboard={true}
-					open={deleteItemDialogOpen}
-					onClose={(e) => {
-						setDeleteItemDialogOpen(false);
-						// scanRef.current.focus();
-					}}
-				>
-					<Modal.Header>
-						<Modal.Title>Hapus Produk </Modal.Title>
-					</Modal.Header>
-
-					<Modal.Body>
-						{items[currentIndex] && (
-							<>
-								<h6>
-									Produk :{' '}
-									<b>{items[currentIndex].productName}</b>
-								</h6>
-								<h6>
-									Kode :{' '}
-									<b>{items[currentIndex].productCode}</b>
-								</h6>
-								<h6>
-									Keterangan :{' '}
-									<b>
-										{items[currentIndex].productDescription}
-									</b>
-								</h6>
-								<h6>
-									Harga Barang :{' '}
-									<b>
-										{items[currentIndex].productPrice
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-								<h6>
-									Qty :{' '}
-									<b>
-										{items[currentIndex].productQuantity
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-								<h6>
-									Satuan :{' '}
-									<b>{items[currentIndex].productUOMName}</b>
-								</h6>
-								<h6>
-									Diskon :{' '}
-									<b>
-										{items[currentIndex].productDiscount
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-								<h6>
-									Jumlah Harga :{' '}
-									<b>
-										{items[currentIndex].productSubTotal
-											.toString()
-											.replace('.', ',')
-											.replace(
-												/(?<!\,.*)(\d)(?=(?:\d{3})+(?:\,|$))/g,
-												'$1.'
-											)}
-									</b>
-								</h6>
-							</>
-						)}
-					</Modal.Body>
-					<Modal.Footer>
-						<Button
-							disabled={deletingItem}
-							onClick={(e) => {
-								deleteItem();
-							}}
-							variant="primary"
-						>
-							Ok (F3)
-						</Button>
-						<Button
-							disabled={deletingItem}
-							onClick={(e) => {
-								setDeleteItemDialogOpen(false);
-							}}
-							variant="warning"
-						>
-							Batal (Escape)
-						</Button>
-					</Modal.Footer>
-				</Modal>*/}
 
 				<Modal
 					backdrop={true}
@@ -1686,16 +1144,13 @@ export function Cashier(props) {
 											value={value}
 											onChange={(event, newValue) => {
 												if (newValue === null) {
-													setValue({
-														label: '',
-														code: '',
-														barcode: '',
-														name: ''
-													});
-													setKodeBarang('');
+													resetvalue();
 												} else {
 													setValue(newValue);
 													setKodeBarang(newValue.code);
+													setKtsKecil(1);
+													let jlh = ktsKecil * hargaJual;
+													setHargaBruto(jlh);
 												}
 											}}
 
@@ -1772,11 +1227,18 @@ export function Cashier(props) {
 													readOnly: true,
 												}}
 											/>
-											<Button
-												onClick={() => {
-													calcHarga();
-													addDetail();
+											<TextField
+												label="Jumlah Harga"
+												value={hargaNetto}
+												variant="standard"
+												size="small"
+												className='text-right'
+												InputProps={{
+													readOnly: true,
 												}}
+											/>
+											<Button
+												onClick={handleClick}
 											>Add</Button>
 										</Stack>
 									</Col>
@@ -1844,7 +1306,7 @@ export function Cashier(props) {
 									{(userDataLoading === false) && (<strong>{userData.name}</strong>)}
 								</Typography>
 								<Typography variant="body" component="div">
-									{(penjualanDataLoading === false) && ('No. ' + lastNo)}
+									{(penjualanDataLoading === false) && ('No. ' + noFaktur)}
 								</Typography>
 							</CardContent>
 						</Card>

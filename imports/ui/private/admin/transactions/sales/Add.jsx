@@ -80,7 +80,7 @@ export function AddSalesInvoice() {
 	const [penjualanDetailCount, penjualanDetailCountLoading] = useTracker(() => {
 		let subs = Meteor.subscribe('penjualandetail.countList', { noFaktur });
 
-		let data = Counts.get('penjualandetail.countList.' + noFaktur);
+		let data = Counts.get('penjualandetail.countList' + noFaktur);
 		return [data, !subs.ready()];
 	}, [noFaktur]);
 

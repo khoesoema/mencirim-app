@@ -100,6 +100,78 @@ export function Cashier(props) {
 	const [tglTrx, setTglTrx] = useState(new Date());
 	const [noFaktur, setNoFaktur] = useState('');
 
+	const [kassaCode, setKassaCode] = useState('');
+	const [kassaName, setKassaName] = useState('');
+	const [formatLastNo, setFormatLastNo] = useState('');
+	const [lastNo, setLastNo] = useState('');
+
+	let { _id } = useParams();
+	let kassaID = _id;
+	let userID = Meteor.user()._id;
+
+	const [itemNum, setItemNum] = useState(0);
+	const [kodeBarang, setKodeBarang] = useState('');
+	const [barcode, setBarcode] = useState('');
+	const [namaBarang, setNamaBarang] = useState('');
+	const [categoryID, setCategoryID] = useState('');
+
+	const [ktsBesar, setKtsBesar] = useState(0);
+	const [ktsKecil, setKtsKecil] = useState(1);
+	const [kts, setKts] = useState(0);
+	const [satuanBesar, setSatuanBesar] = useState('');
+	const [satuanKecil, setSatuanKecil] = useState('');
+
+	const [jenisDiskon1, setJenisDiskon1] = useState('Discount');
+	const [diskonPersen1, setDiskonPersen1] = useState(0);
+	const [diskonHarga1, setDiskonHarga1] = useState(0);
+
+	const [hargaBeli, setHargaBeli] = useState(0);
+	const [hargaBeliSatuan, setHargaBeliSatuan] = useState(0);
+
+	const [hargaBruto, setHargaBruto] = useState(0);
+	const [hargaNetto, setHargaNetto] = useState(0);
+
+	const [ppnPersen, setPpnPersen] = useState(0);
+	const [ppnHarga, setPpnHarga] = useState(0);
+
+	const [qtyBonus, setQtyBonus] = useState(0);
+
+	const [hargaModal, setHargaModal] = useState(0);
+	const [hargaJual, setHargaJual] = useState(0);
+	const [hargaJualMember, setHargaJualMember] = useState(0);
+
+	const [searchKodeBarangText, setSearchKodeBarangText] = useState('');
+	const [searchCategoriesText, setSearchCategoriesText] = useState('');
+
+	const [currentImage, setCurrentImage] = useState('');
+
+	const [changeQuantityDialogOpen, setChangeQuantityDialogOpen] = useState(false);
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [dialogTitle, setDialogTitle] = useState('');
+	const [dialogContent, setDialogContent] = useState('');
+
+	const [adding, setAdding] = useState(false);
+	const [productCode, setProductCode] = useState('');
+	const [currentIndex, setCurrentIndex] = useState(-1);
+	const [subTotal, setSubTotal] = useState(0);
+	const [grandTotal, setGrandTotal] = useState(0);
+	const [discountTotal, setDiscountTotal] = useState(0);
+
+	const [changeQtyAmount, setChangeQtyAmount] = useState(0);
+	const [changingQty, setChangingQty] = useState(false);
+
+	const [changeDescriptionDialogOpen, setChangeDescriptionDialogOpen] = useState(false);
+	const [changeDescriptionValue, setChangeDescriptionValue] = useState('');
+	const [changingDescription, setChangingDescription] = useState(false);
+
+	const [deletingItem, setDeletingItem] = useState(false);
+	const [deleteItemDialogOpen, setDeleteItemDialogOpen] = useState(false);
+
+	const [loggingOut, setLoggingOut] = useState(false);
+	const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+
+	const [readOnlyQty, setReadOnlyQty] = useState(true);
+
 	const formatNum = (input) => {
 		if (input) {
 			return parseFloat(input)
@@ -109,13 +181,6 @@ export function Cashier(props) {
 			return 0; kodeBarang
 		}
 	};
-
-	let { _id } = useParams();
-	let kassaID = _id;
-
-	const [kassaCode, setKassaCode] = useState('');
-	const [kassaName, setKassaName] = useState('');
-	const [formatLastNo, setFormatLastNo] = useState('');
 
 	const [kassaData, kassaDataLoading] = useTracker(() => {
 		let isLoading = true;
@@ -130,7 +195,6 @@ export function Cashier(props) {
 		return [data, isLoading];
 	}, [_id]);
 
-
 	useEffect(() => {
 		if (kassaData && kassaDataLoading === false) {
 			setKassaCode(kassaData.code);
@@ -144,9 +208,6 @@ export function Cashier(props) {
 		}
 	}, [kassaData, kassaDataLoading]);
 
-
-	let userID = Meteor.user()._id;
-
 	const [userData, userDataLoading] = useTracker(() => {
 		let isLoading = true;
 		let data = {};
@@ -159,8 +220,6 @@ export function Cashier(props) {
 		}
 		return [data, isLoading];
 	}, [userID]);
-
-	const [lastNo, setLastNo] = useState('');
 
 	const [penjualanData, penjualanDataLoading] = useTracker(() => {
 		let isLoading = true;
@@ -200,42 +259,6 @@ export function Cashier(props) {
 		setLastNo(last);
 		setNoFaktur(last);
 	}, [penjualanData, penjualanDataLoading]);
-
-	const [itemNum, setItemNum] = useState(0);
-	const [kodeBarang, setKodeBarang] = useState('');
-	const [barcode, setBarcode] = useState('');
-	const [namaBarang, setNamaBarang] = useState('');
-	const [categoryID, setCategoryID] = useState('');
-
-	const [ktsBesar, setKtsBesar] = useState(0);
-	const [ktsKecil, setKtsKecil] = useState(1);
-	const [kts, setKts] = useState(0);
-	const [satuanBesar, setSatuanBesar] = useState('');
-	const [satuanKecil, setSatuanKecil] = useState('');
-
-	const [jenisDiskon1, setJenisDiskon1] = useState('Discount');
-	const [diskonPersen1, setDiskonPersen1] = useState(0);
-	const [diskonHarga1, setDiskonHarga1] = useState(0);
-
-	const [hargaBeli, setHargaBeli] = useState(0);
-	const [hargaBeliSatuan, setHargaBeliSatuan] = useState(0);
-
-	const [hargaBruto, setHargaBruto] = useState(0);
-	const [hargaNetto, setHargaNetto] = useState(0);
-
-	const [ppnPersen, setPpnPersen] = useState(0);
-	const [ppnHarga, setPpnHarga] = useState(0);
-
-	const [qtyBonus, setQtyBonus] = useState(0);
-
-	const [hargaModal, setHargaModal] = useState(0);
-	const [hargaJual, setHargaJual] = useState(0);
-	const [hargaJualMember, setHargaJualMember] = useState(0);
-
-	const [searchKodeBarangText, setSearchKodeBarangText] = useState('');
-	const [searchCategoriesText, setSearchCategoriesText] = useState('');
-
-	const [currentImage, setCurrentImage] = useState('');
 
 	const [productData, productDataLoading] = useTracker(() => {
 		let isLoading = true;
@@ -425,6 +448,7 @@ export function Cashier(props) {
 		setCategoryID('');
 
 		setKts(0);
+		setKtsKecil(1);
 		setQtyBonus(0);
 
 		setHargaBruto(0);
@@ -498,31 +522,6 @@ export function Cashier(props) {
 		console.log(ktsKecil, hargaJual, hargaBruto, diskonHarga1, diskonPersen1, hargaNetto);
 	};
 
-	const [changeQuantityDialogOpen, setChangeQuantityDialogOpen] = useState(false);
-	const [dialogOpen, setDialogOpen] = useState(false);
-	const [dialogTitle, setDialogTitle] = useState('');
-	const [dialogContent, setDialogContent] = useState('');
-
-	const [adding, setAdding] = useState(false);
-	const [productCode, setProductCode] = useState('');
-	const [currentIndex, setCurrentIndex] = useState(-1);
-	const [subTotal, setSubTotal] = useState(0);
-	const [grandTotal, setGrandTotal] = useState(0);
-	const [discountTotal, setDiscountTotal] = useState(0);
-
-	const [changeQtyAmount, setChangeQtyAmount] = useState(0);
-	const [changingQty, setChangingQty] = useState(false);
-
-	const [changeDescriptionDialogOpen, setChangeDescriptionDialogOpen] = useState(false);
-	const [changeDescriptionValue, setChangeDescriptionValue] = useState('');
-	const [changingDescription, setChangingDescription] = useState(false);
-
-	const [deletingItem, setDeletingItem] = useState(false);
-	const [deleteItemDialogOpen, setDeleteItemDialogOpen] = useState(false);
-
-	const [loggingOut, setLoggingOut] = useState(false);
-	const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
-
 	useEffect(() => {
 		if (currentIndex !== -1) {
 			scroller.scrollTo('myScrollToElement' + currentIndex, {
@@ -555,168 +554,158 @@ export function Cashier(props) {
 	// 		}, 500);
 	// 	}
 	// }, [changeDescriptionDialogOpen, changeQuantityDialogOpen]);
-	+
-		useEffect(() => {
-			/**
-			 * Alert if clicked on outside of element
-			 */
-			function handleKeyboardButon(event) {
-				let currentKey = event.key;
-				if (currentKey === 'Escape') {
-					event.preventDefault();
-					if (
-						changeDescriptionDialogOpen === false &&
-						changeQuantityDialogOpen === false &&
-						deleteItemDialogOpen === false &&
-						logoutDialogOpen === false
-					) {
-						setLogoutDialogOpen(true);
-					}
 
-					if (logoutDialogOpen === true) {
-						navigate('/');
-					}
-				} else if (currentKey === 'ArrowUp') {
-					if (
-						changeDescriptionDialogOpen === false &&
-						changeQuantityDialogOpen === false &&
-						deleteItemDialogOpen === false &&
-						logoutDialogOpen === false
-					) {
-						event.preventDefault();
-						setCurrentIndex((prev) => {
-							if (prev <= 0) {
-								return 0;
-							} else {
-								return prev - 1;
-							}
-						});
-					}
-					// let currIndex = currentIndex - 1;
-					// if (currentIndex > 0) {
-					// 	setCurrentIndex(currIndex);
-					// }
-				} else if (currentKey === 'ArrowDown') {
-					if (
-						changeDescriptionDialogOpen === false &&
-						changeQuantityDialogOpen === false &&
-						deleteItemDialogOpen === false &&
-						logoutDialogOpen === false
-					) {
-						event.preventDefault();
-						{/*setCurrentIndex((prev) => {
+	useEffect(() => {
+		/**
+		 * Alert if clicked on outside of element
+		 */
+		function handleKeyboardButon(event) {
+			let currentKey = event.key;
+			if (currentKey === 'Escape') {
+				event.preventDefault();
+				if (
+					changeDescriptionDialogOpen === false &&
+					changeQuantityDialogOpen === false &&
+					deleteItemDialogOpen === false &&
+					logoutDialogOpen === false
+				) {
+					setLogoutDialogOpen(true);
+				}
+
+				if (logoutDialogOpen === true) {
+					navigate('/');
+				}
+			} else if (currentKey === 'ArrowUp') {
+				if (
+					changeDescriptionDialogOpen === false &&
+					changeQuantityDialogOpen === false &&
+					deleteItemDialogOpen === false &&
+					logoutDialogOpen === false
+				) {
+					event.preventDefault();
+					setCurrentIndex((prev) => {
+						if (prev <= 0) {
+							return 0;
+						} else {
+							return prev - 1;
+						}
+					});
+				}
+				// let currIndex = currentIndex - 1;
+				// if (currentIndex > 0) {
+				// 	setCurrentIndex(currIndex);
+				// }
+			} else if (currentKey === 'ArrowDown') {
+				if (
+					changeDescriptionDialogOpen === false &&
+					changeQuantityDialogOpen === false &&
+					deleteItemDialogOpen === false &&
+					logoutDialogOpen === false
+				) {
+					event.preventDefault();
+					{/*setCurrentIndex((prev) => {
 							if (prev >= itemsCount - 1) {
 								return itemsCount - 1;
 							} else {
 								return prev + 1;
 							}
 						});*/}
-					}
-					// let currIndex = currentIndex + 1;
-					// setCurrentIndex(currIndex);
-				} else if (currentKey === 'F2') {
-					if (
-						currentIndex !== -1 &&
-						changeDescriptionDialogOpen === false &&
-						changeQuantityDialogOpen === false &&
-						deleteItemDialogOpen === false &&
-						logoutDialogOpen === false
-					) {
-						event.preventDefault();
-						setChangeQtyAmount(items[currentIndex].productQuantity);
-						setChangeQuantityDialogOpen(true);
-					}
-					// let currIndex = currentIndex + 1;
-					// setCurrentIndex(currIndex);
-				} else if (currentKey === 'F3') {
-					if (
-						currentIndex !== -1 &&
-						changeDescriptionDialogOpen === false &&
-						changeQuantityDialogOpen === false &&
-						deleteItemDialogOpen === false &&
-						logoutDialogOpen === false
-					) {
-						event.preventDefault();
-						setDeleteItemDialogOpen(true);
-					}
-
-					if (currentIndex !== -1 && deleteItemDialogOpen === true) {
-						event.preventDefault();
-						deleteItem();
-					}
-					// let currIndex = currentIndex + 1;
-					// setCurrentIndex(currIndex);
-				} else if (currentKey === 'F4') {
-					if (
-						currentIndex !== -1 &&
-						changeDescriptionDialogOpen === false &&
-						changeQuantityDialogOpen === false &&
-						deleteItemDialogOpen === false &&
-						logoutDialogOpen === false
-					) {
-						event.preventDefault();
-						setChangeDescriptionValue(
-							items[currentIndex].productDescription
-						);
-						setChangeDescriptionDialogOpen(true);
-					}
-					// let currIndex = currentIndex + 1;
-					// setCurrentIndex(currIndex);
-				} else if (currentKey === 'F1') {
-					event.preventDefault();
-					scanRef.current.focus();
-
-					//scanRef.current.focus();
-					//if (productCode) {
-					//	add();
-					//} else {
-					//	scanRef.current.focus();
-					//}
-					// let currIndex = currentIndex + 1;
-					// setCurrentIndex(currIndex);
-				} else if (currentKey === 'F12') {
-					event.preventDefault();
-					if (logoutDialogOpen === true) {
-						setLogoutDialogOpen(false);
-					}
-					// let currIndex = currentIndex + 1;
-					// setCurrentIndex(currIndex);
-				} else if (currentKey === 'F5') {
-					event.preventDefault();
-					event.stopImmediatePropagation();
 				}
-			}
-
-			function handleBarcode(e) {
-				e.stopImmediatePropagation();
-				let barcode = '';
-				let code = e.keyCode ? e.keyCode : e.which;
-
-				if (code === 13) {
-					add(scannedBarcode);
-					scannedBarcode = '';
-				} else {
-					barcode = barcode + String.fromCharCode(code);
-					scannedBarcode += barcode;
+				// let currIndex = currentIndex + 1;
+				// setCurrentIndex(currIndex);
+			} else if (currentKey === 'F2') {
+				setReadOnlyQty(false);
+				event.preventDefault();
+				changeQtyRef.current.focus();
+			} else if (currentKey === 'F3') {
+				if (
+					currentIndex !== -1 &&
+					changeDescriptionDialogOpen === false &&
+					changeQuantityDialogOpen === false &&
+					deleteItemDialogOpen === false &&
+					logoutDialogOpen === false
+				) {
+					event.preventDefault();
+					setDeleteItemDialogOpen(true);
 				}
-			}
 
-			// Bind the event listener
-			document.addEventListener('keydown', handleKeyboardButon);
-			window.addEventListener('keypress', handleBarcode);
-			return () => {
-				// Unbind the event listener on clean upproductCode
-				document.removeEventListener('keydown', handleKeyboardButon);
-				window.removeEventListener('keypress', handleBarcode);
-			};
-		}, [
-			changeQuantityDialogOpen,
-			changeDescriptionDialogOpen,
-			deleteItemDialogOpen,
-			logoutDialogOpen,
-			currentIndex,
-			productCode,
-		]);
+				if (currentIndex !== -1 && deleteItemDialogOpen === true) {
+					event.preventDefault();
+					//deleteItem();
+				}
+				// let currIndex = currentIndex + 1;
+				// setCurrentIndex(currIndex);
+			} else if (currentKey === 'F4') {
+				if (
+					currentIndex !== -1 &&
+					changeDescriptionDialogOpen === false &&
+					changeQuantityDialogOpen === false &&
+					deleteItemDialogOpen === false &&
+					logoutDialogOpen === false
+				) {
+					event.preventDefault();
+					setChangeDescriptionValue(
+						items[currentIndex].productDescription
+					);
+					setChangeDescriptionDialogOpen(true);
+				}
+				// let currIndex = currentIndex + 1;
+				// setCurrentIndex(currIndex);
+			} else if (currentKey === 'F1') {
+				event.preventDefault();
+				scanRef.current.focus();
+
+				//scanRef.current.focus();
+				//if (productCode) {
+				//	add();
+				//} else {
+				//	scanRef.current.focus();
+				//}
+				// let currIndex = currentIndex + 1;
+				// setCurrentIndex(currIndex);
+			} else if (currentKey === 'F12') {
+				event.preventDefault();
+				if (logoutDialogOpen === true) {
+					setLogoutDialogOpen(false);
+				}
+				// let currIndex = currentIndex + 1;
+				// setCurrentIndex(currIndex);
+			} else if (currentKey === 'F5') {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
+		}
+
+		function handleBarcode(e) {
+			e.stopImmediatePropagation();
+			let barcode = '';
+			let code = e.keyCode ? e.keyCode : e.which;
+
+			if (code === 13) {
+				add(scannedBarcode);
+				scannedBarcode = '';
+			} else {
+				barcode = barcode + String.fromCharCode(code);
+				scannedBarcode += barcode;
+			}
+		}
+
+		// Bind the event listener
+		document.addEventListener('keydown', handleKeyboardButon);
+		window.addEventListener('keypress', handleBarcode);
+		return () => {
+			// Unbind the event listener on clean upproductCode
+			document.removeEventListener('keydown', handleKeyboardButon);
+			window.removeEventListener('keypress', handleBarcode);
+		};
+	}, [
+		changeQuantityDialogOpen,
+		changeDescriptionDialogOpen,
+		deleteItemDialogOpen,
+		logoutDialogOpen,
+		currentIndex,
+		productCode,
+	]);
 
 	const add = (inputCode = undefined) => {
 		setAdding(true);
@@ -958,7 +947,7 @@ export function Cashier(props) {
 			ktsKecil
 		) {
 			Meteor.call(
-				'penjualandetail.add',
+				'penjualandetail.addc',
 				{
 					itemNum,
 					noFaktur,
@@ -984,9 +973,6 @@ export function Cashier(props) {
 
 					ppnPersen,
 					ppnHarga,
-
-					hargaBruto,
-					hargaNetto,
 
 					hargaJual,
 				},
@@ -1034,9 +1020,10 @@ export function Cashier(props) {
 	};
 
 	const handleClick = () => {
-		calcHarga();
-    //addDetail();
-  };
+		//calcHarga();
+		setReadOnlyQty(true);
+		addDetail();
+	};
 
 	return (
 		<>
@@ -1047,18 +1034,18 @@ export function Cashier(props) {
 			>
 
 				<Snackbar
-					anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+					anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
 					open={openSnackbar}
 					onClose={() => { setOpenSnackbar(false); }}
 					autoHideDuration={3000}
-					key={'bottom' + 'left'}
+					key={'bottom' + 'right'}
 				>
 					<Alert
 						onClose={() => { setOpenSnackbar(false); }}
 						severity={severity}
 						sx={{ width: '100%' }}
 					>
-						<AlertTitle>{msgTitle}</AlertTitle>
+						{/*<AlertTitle>{msgTitle}</AlertTitle>*/}
 						{msg}
 					</Alert>
 				</Snackbar>
@@ -1224,18 +1211,15 @@ export function Cashier(props) {
 												size="small"
 												className='text-right'
 												InputProps={{
-													readOnly: true,
+													readOnly: readOnlyQty,
 												}}
-											/>
-											<TextField
-												label="Jumlah Harga"
-												value={hargaNetto}
-												variant="standard"
-												size="small"
-												className='text-right'
-												InputProps={{
-													readOnly: true,
+												onChange={(e)=>{
+													setKtsKecil(e.target.value);
 												}}
+												onKeyDown={(e) => {
+													let currentKey = e.key;
+												}}
+												inputRef={(input) => (changeQtyRef.current = input)}
 											/>
 											<Button
 												onClick={handleClick}

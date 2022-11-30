@@ -22,7 +22,7 @@ if (Meteor.isServer) {
 			try {
 
 				let noFaktur = data.noFaktur;
-				let itemNo	= Number(data.itemNum);
+				let itemNo = Number(data.itemNum);
 
 				let kodeBarang = data.kodeBarang;
 				let barcode = data.barcode;
@@ -48,7 +48,7 @@ if (Meteor.isServer) {
 				let hargaJual = Number(data.hargaJual.toString().split(',').join(''));
 				let profitJual = 0;
 
-				if ( !kodeBarang ) {
+				if (!kodeBarang) {
 					returnData.code = 400;
 					returnData.title = 'Kesalahan Validasi';
 					returnData.message =
@@ -56,10 +56,10 @@ if (Meteor.isServer) {
 					return returnData;
 				}
 
-				if ( !ktsKecil ) {
+				if (!ktsKecil) {
 					returnData.code = 400;
 					returnData.title = 'Kesalahan Validasi';
-					returnData.message = 
+					returnData.message =
 						'Silahkan isi Kuantitas Barang !';
 					return returnData;
 				}
@@ -87,7 +87,7 @@ if (Meteor.isServer) {
 					ktsBesar,
 					ktsKecil,
 					satuanBesar,
-				 	satuanKecil,
+					satuanKecil,
 					qtyBonus,
 
 					jenisDiskon1,
@@ -96,7 +96,7 @@ if (Meteor.isServer) {
 
 					ppnPersen,
 					ppnHarga,
-						
+
 					hargaBruto,
 					hargaNetto,
 
@@ -145,7 +145,149 @@ if (Meteor.isServer) {
 				throw new Meteor.Error(
 					'Unexpected Error',
 					'An Error Occured While Processing Your Request, Please Report to Our Customer Service Immediately. Error Code = ' +
-						errorCode
+					errorCode
+				);
+			} finally {
+			}
+		},
+		'penjualandetail.addc'(data) {
+			let returnData = {
+				code: 200,
+				title: '',
+				message: '',
+			};
+
+			try {
+
+				let noFaktur = data.noFaktur;
+				let itemNo = Number(data.itemNum);
+
+				let kodeBarang = data.kodeBarang;
+				let barcode = data.barcode;
+				let namaBarang = data.namaBarang;
+				let categoryID = data.categoryID;
+
+				let ktsBesar = Number(data.ktsBesar);
+				let ktsKecil = Number(data.ktsKecil);
+				let satuanBesar = data.satuanBesar;
+				let satuanKecil = data.satuanKecil;
+				let qtyBonus = data.qtyBonus;
+
+				let jenisDiskon1 = data.jenisDiskon1;
+				let diskonPersen1 = Number(data.diskonPersen1.toString().split(',').join(''));
+				let diskonHarga1 = Number(data.diskonHarga1.toString().split(',').join(''));
+
+				let ppnPersen = 0;
+				let ppnHarga = 0;
+
+				let hargaBruto = 0;
+				let hargaNetto = 0;
+
+				let hargaJual = Number(data.hargaJual.toString().split(',').join(''));
+				let profitJual = 0;
+				
+				hargaBruto = hargaJual * ktsKecil;
+
+				hargaNetto = hargaBruto - diskonHarga1;
+
+				if (!kodeBarang) {
+					returnData.code = 400;
+					returnData.title = 'Kesalahan Validasi';
+					returnData.message =
+						'Silahkan isi Kode Barang !';
+					return returnData;
+				}
+
+				if (!ktsKecil) {
+					returnData.code = 400;
+					returnData.title = 'Kesalahan Validasi';
+					returnData.message =
+						'Silahkan isi Kuantitas Barang !';
+					return returnData;
+				}
+
+				let countExist = PenjualanDetailCollections.find({
+					noFaktur, itemNo
+				}).count();
+
+				if (countExist > 0) {
+					returnData.code = 400;
+					returnData.title = 'Kesalahan Validasi';
+					returnData.message = 'Data Penjualan Detail Sudah ada di Sistem';
+					return returnData;
+				}
+
+				let insertData = {
+					itemNo,
+					noFaktur,
+
+					kodeBarang,
+					barcode,
+					namaBarang,
+					categoryID,
+
+					ktsBesar,
+					ktsKecil,
+					satuanBesar,
+					satuanKecil,
+					qtyBonus,
+
+					jenisDiskon1,
+					diskonPersen1,
+					diskonHarga1,
+
+					ppnPersen,
+					ppnHarga,
+
+					hargaBruto,
+					hargaNetto,
+
+					hargaJual,
+					profitJual,
+
+					createdAt: new Date(),
+					createdBy: Meteor.user().username,
+					modifiedAt: new Date(),
+					modifiedBy: Meteor.user().username,
+				};
+
+				PenjualanDetailCollections.insert(insertData);
+
+				//if (productID) {
+				//	ProductsPriceHistoriesCollections.insert({
+				//		price,
+				//		productID,
+				//		createdAt: new Date(),
+				//		createdBy: Meteor.user().username,
+				//	});
+				//}
+
+				addLog(this, {
+					type: 'ADD',
+					module: 'PENJUALAN DETAIL CASHIER',
+					title: 'Add Penjualan Detail Cashier',
+					description: JSON.stringify(insertData),
+				});
+
+				returnData.title = 'Berhasil';
+				returnData.message = 'Data Penjualan Detail Berhasil ditambah';
+
+				return returnData;
+			} catch (tryErr) {
+				console.log(tryErr);
+				let currLine = getCurrentLine();
+				let errorCode = addErrorLog(
+					currLine.line,
+					currLine.file,
+					this,
+					'BACKEND',
+					'method.penjualandetail.addc',
+					tryErr.message
+				);
+				throw new Meteor.Error(
+					'Unexpected Error',
+					'An Error Occured While Processing Your Request, Please Report to Our Customer Service Immediately. Error Code = ' +
+					errorCode
 				);
 			} finally {
 			}
@@ -161,8 +303,8 @@ if (Meteor.isServer) {
 
 				let _id = data.selectedID;
 				let noFaktur = data.noFaktur;
-				
-				let itemNo	= Number(data.itemNo);
+
+				let itemNo = Number(data.itemNo);
 				let kodeBarang = data.kodeBarang;
 				let barcode = data.barcode;
 				let namaBarang = data.namaBarang;
@@ -193,7 +335,7 @@ if (Meteor.isServer) {
 					returnData.message = 'Data Produk tidak ditemukan';
 					return returnData;
 				}
-				if ( !kodeBarang ) {
+				if (!kodeBarang) {
 					returnData.code = 400;
 					returnData.title = 'Kesalahan Validasi';
 					returnData.message =
@@ -201,10 +343,10 @@ if (Meteor.isServer) {
 					return returnData;
 				}
 
-				if ( !ktsKecil ) {
+				if (!ktsKecil) {
 					returnData.code = 400;
 					returnData.title = 'Kesalahan Validasi';
-					returnData.message = 
+					returnData.message =
 						'Silahkan isi Kuantitas Barang !';
 					return returnData;
 				}
@@ -244,7 +386,7 @@ if (Meteor.isServer) {
 					ktsBesar,
 					ktsKecil,
 					satuanBesar,
-				 	satuanKecil,
+					satuanKecil,
 					qtyBonus,
 
 					jenisDiskon1,
@@ -304,7 +446,7 @@ if (Meteor.isServer) {
 				throw new Meteor.Error(
 					'Unexpected Error',
 					'An Error Occured While Processing Your Request, Please Report to Our Customer Service Immediately. Error Code = ' +
-						errorCode
+					errorCode
 				);
 			} finally {
 			}
@@ -357,7 +499,7 @@ if (Meteor.isServer) {
 				throw new Meteor.Error(
 					'Unexpected Error',
 					'An Error Occured While Processing Your Request, Please Report to Our Customer Service Immediately. Error Code = ' +
-						errorCode
+					errorCode
 				);
 			} finally {
 			}

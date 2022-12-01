@@ -707,62 +707,6 @@ export function Cashier(props) {
 		productCode,
 	]);
 
-	const add = (inputCode = undefined) => {
-		setAdding(true);
-		if (productCode || inputCode) {
-			let submitCode = inputCode ? inputCode : productCode;
-			Meteor.call(
-				'cashierOnGoingTransactions.add',
-				{
-					productCode: submitCode,
-					kassaID,
-				},
-				(err, res) => {
-					if (err) {
-						setProductCode('');
-						setAdding(false);
-						// setDialogOpen(true);
-						// setDialogTitle(err.error);
-						// setDialogContent(err.reason);
-					} else if (res) {
-						let resultCode = res.code;
-						let resultTitle = res.title;
-						let resultMessage = res.message;
-						if (resultCode === 200) {
-							setProductCode('');
-							setAdding(false);
-							// scanRef.current.focus();
-
-							// setDialogOpen(true);
-							// setDialogTitle(resultTitle);
-							setDialogContent(resultMessage);
-						} else {
-							setProductCode('');
-							setAdding(false);
-							// setDialogOpen(true);
-							// setDialogTitle(resultTitle);
-							// setDialogContent(resultMessage);
-						}
-					} else {
-						setProductCode('');
-						setAdding(false);
-						// setDialogOpen(true);
-						// setDialogTitle('Kesalahan Sistem');
-						// setDialogContent(
-						// 	'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						// );
-					}
-				}
-			);
-		} else {
-			setProductCode('');
-			setAdding(false);
-			// setDialogOpen(true);
-			// setDialogTitle('Kesalahan Validasi');
-			// setDialogContent('Silahkan Isi Scan Produk/Kode Produk');
-		}
-	};
-
 	const [page, setPage] = useState(1);
 	const [orderBy, setOrderBy] = useState('itemNo');
 	const [order, setOrder] = useState(1);
@@ -800,62 +744,6 @@ export function Cashier(props) {
 	useEffect(() => {
 		setItemNum(penjualanDetailCount + 1);
 	}, [penjualanDetailCount]);
-
-	const changeQty = (e) => {
-		setChangingQty(true);
-		let selectedProduct = items[currentIndex];
-		if (selectedProduct && Number(changeQtyAmount)) {
-			Meteor.call(
-				'cashierOnGoingTransactions.changeQty',
-				{
-					productCode: selectedProduct.productCode,
-					kassaID,
-					quantity: Number(changeQtyAmount),
-				},
-				(err, res) => {
-					if (err) {
-						setChangingQty(false);
-						// setDialogOpen(true);
-						// setDialogTitle(err.error);
-						// setDialogContent(err.reason);
-					} else if (res) {
-						let resultCode = res.code;
-						let resultTitle = res.title;
-						let resultMessage = res.message;
-						if (resultCode === 200) {
-							setChangeQtyAmount(0);
-							setChangingQty(false);
-							setChangeQuantityDialogOpen(false);
-							// setDialogOpen(true);
-							// setDialogTitle(resultTitle);
-							// setDialogContent(resultMessage);
-						} else {
-							setChangingQty(false);
-							// setDialogOpen(true);
-							// setDialogTitle(resultTitle);
-							// setDialogContent(resultMessage);
-						}
-					} else {
-						setChangingQty(false);
-						// setDialogOpen(true);
-						// setDialogTitle('Kesalahan Sistem');
-						// setDialogContent(
-						// 	'Terjadi kesalahan pada sistem, silahkan hubungi customer service'
-						// );
-					}
-				}
-			);
-		} else {
-			alert('Qty Produk harus lebih besar dari 0');
-			setChangingQty(false);
-			setTimeout(() => {
-				changeQtyRef.current.focus();
-			}, 500);
-			// setDialogOpen(true);
-			// setDialogTitle('Kesalahan Validasi');
-			// setDialogContent('Silahkan Isi Scan Produk/Kode Produk');
-		}
-	};
 
 	const columns = [
 		{ id: 'itemNo', label: '#', minWidth: 50 },
@@ -898,11 +786,6 @@ export function Cashier(props) {
 		},
 	];
 
-	function createData(no, barcode, namaBarang, qty, hargaBarang, discHarga, discPersen) {
-		const jumlahHarga = qty * (hargaBarang - discHarga);
-		return { no, barcode, namaBarang, qty, hargaBarang, discHarga, discPersen, jumlahHarga };
-	}
-
 	const [rows, setRows] = useState([]);
 
 	useEffect(() => {
@@ -927,10 +810,6 @@ export function Cashier(props) {
 		}
 		setGrandTotal(formatNum(grandttl));
 	}, [penjualanDetail, penjualanDetailLoading]);
-
-	//const rows = [
-	//	createData(1, 1324171354, 'Indomie Goreng Spesial 85Gr', 5, 2570, 0, 0),
-	//];
 
 	const isDisabled = () => {
 		if (addingDetail || productDataLoading) {
@@ -1037,7 +916,7 @@ export function Cashier(props) {
 					anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
 					open={openSnackbar}
 					onClose={() => { setOpenSnackbar(false); }}
-					autoHideDuration={3000}
+					autoHideDuration={2000}
 					key={'bottom' + 'right'}
 				>
 					<Alert

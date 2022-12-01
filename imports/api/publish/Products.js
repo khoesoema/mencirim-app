@@ -411,7 +411,7 @@ if (Meteor.isServer) {
 					$or: findOrObject,
 				},
 				{
-					limit: 10,
+					limit: 3,
 				}
 			);
 

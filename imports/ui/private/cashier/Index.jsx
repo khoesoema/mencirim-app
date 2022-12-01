@@ -41,6 +41,7 @@ import { DataUsersCollections } from '../../../db/Userscol';
 
 import { CategoriesCollections } from '../../../db/Categories';
 import { ProductsCollections } from '../../../db/Products';
+import { CustomersCollections } from '../../../db/Customers';
 import { PromotionsDetailCollections } from '../../../db/PromotionsDetail';
 import { PenjualanCollections } from '../../../db/Penjualan';
 import { PenjualanDetailCollections } from '../../../db/PenjualanDetail';
@@ -85,13 +86,21 @@ export function Cashier(props) {
 	});
 	const [inputValue, setInputValue] = useState('');
 
+	const [value2, setValue2] = useState({
+		label: '',
+		code: '',
+		mobileNumber: '',
+		name: ''
+	});
+	const [inputValue2, setInputValue2] = useState('');
+
 	const myRefs = useRef();
 
 	let scannedBarcode = '';
 	let navigate = useNavigate();
 	const windowFocused = useWindowFocus();
 	const scanRef = useRef();
-	const currentRef = useRef();
+	const custRef = useRef();
 	const scrollRef = useRef();
 	const changeQtyRef = useRef();
 	const changeDescriptionRef = useRef();
@@ -172,13 +181,22 @@ export function Cashier(props) {
 
 	const [readOnlyQty, setReadOnlyQty] = useState(true);
 
+	const [optionsProd, setOptionsProd] = useState([]);
+
+	const [optionsCust, setOptionsCust] = useState([]);
+	const [customerID, setCustomerID] = useState('');
+	const [customerName, setCustomerName] = useState('');
+	const [customerBirth, setCustomerBirth] = useState('');
+	const [customerAddress, setCustomerAddress] = useState('');
+	const [customerPoin, setCustomerPoin] = useState('');
+
 	const formatNum = (input) => {
 		if (input) {
 			return parseFloat(input)
 				.toFixed(2)
 				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
 		} else {
-			return 0; kodeBarang
+			return 0;
 		}
 	};
 
@@ -363,8 +381,6 @@ export function Cashier(props) {
 		return [data, isLoading];
 	}, [inputValue, value]);
 
-	const [optionsProd, setOptionsProd] = useState([]);
-
 	useEffect(() => {
 		let baris = [];
 		if (products && productsLoading === false) {
@@ -382,16 +398,48 @@ export function Cashier(props) {
 		}
 	}, [products, productsLoading]);
 
-	const renderProductsLoading = (menu) => {
-		if (productsLoading) {
-			return (
-				<p style={{ padding: 4, color: '#999', textAlign: 'center' }}>
-					<SpinnerIcon spin /> Loading...
-				</p>
-			);
+	const [customers, customersLoading] = useTracker(() => {
+		let subs = Meteor.subscribe('customers.search2', {
+			searchText: inputValue2,
+			selectedID: customerID,
+		});
+
+		let data = CustomersCollections.find({
+			$or: [
+				{
+					code: customerID,
+				},
+				{
+					mobileNumber: {
+						$regex: inputValue2,
+						$options: 'i',
+					},
+				},
+			],
+		}).fetch();
+
+		return [data, !subs.ready()];
+	}, [inputValue2, customerID]);
+
+	useEffect(() => {
+		let baris = [];
+		if (customers && customersLoading === false) {
+			customers.map((item, index) => {
+				baris[index] = {
+					label: item.mobileNumber,
+					code: item.code,
+					mobileNumber: item.mobileNumber,
+					name: item.name,
+					tglLahir: item.birthPlace + ', ' + moment(item.birthDate).format('DD-MMM-YYYY'),
+					address: item.address,
+					poin: item.current,
+				};
+			})
+			setOptionsCust(baris);
+		} else if (!customers && customersLoading === false) {
+			baris = [];
 		}
-		return menu;
-	};
+	}, [customers, customersLoading]);
 
 	const [promotionsDetailData, promotionsDetailDataLoading] = useTracker(() => {
 		let isLoading = true;
@@ -613,6 +661,18 @@ export function Cashier(props) {
 				}
 				// let currIndex = currentIndex + 1;
 				// setCurrentIndex(currIndex);
+			} else if (currentKey === 'F1') {
+				event.preventDefault();
+				scanRef.current.focus();
+
+				//scanRef.current.focus();
+				//if (productCode) {
+				//	add();
+				//} else {
+				//	scanRef.current.focus();
+				//}
+				// let currIndex = currentIndex + 1;
+				// setCurrentIndex(currIndex);
 			} else if (currentKey === 'F2') {
 				setReadOnlyQty(false);
 				event.preventDefault();
@@ -651,18 +711,12 @@ export function Cashier(props) {
 				}
 				// let currIndex = currentIndex + 1;
 				// setCurrentIndex(currIndex);
-			} else if (currentKey === 'F1') {
+			} else if (currentKey === 'F5') {
 				event.preventDefault();
-				scanRef.current.focus();
-
-				//scanRef.current.focus();
-				//if (productCode) {
-				//	add();
-				//} else {
-				//	scanRef.current.focus();
-				//}
-				// let currIndex = currentIndex + 1;
-				// setCurrentIndex(currIndex);
+				event.stopImmediatePropagation();
+			} else if (currentKey === 'F6') {
+				event.preventDefault();
+				custRef.current.focus();
 			} else if (currentKey === 'F12') {
 				event.preventDefault();
 				if (logoutDialogOpen === true) {
@@ -670,9 +724,6 @@ export function Cashier(props) {
 				}
 				// let currIndex = currentIndex + 1;
 				// setCurrentIndex(currIndex);
-			} else if (currentKey === 'F5') {
-				event.preventDefault();
-				event.stopImmediatePropagation();
 			}
 		}
 
@@ -682,7 +733,7 @@ export function Cashier(props) {
 			let code = e.keyCode ? e.keyCode : e.which;
 
 			if (code === 13) {
-				add(scannedBarcode);
+				//add(scannedBarcode);
 				scannedBarcode = '';
 			} else {
 				barcode = barcode + String.fromCharCode(code);
@@ -1029,11 +1080,10 @@ export function Cashier(props) {
 											disablePortal
 											clearOnEscape
 											getOptionLabel={(option) => option.label}
-											//isOptionEqualToValue={(option, value) => option.code === value.code}
-											filterOptions={filterOptions}
+
 											renderOption={(props, option) => (
 												<Box component="li" {...props}>
-													[{option.barcode}] {option.name}
+													[{option.code}] {option.name}
 												</Box>
 											)}
 
@@ -1092,7 +1142,7 @@ export function Cashier(props) {
 												InputProps={{
 													readOnly: readOnlyQty,
 												}}
-												onChange={(e)=>{
+												onChange={(e) => {
 													setKtsKecil(e.target.value);
 												}}
 												onKeyDown={(e) => {
@@ -1100,9 +1150,7 @@ export function Cashier(props) {
 												}}
 												inputRef={(input) => (changeQtyRef.current = input)}
 											/>
-											<Button
-												onClick={handleClick}
-											>Add</Button>
+											<Button onClick={handleClick}> Add </Button>
 										</Stack>
 									</Col>
 									<Col xs={3}>
@@ -1247,7 +1295,124 @@ export function Cashier(props) {
 					</Grid>
 					<Grid item xs={3} >
 						<Card sx={{ height: '100%' }}>
-							<CardContent></CardContent>
+							<CardContent>
+								<Autocomplete
+									id="searchCustomers"
+									size="small"
+									options={optionsCust}
+
+									value={value2}
+									onChange={(event, newValue) => {
+										if (newValue === null) {
+											setValue2({
+												label: '',
+												code: '',
+												mobileNumber: '',
+												name: ''
+											});
+											setCustomerID('');
+											setCustomerName('');
+											setCustomerBirth('');
+											setCustomerAddress('');
+											setCustomerPoin('');
+										} else {
+											setValue2(newValue);
+											setCustomerID(newValue.code);
+											setCustomerName(newValue.name);
+											setCustomerBirth(newValue.tglLahir);
+											setCustomerAddress(newValue.address);
+											setCustomerPoin(newValue.poin);
+										}
+									}}
+
+									inputValue={inputValue2}
+									onInputChange={(event, newInputValue) => {
+										setInputValue2(newInputValue);
+									}}
+
+									disablePortal
+									clearOnEscape
+									getOptionLabel={(option) => option.label}
+
+									renderOption={(props, option) => (
+										<Box component="li" {...props}>
+											[{option.label}] {option.name}
+										</Box>
+									)}
+
+									renderInput={(params) =>
+										<TextField
+											{...params}
+											label="Search No HP Customer"
+											onKeyDown={(e) => {
+												let currentKey = e.key;
+											}}
+											inputRef={(input) => (custRef.current = input)}
+											size="small"
+										/>}
+								/>
+								{customerID &&
+									<>
+										<TextField
+											label="Kode Customer"
+											value={customerID ? customerID : ''}
+											variant="standard"
+											size="small"
+											fullWidth
+											InputProps={{
+												readOnly: true,
+											}}
+											sx={{ mt: 2 }}
+										/>
+										<TextField
+											label="Nama Customer"
+											value={customerName ? customerName : ''}
+											variant="standard"
+											size="small"
+											fullWidth
+											InputProps={{
+												readOnly: true,
+											}}
+											sx={{ mt: 2 }}
+										/>
+										<TextField
+											label="Tempat & Tanggal Lahir"
+											value={customerBirth ? customerBirth : ''}
+											variant="standard"
+											size="small"
+											fullWidth
+											InputProps={{
+												readOnly: true,
+											}}
+											sx={{ mt: 2 }}
+										/>
+										<TextField
+											label="Alamat Customer"
+											value={customerAddress ? customerAddress : ''}
+											variant="standard"
+											size="small"
+											fullWidth
+											multiline
+											maxRows={2}
+											InputProps={{
+												readOnly: true,
+											}}
+											sx={{ mt: 2 }}
+										/>
+										<TextField
+											label="Poin"
+											value={customerPoin ? customerPoin : ''}
+											variant="standard"
+											size="small"
+											fullWidth
+											InputProps={{
+												readOnly: true,
+											}}
+											sx={{ mt: 2 }}
+										/>
+									</>
+								}
+							</CardContent>
 						</Card>
 					</Grid>
 					<Grid item xs={12}>

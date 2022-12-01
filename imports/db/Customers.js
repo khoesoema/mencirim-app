@@ -6,9 +6,6 @@ export const CustomersCollections = new Mongo.Collection('mst_customers');
 export const customersSchema = new SimpleSchema({
 	name: { type: String },
 	code: { type: String },
-	isBusiness: { type: Number, defaultValue: 0 },
-	businessTypeID: { type: String, regEx: SimpleSchema.RegEx.Id },
-	primaryContactName: { type: String },
 	address: { type: String },
 	phoneNumber: { type: String },
 	mobileNumber: { type: String },

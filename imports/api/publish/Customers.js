@@ -50,7 +50,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -114,7 +114,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -193,7 +193,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -240,7 +240,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -268,7 +268,7 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
 			);
 		}
 	});
@@ -362,7 +362,58 @@ if (Meteor.isServer) {
 			throw new Meteor.Error(
 				'Terjadi Kesalahan',
 				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
-					errorCode
+				errorCode
+			);
+		}
+	});
+
+	Meteor.publish('customers.search2', function customers_countAll(data) {
+		try {
+			console.log('publish.customers.search2', data.searchText);
+
+			let selectedID = data.selectedID;
+			let searchText = data.searchText;
+
+			let findOrObject = [
+				{
+					mobileNumber: {
+						$regex: searchText,
+						$options: 'i',
+					},
+				}
+			];
+
+			if (selectedID) {
+				findOrObject.push({
+					mobileNumber: selectedID,
+				});
+			}
+
+			let datasCursor = CustomersCollections.find(
+				{
+					$or: findOrObject,
+				},
+				{
+					limit: 10,
+				}
+			);
+
+			return datasCursor;
+		} catch (tryErr) {
+			console.log(tryErr);
+			let currLine = getCurrentLine();
+			let errorCode = addErrorLog(
+				currLine.line,
+				currLine.file,
+				this,
+				'AGENT',
+				'publish.customers.search2',
+				tryErr.message
+			);
+			throw new Meteor.Error(
+				'Terjadi Kesalahan',
+				'Terjadi Kesalahan, silahkan hubungi customer service. Kode Kesalahan = ' +
+				errorCode
 			);
 		}
 	});

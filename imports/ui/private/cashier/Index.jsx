@@ -5,16 +5,18 @@ import moment from 'moment-timezone';
 import 'moment/locale/id';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, FormControl, InputGroup } from 'react-bootstrap';
+import { FormControl, InputGroup } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Element, scroller } from 'react-scroll';
-import Form from 'rsuite/Form';
 import { Col, Row } from 'react-bootstrap';
-
 import Clock from 'react-live-clock';
 
 import Modal from 'rsuite/Modal';
+import Form from 'rsuite/Form';
+import SelectPicker from 'rsuite/SelectPicker';
+import Button from 'rsuite/Button';
+
 import useWindowFocus from 'use-window-focus';
 
 import Grid from '@mui/material/Grid';
@@ -33,8 +35,11 @@ import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-
-import SpinnerIcon from '@rsuite/icons/legacy/Spinner';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import { KassaCollections } from '../../../db/Kassa';
 import { DataUsersCollections } from '../../../db/Userscol';
@@ -190,6 +195,12 @@ export function Cashier(props) {
 	const [customerAddress, setCustomerAddress] = useState('');
 	const [customerPoin, setCustomerPoin] = useState('');
 
+	const [openModal, setOpenModal] = useState(false);
+
+	const [paymentMethod, setPaymentMethod] = useState('Cash');
+	const [payment, setPayment] = useState(0);
+	const [changeMoney, setChangeMoney] = useState(0);
+
 	const formatNum = (input) => {
 		if (input) {
 			return parseFloat(input)
@@ -296,7 +307,7 @@ export function Cashier(props) {
 	}, [kodeBarang]);
 
 	useEffect(() => {
-		let isMember = '';
+		let isMember = customerID;
 		if (productData && productDataLoading === false) {
 			setBarcode(productData.barcode);
 			setNamaBarang(productData.namaBarang);
@@ -528,48 +539,6 @@ export function Cashier(props) {
 		return str.split("-")[1] || 0;
 	}
 
-	const calcHarga = () => {
-		let ktskcl = ktsKecil.toString().split(',').join('');
-		let ktsbsr = ktsBesar.toString().split(',').join('');
-		let bruto = 0;
-		let netto = 0;
-
-		let discpers1 = diskonPersen1.toString().split(',').join('');
-		let dischrg1 = 0;
-		let ppnpers = ppnPersen.toString().split(',').join('');
-		let ppnhrg = 0;
-
-		let hrgjual = hargaJual.toString().split(',').join('');
-		let hrgjualmbr = hargaJualMember.toString().split(',').join('');
-
-		bruto = ktskcl * hrgjual;
-
-		dischrg1 = discpers1 / 100 * bruto;
-		ppnhrg = ppnpers / 100 * (bruto - dischrg1);
-
-		netto = bruto - dischrg1 + ppnhrg;
-
-		setKtsKecil(ktskcl);
-
-		if (countDecimals(ktsbsr) <= 1) {
-			setKtsBesar(ktsbsr);
-		} else {
-			setKtsBesar(parseFloat(ktsbsr)
-				.toFixed(2)
-				.replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,')
-			);
-		};
-
-		setHargaBruto(formatNum(bruto));
-		setDiskonHarga1(formatNum(dischrg1));
-		setHargaNetto(formatNum(netto));
-		setPpnHarga(formatNum(ppnhrg));
-		setHargaJual(formatNum(hrgjual));
-		setHargaJualMember(formatNum(hrgjualmbr));
-
-		console.log(ktsKecil, hargaJual, hargaBruto, diskonHarga1, diskonPersen1, hargaNetto);
-	};
-
 	useEffect(() => {
 		if (currentIndex !== -1) {
 			scroller.scrollTo('myScrollToElement' + currentIndex, {
@@ -717,6 +686,13 @@ export function Cashier(props) {
 			} else if (currentKey === 'F6') {
 				event.preventDefault();
 				custRef.current.focus();
+			} else if (currentKey === 'F7') {
+				event.preventDefault();
+			} else if (currentKey === 'F8') {
+				event.preventDefault();
+				handleClickOpen();
+			} else if (currentKey === 'F9') {
+				event.preventDefault();
 			} else if (currentKey === 'F12') {
 				event.preventDefault();
 				if (logoutDialogOpen === true) {
@@ -955,6 +931,18 @@ export function Cashier(props) {
 		addDetail();
 	};
 
+	const handleClickOpen = () => {
+		setOpenModal(true);
+	};
+
+	const handleClose = () => {
+		setOpenModal(false);
+	};
+
+	const dataPaymentMethod = ['Cash', 'Debit Card', 'Credit Card'].map(
+		(item, index) => ({ label: item, value: (index + 1) })
+	);
+
 	return (
 		<>
 			<Container
@@ -962,6 +950,105 @@ export function Cashier(props) {
 				className="kasir-container"
 				style={{ height: '100%', margin: 0, backgroundColor: '#eceff1' }}
 			>
+
+				<Modal
+					open={openModal}
+					onClose={handleClose}
+					size="sm"
+					style={{margintTop: 50}}
+				>
+					<Modal.Header>
+						<Modal.Title> Pembayaran </Modal.Title>
+					</Modal.Header>
+					<hr />
+					<Modal.Body>
+						<Form
+							layout="horizontal"
+						//onSubmit={() => { addDetail();}}
+						//disabled={isDisabled()}
+						>
+							<Form.Group controlId="total" style={{ marginBottom: 0 }}>
+								<Form.ControlLabel className="text-left">Total</Form.ControlLabel>
+								<Form.Control
+									readOnly
+									name="total"
+									placeholder="Grand Total"
+									value={grandTotal}
+									style={{ color: "#1675e0" }}
+									className="text-right"
+								//disabled={isDisabled()}
+								/>
+							</Form.Group>
+
+							<Form.Group controlId="payment" style={{ marginBottom: 0 }}>
+								<Stack
+									direction="row"
+									justifyContent="flex-start"
+									alignItems="flex-end"
+									spacing={1}
+									mt={1}
+									mb={1}
+								>
+									<Form.ControlLabel className="text-left">Pembayaran</Form.ControlLabel>
+									<SelectPicker
+										name="paymentMethod"
+										searchable={false}
+										style={{ width: 224 }}
+										data={dataPaymentMethod}
+										value={paymentMethod}
+										onChange={(e) => {
+											setPaymentMethod(e);
+										}}
+										onClean={() => {
+											setPaymentMethod('');
+										}}
+									//disabled={adding}
+									/>
+									<Form.Control
+										name="payment"
+										className="text-right"
+										placeholder=""
+										value={payment}
+										onChange={(e) => {
+											e = e.toString().split(',').join('');
+											const validateNumber = e.match(/^(\d*\.{0,1}\d{0,2}$)/);
+											if (validateNumber) {
+												let paym = e.toString().replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,');
+												setPayment(paym);
+
+												let chg = e.toString().split(',').join('') - grandTotal.toString().split(',').join('');
+												setChangeMoney(chg.toString().replace(/(\d)(?=(\d{3})+(\.(\d){0,2})*$)/g, '$1,'));
+											}
+										}}
+									//disabled={isDisabled()}
+									/>
+								</Stack>
+							</Form.Group>
+							<Form.Group controlId="changeMoney" style={{ marginBottom: 0 }}>
+								<Form.ControlLabel className="text-left">Kembalian</Form.ControlLabel>
+								<Form.Control
+									readOnly
+									name="changeMoney"
+									placeholder="Change Money"
+									value={changeMoney}
+									style={{ color: "#1675e0" }}
+									className="text-right"
+								//disabled={isDisabled()}
+								/>
+							</Form.Group>
+						</Form>
+					</Modal.Body>
+					<Modal.Footer>
+						<Button onClick={handleClose} appearance="subtle">
+							Cancel
+						</Button>
+						<Button
+							onClick={handleClose}
+							appearance="primary">
+							Pay
+						</Button>
+					</Modal.Footer>
+				</Modal>
 
 				<Snackbar
 					anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -1083,7 +1170,7 @@ export function Cashier(props) {
 
 											renderOption={(props, option) => (
 												<Box component="li" {...props}>
-													[{option.code}] {option.name}
+													[{option.barcode}] {option.name}
 												</Box>
 											)}
 

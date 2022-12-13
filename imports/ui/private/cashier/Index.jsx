@@ -59,7 +59,7 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Snackbar from '@mui/material/Snackbar';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
-	return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+	return <MuiAlert elevation={6} ref={ref} {...props} />;
 });
 
 moment.locale('id');
@@ -113,6 +113,9 @@ export function Cashier(props) {
 	const [addingDetail, setAddingDetail] = useState(false);
 	const [tglTrx, setTglTrx] = useState(new Date());
 	const [noFaktur, setNoFaktur] = useState('');
+	const [tglFaktur, setTglFaktur] = useState(new Date());
+	const [currencyID, setCurrencyID] = useState('IDR');
+	const [keterangan, setKeterangan] = useState('');
 
 	const [kassaCode, setKassaCode] = useState('');
 	const [kassaName, setKassaName] = useState('');
@@ -197,7 +200,7 @@ export function Cashier(props) {
 
 	const [openModal, setOpenModal] = useState(false);
 
-	const [paymentMethod, setPaymentMethod] = useState('Cash');
+	const [paymentMethod, setPaymentMethod] = useState('1');
 	const [payment, setPayment] = useState(0);
 	const [changeMoney, setChangeMoney] = useState(0);
 
@@ -280,7 +283,7 @@ export function Cashier(props) {
 		if (penjualanData && penjualanDataLoading === false) {
 			let data = penjualanData.noFaktur;
 			const arr = data.split(".");
-			let num = arr[2] + 1;
+			let num = parseInt(arr[2]) + 1;
 			last = arr[0] + '.' + arr[1] + '.' + num;
 		} else if (!penjualanData && penjualanDataLoading === false) {
 			last = kassaCode + '.' + moment(new Date()).format('YYMMDD') + '.1';
@@ -846,6 +849,69 @@ export function Cashier(props) {
 		}
 	};
 
+	const add = () => {
+		setAdding(true);
+		if (
+			noFaktur &&
+			tglFaktur
+		) {
+			Meteor.call(
+				'penjualan.add',
+				{
+					noFaktur,
+					tglFaktur,
+					currencyID,
+					customerID,
+					grandTotal,
+					keterangan,
+				},
+				(err, res) => {
+					if (err) {
+						setAdding(false);
+						setSeverity("error");
+						setMsgTitle(err.error);
+						setMsg(err.reason);
+					} else if (res) {
+						let resultCode = res.code;
+						let resultTitle = res.title;
+						let resultMessage = res.message;
+						if (resultCode === 200) {
+							setNoFaktur('');
+							setTglFaktur(moment().toDate());
+							setCustomerID('');
+							setCurrencyID('');
+							setGrandTotal(0);
+							setKeterangan('');
+							setAdding(false);
+							setOpenSnackbar(true);
+							setSeverity("success");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
+						} else {
+							setAdding(false);
+							setOpenSnackbar(true);
+							setSeverity("warning");
+							setMsgTitle(resultTitle);
+							setMsg(resultMessage);
+						}
+					} else {
+						setAdding(false);
+						setOpenSnackbar(true);
+						setSeverity("error");
+						setMsgTitle('Kesalahan Sistem');
+						setMsg('Terjadi kesalahan pada sistem, silahkan hubungi customer service');
+					}
+				}
+			);
+		} else {
+			setAdding(false);
+			setOpenSnackbar(true);
+			setSeverity("warning");
+			setMsgTitle('Kesalahan Validasi');
+			setMsg('Customer, Mata Uang,  Tanggal Transaksi, Produk Wajib Diisi');
+		}
+	};
+
 	const addDetail = () => {
 		setAddingDetail(true);
 		if (
@@ -885,6 +951,7 @@ export function Cashier(props) {
 				(err, res) => {
 					if (err) {
 						setAddingDetail(false);
+						setOpenSnackbar(true);
 						setSeverity("error");
 						setMsgTitle(err.error);
 						setMsg(err.reason);
@@ -939,6 +1006,11 @@ export function Cashier(props) {
 		setOpenModal(false);
 	};
 
+	const handleClose2 = () => {
+		add();
+		setOpenModal(false);
+	};
+
 	const dataPaymentMethod = ['Cash', 'Debit Card', 'Credit Card'].map(
 		(item, index) => ({ label: item, value: (index + 1) })
 	);
@@ -955,7 +1027,7 @@ export function Cashier(props) {
 					open={openModal}
 					onClose={handleClose}
 					size="sm"
-					style={{margintTop: 50}}
+					style={{ margintTop: 50 }}
 				>
 					<Modal.Header>
 						<Modal.Title> Pembayaran </Modal.Title>
@@ -1043,7 +1115,7 @@ export function Cashier(props) {
 							Cancel
 						</Button>
 						<Button
-							onClick={handleClose}
+							onClick={handleClose2}
 							appearance="primary">
 							Pay
 						</Button>

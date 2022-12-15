@@ -696,6 +696,7 @@ export function Cashier(props) {
 				handleClickOpen();
 			} else if (currentKey === 'F9') {
 				event.preventDefault();
+				
 			} else if (currentKey === 'F12') {
 				event.preventDefault();
 				if (logoutDialogOpen === true) {
@@ -703,6 +704,9 @@ export function Cashier(props) {
 				}
 				// let currIndex = currentIndex + 1;
 				// setCurrentIndex(currIndex);
+			} else if (currentKey === 'Control') {
+				event.preventDefault();
+				handleClick();
 			}
 		}
 
@@ -1309,7 +1313,7 @@ export function Cashier(props) {
 												}}
 												inputRef={(input) => (changeQtyRef.current = input)}
 											/>
-											<Button onClick={handleClick}> Add </Button>
+											<Button appearance="primary" onClick={handleClick}> [Ctrl] Add </Button>
 										</Stack>
 									</Col>
 									<Col xs={3}>

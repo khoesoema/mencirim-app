@@ -41,6 +41,7 @@
 		"react-router-dom": "^6.3.0",
 		"react-scroll": "^1.8.7",
 		"react-search-autocomplete": "^8.1.0",
+		"react-to-print": "^2.14.10",
 		"recharts": "^2.1.16",
 		"rsuite": "^5.19.0",
 		"simpl-schema": "^1.12.0",

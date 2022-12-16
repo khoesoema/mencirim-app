@@ -58,6 +58,9 @@ import MuiAlert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Snackbar from '@mui/material/Snackbar';
 
+import { useReactToPrint } from "react-to-print";
+import { ComponentToPrint } from './ComponentToPrint';
+
 const Alert = React.forwardRef(function Alert(props, ref) {
 	return <MuiAlert elevation={6} ref={ref} {...props} />;
 });
@@ -203,6 +206,12 @@ export function Cashier(props) {
 	const [paymentMethod, setPaymentMethod] = useState('1');
 	const [payment, setPayment] = useState(0);
 	const [changeMoney, setChangeMoney] = useState(0);
+
+	const componentRef = useRef();
+
+	const handlePrint = useReactToPrint({
+		content: () => componentRef.current,
+	});
 
 	const formatNum = (input) => {
 		if (input) {
@@ -691,12 +700,13 @@ export function Cashier(props) {
 				custRef.current.focus();
 			} else if (currentKey === 'F7') {
 				event.preventDefault();
+				handlePrint();
 			} else if (currentKey === 'F8') {
 				event.preventDefault();
 				handleClickOpen();
 			} else if (currentKey === 'F9') {
 				event.preventDefault();
-				
+
 			} else if (currentKey === 'F12') {
 				event.preventDefault();
 				if (logoutDialogOpen === true) {
@@ -1026,7 +1036,10 @@ export function Cashier(props) {
 				className="kasir-container"
 				style={{ height: '100%', margin: 0, backgroundColor: '#eceff1' }}
 			>
-
+				<div style={{ display: "none" }}>
+					<ComponentToPrint ref={componentRef} />
+				</div>
+				
 				<Modal
 					open={openModal}
 					onClose={handleClose}
